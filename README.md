@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
 
-First, run the development server:
+# ?? Frontend  ? React + Next.js (Terhubung Laravel JWT)
+
+
+## ??? Persyaratan
+
+- Node.js v16+ (disarankan)
+- Laravel backend (dengan JWT) aktif di `http://localhost:8000`
+
+---
+
+## ?? Instalasi
+
+### 1. Clone repositori ini
+
+```bash
+git clone https://github.com/nama-user/nama-repo.git
+cd nama-repo
+````
+
+### 2. Install dependency
+
+```bash
+npm install
+```
+
+---
+
+## ?? Menjalankan Aplikasi
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Akses di: [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ?? Login
 
-## Learn More
+1. Jalankan backend Laravel (`php artisan serve`)
+2. Akses `http://localhost:3000/login`
+3. Masukkan email & password yang valid dari Laravel
+4. Jika berhasil, akan diarahkan ke `/dashboard`
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ?? Konfigurasi Axios (Token Otomatis)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Axios sudah dikonfigurasi untuk otomatis mengirim JWT ke backend Laravel:
 
-## Deploy on Vercel
+```js
+// lib/api.js
+const api = axios.create({ baseURL: 'http://localhost:8000/api' });
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## ?? Struktur Folder Penting
+
+```
+/lib/api.js            # Konfigurasi Axios + token
+/app/login/page.js     # Halaman login
+/app/dashboard/page.js # Halaman dashboard setelah login
+```
+
+---
+
+## ?? Logout
+
+Untuk logout:
+
+* Hapus token dari `localStorage` secara manual atau
+* Tambahkan tombol logout yang memanggil endpoint Laravel `/logout` dan menghapus token
+
+---
+
+## ? Troubleshooting
+
+* Jika login gagal, pastikan:
+
+  * Email dan password sudah terdaftar di Laravel
+  * Backend Laravel berjalan di `http://localhost:8000`
+  * CORS backend mengizinkan akses dari frontend
+
+Contoh konfigurasi `config/cors.php` Laravel:
+
+```php
+'paths' => ['api/*'],
+'allowed_origins' => ['http://localhost:3000'],
+'allowed_headers' => ['*'],
+'allowed_methods' => ['*'],
+```
+
+--
+
