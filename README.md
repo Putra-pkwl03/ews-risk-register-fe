@@ -1,6 +1,6 @@
 
 
-# Frontend  ? React + Next.js (Terhubung Laravel JWT)
+# Frontend == React + Next.js (Terhubung Laravel JWT)
 
 
 ## Persyaratan
