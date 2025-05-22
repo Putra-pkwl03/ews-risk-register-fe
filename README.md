@@ -1,16 +1,16 @@
 
 
-# ?? Frontend  ? React + Next.js (Terhubung Laravel JWT)
+# Frontend  ? React + Next.js (Terhubung Laravel JWT)
 
 
-## ??? Persyaratan
+## Persyaratan
 
 - Node.js v16+ (disarankan)
 - Laravel backend (dengan JWT) aktif di `http://localhost:8000`
 
 ---
 
-## ?? Instalasi
+##  Instalasi
 
 ### 1. Clone repositori ini
 
@@ -27,7 +27,7 @@ npm install
 
 ---
 
-## ?? Menjalankan Aplikasi
+## Menjalankan Aplikasi
 
 ```bash
 npm run dev
@@ -37,7 +37,7 @@ Akses di: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## ?? Login
+##  Login
 
 1. Jalankan backend Laravel (`php artisan serve`)
 2. Akses `http://localhost:3000/login`
@@ -46,7 +46,7 @@ Akses di: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## ?? Konfigurasi Axios (Token Otomatis)
+##  Konfigurasi Axios (Token Otomatis)
 
 Axios sudah dikonfigurasi untuk otomatis mengirim JWT ke backend Laravel:
 
@@ -65,7 +65,7 @@ api.interceptors.request.use((config) => {
 
 ---
 
-## ?? Struktur Folder Penting
+## Struktur Folder Penting
 
 ```
 /lib/api.js            # Konfigurasi Axios + token
@@ -75,7 +75,7 @@ api.interceptors.request.use((config) => {
 
 ---
 
-## ?? Logout
+##  Logout
 
 Untuk logout:
 
@@ -84,7 +84,7 @@ Untuk logout:
 
 ---
 
-## ? Troubleshooting
+## Troubleshooting
 
 * Jika login gagal, pastikan:
 
