@@ -22,7 +22,9 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await api.post('/login', { email, password });
-      localStorage.setItem('token', res.data.access_token);
+    localStorage.setItem('token', res.data.access_token);
+    localStorage.setItem('role', res.data.user.role); // Simpan role
+    localStorage.setItem('name', res.data.user.name);
       router.replace('/dashboard');
     } catch (err) {
       setError('Login gagal. Periksa kembali kredensial Anda.');
