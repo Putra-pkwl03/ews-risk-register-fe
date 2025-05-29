@@ -15,7 +15,7 @@ export default function Layout({ children }) {
   }, []);
 
   return (
-    <div className={`bg-gray-200 min-h-screen flex`}>
+    <div className={`bg-[#f8f8f8] min-h-screen flex`}>
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} toggle={toggleSidebar} role={role} />
 

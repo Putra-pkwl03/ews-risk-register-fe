@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { getUsers, deleteUser } from "../../lib/userApi";
 import UserFormModal from "./UserFormModal";
 import ConfirmDeleteModal from "../../components/modalconfirmasi/DeleteModal";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import SuccessToast from "../../components/modalconfirmasi/SuccessToast";
 import ErrorToast from "../../components/modalconfirmasi/ErrorToast";
+import Pagination from "./Pagenations";
+import LoadingSkeleton from "../../components/loadings/LoadingSkeleton";
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
@@ -20,6 +21,24 @@ export default function ManageUsers() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorOpen, setErrorOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === "" || user.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  const startIdx = (currentPage - 1) * itemsPerPage;
+  const endIdx = startIdx + itemsPerPage;
+  const paginatedUsers = filteredUsers.slice(startIdx, endIdx);
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
   const handleAdd = () => {
     setEditingUser(null);
@@ -47,6 +66,10 @@ export default function ManageUsers() {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, roleFilter]);
+
   const handleDeleteClick = (userId) => {
     setSelectedUserId(userId);
     setIsConfirmOpen(true);
@@ -56,6 +79,7 @@ export default function ManageUsers() {
     try {
       await deleteUser(selectedUserId);
       fetchUsers();
+      setCurrentPage(1);
       setSuccessMessage("Berhasil menghapus user!");
       setSuccessOpen(true);
     } catch (err) {
@@ -106,72 +130,175 @@ export default function ManageUsers() {
         onClose={() => setErrorOpen(false)}
       />
 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Manage Users</h2>
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
-          onClick={handleAdd}
-        >
-          Add User
-        </button>
-      </div>
+      <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-1">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
+          <h5 className="text-[20px] text-black font-semibold">Manage Users</h5>
 
-      {loading ? (
-        <div className="text-gray-500">Loading...</div>
-      ) : (
-        <table className="w-full bg-white rounded shadow-md overflow-hidden text-sm sm:text-base">
-          <thead className="bg-gray-300 text-gray-600 text-left border-b">
-            <tr>
-              <th className="p-2 text-sm sm:p-3 sm:text-base">No</th>
-              <th className="p-2 text-sm sm:p-3 sm:text-base">Name</th>
-              <th className="p-2 text-sm sm:p-3 sm:text-base">Email</th>
-              <th className="p-2 text-sm sm:p-3 sm:text-base">Role</th>
-              <th className="p-2 text-sm sm:p-3 sm:text-base">Created At</th>
-              <th className="p-2 text-sm sm:p-3 sm:text-base">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, idx) => (
-              <tr
-                key={user.id}
-                className="bg-gray-100 hover:bg-gray-200 transition-colors"
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex items-center border-[1px] border-[#9197B3] rounded-md px-2 py-2 bg-white">
+              <img
+                src="/icons/search.svg"
+                alt="Search Icon"
+                className="h-4 w-4 mr-2 opacity-60"
+              />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="outline-none text-[12px] text-[#B5B7C0] not-[]:w-full"
+              />
+            </div>
+            <div className="relative inline-flex items-center gap-1 text-sm text-gray-400 ">
+              <span>Filter By:</span>
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
               >
-                <td className="p-2 text-sm sm:p-3 sm:text-base">{idx + 1}</td>
-                <td className="p-2 text-sm sm:p-3 sm:text-base">{user.name}</td>
-                <td className="p-2 text-sm sm:p-3 sm:text-base">
-                  {user.email}
-                </td>
-                <td className="p-2 text-sm sm:p-3 sm:text-base capitalize">
-                  {user.role.replace("_", " ")}
-                </td>
-                <td className="p-2 text-sm sm:p-3 sm:text-base">
-                  {new Date(user.created_at).toLocaleDateString("id-ID", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </td>
-                <td className="p-2 text-sm sm:p-3 sm:text-base flex gap-2">
-                  <button
-                    onClick={() => handleEdit(user)}
-                    className="text-blue-600 hover:text-blue-800"
-                    title="Edit"
-                  >
-                    <PencilIcon className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteClick(user.id)}
-                    className="text-red-600 hover:text-red-800"
-                    title="Delete"
-                  >
-                    <TrashIcon className="h-5 w-5" />
-                  </button>
-                </td>
+                <option className="text-black text-center" value="">
+                  All Roles
+                </option>
+                <option className="text-black text-center" value="admin">
+                  Admin
+                </option>
+                <option
+                  className="text-black text-center"
+                  value="koordinator_unit"
+                >
+                  Kordinator Unit
+                </option>
+                <option
+                  className="text-black text-center"
+                  value="koordinator_mutu"
+                >
+                  Kordinator Mutu
+                </option>
+                <option
+                  className="text-black text-center"
+                  value="koordinator_menris"
+                >
+                  Koordinator Menris
+                </option>
+                <option
+                  className="text-black text-center"
+                  value="kepala_puskesmas"
+                >
+                  Kepala Puskesmas
+                </option>
+                <option
+                  className="text-black text-center"
+                  value="dinas_kesehatan"
+                >
+                  Dinkes
+                </option>
+              </select>
+              <img
+                src="/icons/chevron-down.svg"
+                alt="Filter Icon"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 h-6 w-5 pointer-events-none text-[#3D3C42]"
+              />
+            </div>
+            <button
+              onClick={handleAdd}
+              className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 px-3 py-1.5 rounded-md"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Add User
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="p-4">
+            <LoadingSkeleton rows={8} columns={6} />
+          </div>
+        ) : (
+          <table className="w-full text-sm sm:text-base">
+            <thead className="bg-gray-100 text-[#5932EA] text-left border-b-[1px] border-gray-200">
+              <tr>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">No</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Name</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Email</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Role</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">
+                  Created At
+                </th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
+            <tbody>
+              {paginatedUsers.map((user, idx) => (
+                <tr
+                  key={user.id}
+                  className={`text-[12px] text-[#292D32] transition-colors border-b-[1px] border-gray-200 ${
+                    idx % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
+                  } hover:bg-gray-200`}
+                >
+                  <td className="p-2 text-[12px] sm:p-3">
+                    {startIdx + idx + 1}
+                  </td>
+                  <td className="p-2 text-text-[12px] sm:p-3">{user.name}</td>
+                  <td className="p-2 text-[12px] sm:p-3">{user.email}</td>
+                  <td className="p-2 text-text-[12px] sm:p-3 capitalize">
+                    {user.role.replace("_", " ")}
+                  </td>
+                  <td className="p-2 text-[12px] sm:p-3">
+                    {new Date(user.created_at).toLocaleDateString("id-ID", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </td>
+                  <td className="p-2 text-sm sm:p-3 flex gap-2 justify-center">
+                    <button onClick={() => handleEdit(user)} title="Edit">
+                      <img
+                        src="/icons/edit.svg"
+                        alt="Edit Icon"
+                        className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
+                      />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(user.id)}
+                      title="Delete"
+                    >
+                      <img
+                        src="/icons/hapus.svg"
+                        alt="Delete Icon"
+                        className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
+                      />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <div className="text-sm text-gray-600 ml-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            totalItems={filteredUsers.length}
+          />
+        </div>
+      </div>
     </div>
   );
 }

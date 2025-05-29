@@ -16,5 +16,5 @@ export default function Home() {
   }, [router]);
   
 
-  return null; // atau tampilkan spinner jika mau
+  return null; 
 }

@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
-import { addUser, editUser } from '../../lib/userApi';
-import { XMarkIcon } from '@heroicons/react/24/solid';
+import { useEffect, useState } from "react";
+import { addUser, editUser } from "../../lib/userApi";
 
 export default function UserFormModal({
   isOpen,
@@ -9,43 +8,79 @@ export default function UserFormModal({
   editingUser = null,
 }) {
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "",
   });
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (editingUser) {
       setForm({
-        name: editingUser.name || '',
-        email: editingUser.email || '',
-        password: '',
-        confirmPassword: '',
-        role: editingUser.role || '',
+        name: editingUser.name || "",
+        email: editingUser.email || "",
+        password: "",
+        confirmPassword: "",
+        role: editingUser.role || "",
       });
     } else {
       setForm({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        role: '',
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        role: "",
       });
     }
+    setErrors({});
   }, [editingUser, isOpen]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // Hapus error jika ada untuk field ini
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!form.name.trim()) {
+      newErrors.name = "Harus diisi";
+    }
+    if (!form.email.trim()) {
+      newErrors.email = "Harus diisi";
+    }
+    if (!editingUser) {
+      if (!form.password) {
+        newErrors.password = "Harus diisi";
+      }
+      if (!form.confirmPassword) {
+        newErrors.confirmPassword = "Harus diisi";
+      }
+      if (form.password !== form.confirmPassword) {
+        newErrors.confirmPassword = "Konfirmasi password tidak cocok";
+      }
+    }
+    if (!form.role) {
+      newErrors.role = "Harus diisi";
+    }
+
+    setErrors(newErrors);
+
+    // Jika ada error return false
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!editingUser && form.password !== form.confirmPassword) {
-      alert('Konfirmasi password tidak cocok.');
+    if (!validate()) {
       return;
     }
 
@@ -59,7 +94,7 @@ export default function UserFormModal({
       onUserSaved(!!editingUser);
       onClose();
     } catch (err) {
-      alert('Gagal menyimpan user.');
+      alert("Gagal menyimpan user.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -70,102 +105,192 @@ export default function UserFormModal({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-      <div className="relative bg-white p-6 rounded shadow w-full max-w-md">
-        {/* Tombol Close */}
-        <button
-          onClick={onClose}
-          className="absolute cursor-pointer top-0 right-0 text-red-600 hover:text-red-800"
-        >
-          <XMarkIcon className="w-6 h-6" />
-        </button>
-
-        <h3 className="text-lg font-bold mb-4 text-center">
-          {editingUser ? 'Perbarui Pengguna' : 'Tambah Pengguna Baru'}
-        </h3>
+      <div className="relative bg-white p-6 rounded-2xl shadow w-full max-w-lg mx-4">
+        <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">
+          {editingUser ? "Perbarui Pengguna" : "Tambah Pengguna Baru"}
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Nama */}
-          <div>
-            <label className="block text-sm font-medium mb-1 text-gray-700">Nama</label>
+          <div className="my-5">
+            <label className="block text-sm font-bold mb-1 text-gray-800">
+              Name
+            </label>
             <input
               type="text"
               name="name"
               value={form.name}
               onChange={handleChange}
-              required
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="eg: John Doe"
+              className={`w-full bg-[#f7faff] text-gray-700 placeholder:text-gray-200 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2
+              ${
+                errors.name
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-400"
+              }`}
             />
+            {errors.name && (
+              <p className="text-red-600 text-xs mt-1">{errors.name}</p>
+            )}
           </div>
+
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-700">Email</label>
+            <label className="block text-sm font-bold mb-1 text-gray-800">
+              Email
+            </label>
             <input
               type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
-              required
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="eg: john@gmail.com"
+              className={`w-full bg-[#f7faff] text-gray-700 placeholder:text-gray-200 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2
+              ${
+                errors.email
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-400"
+              }`}
             />
+            {errors.email && (
+              <p className="text-red-600 text-xs mt-1">{errors.email}</p>
+            )}
           </div>
+
           {/* Password */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-700">Password</label>
+            <label className="block text-sm font-bold mb-1 text-gray-800">
+              Password
+            </label>
             <input
               type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
-              required={!editingUser}
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Enter Your Password"
+              autoComplete="new-password"
+              className={`w-full bg-[#f7faff] text-gray-700 placeholder:text-gray-200 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2
+              ${
+                errors.password
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-400"
+              }`}
             />
+            {errors.password && (
+              <p className="text-red-600 text-xs mt-1">{errors.password}</p>
+            )}
           </div>
-          {/* Konfirmasi Password */}
+
+          {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-700">Konfirmasi Password</label>
+            <label className="block text-sm font-bold mb-1 text-gray-800">
+              Confirm Password
+            </label>
             <input
               type="password"
               name="confirmPassword"
               value={form.confirmPassword}
               onChange={handleChange}
-              required={!editingUser}
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="Confirm Your Password"
+              className={`w-full bg-[#f7faff] text-gray-700 placeholder:text-gray-200 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2
+              ${
+                errors.confirmPassword
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-400"
+              }`}
             />
+            {errors.confirmPassword && (
+              <p className="text-red-600 text-xs mt-1">
+                {errors.confirmPassword}
+              </p>
+            )}
           </div>
+
           {/* Role */}
           <div>
-            <label className="block text-sm font-medium mb-1 text-gray-700">Role</label>
+            <label className="block text-sm font-bold mb-1 text-gray-800">
+              Role
+            </label>
             <select
               name="role"
               value={form.role}
               onChange={handleChange}
-              required
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className={`w-full border text-gray-700 px-4 py-2 rounded-lg hover:cursor-pointer bg-white focus:outline-none focus:ring-2
+              ${
+                errors.role
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-400"
+              }`}
             >
-              <option value="">-- Pilih Role --</option>
+              <option value="">-- Select Role --</option>
               {[
-                'koordinator_unit',
-                'koordinator_menris',
-                'koordinator_mutu',
-                'kepala_puskesmas',
-                'dinas_kesehatan',
-                'admin',
+                "koordinator_unit",
+                "koordinator_menris",
+                "koordinator_mutu",
+                "kepala_puskesmas",
+                "dinas_kesehatan",
+                "admin",
               ].map((role) => (
                 <option key={role} value={role}>
-                  {role.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                  {role
+                    .replace(/_/g, " ")
+                    .replace(/\b\w/g, (c) => c.toUpperCase())}
                 </option>
               ))}
             </select>
+            {errors.role && (
+              <p className="text-red-600 text-xs mt-1">{errors.role}</p>
+            )}
           </div>
 
-          {/* Tombol Simpan */}
-          <div className="flex justify-center pt-4 w-full">
+          {/* Tombol Aksi */}
+          <div className="flex justify-end pt-4 w-full gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={loading}
+              className="w-[90px] h-[42px] text-sm text-red-600 border border-red-400 rounded-lg hover:bg-red-100 transition duration-300 ease-in-out"
+            >
+              Cancel
+            </button>
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              className={`w-[90px] h-[42px] text-sm text-blue-600 bg-transparent border border-blue-500 rounded-lg transition duration-300 ease-in-out hover:text-blue hover:bg-blue-100
+                ${
+                  loading
+                    ? "bg-blue-400 cursor-not-allowed"
+                    : "bg-[#397bf4] hover:bg-[#2f6ce0] cursor-pointer"
+                }`}
             >
-              {loading ? 'Menyimpan...' : 'Simpan'}
+              {loading ? (
+                <span className="flex justify-center items-center gap-2 text-xs">
+                  <svg
+                    className="w-4 h-4 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8z"
+                    ></path>
+                  </svg>
+                  ...
+                </span>
+              ) : (
+                "Save"
+              )}
             </button>
           </div>
         </form>
