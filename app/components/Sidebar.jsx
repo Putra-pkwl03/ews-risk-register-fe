@@ -1,34 +1,106 @@
-'use client';
+"use client";
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
-  HomeIcon,
+  Bars3Icon,
   ExclamationTriangleIcon,
   UsersIcon,
-  Cog6ToothIcon,
   XMarkIcon,
-  Bars3Icon, 
-} from '@heroicons/react/24/outline';
+} from "@heroicons/react/24/outline";
+import { LayoutDashboardIcon, LogOutIcon, ChartBarIcon, } from "lucide-react";
 
 export default function Sidebar({ isOpen, toggle, role }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const page = searchParams.get('page');
+  const page = searchParams.get("page");
 
   const handleNavigate = (targetPage) => {
-    router.push(`/dashboard${targetPage ? `?page=${targetPage}` : ''}`);
+    router.push(`/dashboard${targetPage ? `?page=${targetPage}` : ""}`);
+  };
+
+  // Variants for staggered animation
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -10 },
+    show: { opacity: 1, x: 0 },
   };
 
   return (
-    <div
-      className={`fixed top-0 left-0 h-full bg-gray-900 text-white shadow-lg 
-    transition-all duration-300 ease-in-out
-    ${isOpen ? "w-40 sm:w-48 md:w-64" : "w-16"}
-  `}
+    <motion.div
+      initial={{ width: isOpen ? 64 : 256 }}
+      animate={{ width: isOpen ? 256 : 64 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="fixed top-0 left-0 h-full bg-white shadow-lg z-50 overflow-hidden"
     >
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
-        {isOpen && <h2 className="text-lg font-semibold">Menu</h2>}
-        <button onClick={toggle} className="text-gray-400 hover:text-white">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b h-16 relative">
+        <AnimatePresence initial={false} mode="wait">
+          {isOpen && (
+            <motion.div
+              key="logo-header"
+              initial={{ opacity: 0, x: -12, scale: 0.95 }}
+              animate={{
+                opacity: 1,
+                x: 0,
+                scale: 1,
+                transition: {
+                  duration: 0.4,
+                  delay: 0.2,
+                  ease: [0.25, 0.8, 0.25, 1],
+                },
+              }}
+              exit={{
+                opacity: 0,
+                x: 33,
+                scale: 0.95,
+                transition: {
+                  duration: 0.3,
+                  ease: [0.25, 0.8, 0.25, 1],
+                },
+              }}
+              className="flex items-center gap-2"
+            >
+              <img src="/icons/logo.svg" alt="Logo" className="h-6 w-6" />
+              <motion.h2
+                initial={{ opacity: 0, y: 5 }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 0.3,
+                    delay: 0.35,
+                  },
+                }}
+                exit={{
+                  opacity: 0,
+                  y: 5,
+                  transition: {
+                    duration: 0.2,
+                    ease: "easeInOut",
+                  },
+                }}
+                className="text-lg text-black font-semibold"
+              >
+                Risk Management
+              </motion.h2>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <button
+          onClick={toggle}
+          className="text-gray-400 ml-1 hover:text-black hover:cursor-pointer"
+        >
           {isOpen ? (
             <XMarkIcon className="h-6 w-6" />
           ) : (
@@ -37,89 +109,128 @@ export default function Sidebar({ isOpen, toggle, role }) {
         </button>
       </div>
 
-      <ul className="p-4 space-y-3 flex flex-col h-[calc(100%-80px)]">
-        <div className="flex-grow space-y-3">
+      {/* Menu */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="flex flex-col h-[calc(100%-64px)] justify-between"
+      >
+        <ul className="space-y-2 p-2">
           {/* Dashboard */}
-          <li
+          <motion.li
+            variants={itemVariants}
             onClick={() => handleNavigate("")}
-            className={`flex items-center gap-3 p-2 rounded cursor-pointer ${
-              !page ? "bg-gray-800" : "hover:bg-gray-800"
-            }`}
+            className={`flex items-center transition-all duration-200 cursor-pointer rounded
+              ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-2"}
+              ${
+                !page
+                  ? "bg-[#5932EA] text-white"
+                  : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+              }
+              w-full
+            `}
           >
-            <HomeIcon className="h-5 w-5 flex-shrink-0" />
-            <span
-              className={`text-sm transition-all duration-200 ${
-                !isOpen && "hidden"
+            <LayoutDashboardIcon
+              className={`h-6 w-6 flex-shrink-0 ${
+                !page ? "text-white" : "text-[#9197B3]"
               }`}
-            >
-              Dashboard
-            </span>
-          </li>
+            />
+            {isOpen && <span className="text-sm">Dashboard</span>}
+          </motion.li>
 
-          {/* Identifikasi Risiko (Koordinator Unit) */}
+          {/* Identifikasi Risiko */}
           {role === "koordinator_unit" && (
-            <li
+            <motion.li
+              variants={itemVariants}
               onClick={() => handleNavigate("identifikasi-risiko")}
-              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition-all ${
-                page === "identifikasi-risiko"
-                  ? "bg-gray-800 border-l-4 border-blue-500 text-white pl-2"
-                  : "hover:bg-gray-800 pl-2"
-              }`}
+              className={`flex items-center transition-all duration-200 cursor-pointer rounded-md
+                ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                ${
+                  page === "identifikasi-risiko"
+                    ? "bg-[#5932EA] text-white"
+                    : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                }
+                w-full
+              `}
             >
-              <ExclamationTriangleIcon className="h-5 w-5 flex-shrink-0" />
-              <span
-                className={`text-sm transition-all duration-200 ${
-                  !isOpen && "hidden"
+              <ExclamationTriangleIcon
+                className={`h-6 w-6 flex-shrink-0 ${
+                  page === "identifikasi-risiko"
+                    ? "text-white"
+                    : "text-[#9197B3]"
                 }`}
-              >
-                Indentifikasi Risiko
-              </span>
-            </li>
+              />
+              {isOpen && <span className="text-sm">Identifikasi Risiko</span>}
+            </motion.li>
           )}
 
-          {/* Manage Users (Admin) */}
+          {/* Analysis Risiko */}
+          {(role === "koordinator_unit" || role === "koordinator_menris") && (
+            <motion.li
+              variants={itemVariants}
+              onClick={() => handleNavigate("analisis-risiko")}
+              className={`flex items-center transition-all duration-200 cursor-pointer rounded-md
+      ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+      ${
+        page === "analisis-risiko"
+          ? "bg-[#5932EA] text-white"
+          : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+      }
+      w-full
+    `}
+            >
+              <ChartBarIcon
+                className={`h-6 w-6 flex-shrink-0 ${
+                  page === "analisis-risiko" ? "text-white" : "text-[#9197B3]"
+                }`}
+              />
+              {isOpen && <span className="text-sm">Analisis Risiko</span>}
+            </motion.li>
+          )}
+
+          {/* Manage Users */}
           {role === "admin" && (
-            <li
+            <motion.li
+              variants={itemVariants}
               onClick={() => handleNavigate("manage-users")}
-              className={`flex items-center gap-3 p-2 rounded cursor-pointer transition-all ${
-                page === "manage-users"
-                  ? "bg-gray-800 border-l-4 border-blue-500 text-white pl-2"
-                  : "hover:bg-gray-800 pl-2"
-              }`}
+              className={`flex items-center transition-all duration-200 cursor-pointer rounded
+                ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                ${
+                  page === "manage-users"
+                    ? "bg-[#5932EA] text-white"
+                    : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                }
+                w-full
+              `}
             >
-              <UsersIcon className="h-5 w-5 flex-shrink-0" />
-              <span
-                className={`text-sm transition-all duration-200 ${
-                  !isOpen && "hidden"
+              <UsersIcon
+                className={`h-6 w-6 flex-shrink-0 ${
+                  page === "manage-users" ? "text-white" : "text-[#9197B3]"
                 }`}
-              >
-                Manage Users
-              </span>
-            </li>
+              />
+              {isOpen && <span className="text-sm">Manage Users</span>}
+            </motion.li>
           )}
-        </div>
+        </ul>
 
-        {/* Settings */}
-        <div>
-          <li
-            onClick={() => handleNavigate("settings")}
-            className={`flex items-center gap-3 p-2 rounded cursor-pointer ${
-              page === "settings"
-                ? "bg-gray-800 border-l-4 border-blue-500 text-white pl-2"
-                : "hover:bg-gray-800 pl-2"
-            }`}
+        {/* Logout */}
+        <motion.div variants={itemVariants} className="p-2">
+          <button
+            className={`flex items-center  bg-red-500 hover:bg-red-400 text-white font-semibold rounded-md transition-colors duration-200 hover:cursor-pointer
+              ${isOpen ? "gap-2 px-4 py-2" : "py-2 justify-center"}
+              w-full
+            `}
+            onClick={() => {
+              localStorage.removeItem("token");
+              window.location.href = "/login";
+            }}
           >
-            <Cog6ToothIcon className="h-5 w-5 flex-shrink-0" />
-            <span
-              className={`text-sm transition-all duration-200 ${
-                !isOpen && "hidden"
-              }`}
-            >
-              Setings
-            </span>
-          </li>
-        </div>
-      </ul>
-    </div>
+            <LogOutIcon className="w-5 h-5" />
+            {isOpen && <span>Logout</span>}
+          </button>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   );
 }

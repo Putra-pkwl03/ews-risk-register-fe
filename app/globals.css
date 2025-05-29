@@ -51,3 +51,30 @@ body {
   animation: fall 0.4s ease-out forwards;
 }
 
+
+@keyframes slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+.animate-slide {
+  animation: slide 1s linear infinite;
+}
+
+
+.form-input {
+  @apply w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+.form-select {
+  @apply w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+.form-textarea {
+  @apply w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+.btn-primary {
+  @apply px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700;
+}
