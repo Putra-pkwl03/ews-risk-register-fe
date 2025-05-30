@@ -25,6 +25,8 @@ export default function FormFields({
   const [showNoteModal, setShowNoteModal] = useState(false);
   const handleOpenNoteModal = () => setShowNoteModal(true);
   const handleCloseNoteModal = () => setShowNoteModal(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md text-gray-900 max-w-4xl mx-auto mt-8">
@@ -104,19 +106,12 @@ export default function FormFields({
         </div>
 
         <div>
-          <label className="block mb-2 font-semibold">Dampak (1-5)</label>
+          <label className="block mb-2 font-semibold">Dampak</label>
           <input
             name="dampak"
-            type="number"
-            min={1}
-            max={5}
+            type="text"
             value={formData.dampak}
-            onChange={(e) => {
-              const value = parseInt(e.target.value, 10);
-              if ((value >= 1 && value <= 5) || e.target.value === "") {
-                handleChange(e);
-              }
-            }}
+            onChange={handleChange}
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -151,7 +146,9 @@ export default function FormFields({
         penyebabList={formData.penyebab}
         onAdd={handleAddPenyebab}
         onRemove={handleRemovePenyebab}
+        isEditMode={isEditMode}
       />
+
       <div className="flex justify-end gap-4 mt-6">
         <button
           onClick={onCancel}

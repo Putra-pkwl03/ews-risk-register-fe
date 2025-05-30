@@ -29,7 +29,7 @@ export default function IdentifikasiRisikoTable() {
   const [showError, setShowError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
-  const itemsPerPage = 5; // Atur sesuai kebutuhan
+  const itemsPerPage = 5; 
 
   const handleCancel = () => {
     setShowForm(false);
@@ -434,7 +434,7 @@ export default function IdentifikasiRisikoTable() {
                             const params = new URLSearchParams();
                             params.set("page", "analisis-risiko");
 
-                            const encodedId = btoa(item.id); 
+                            const encodedId = btoa(item.id);
                             params.set("id", encodedId);
 
                             router.push(`/dashboard?${params.toString()}`);

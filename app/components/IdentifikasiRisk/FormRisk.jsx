@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FormFields from "../../components/IdentifikasiRisk/RiskFormField";
 import ModalPenyebab from "../../components/IdentifikasiRisk/ModalPenyebab";
-import RiskService from "../../lib/RiskService"; 
 import ErrorToast from "../../components/modalconfirmasi/ErrorToast";
 import SuccessToast from "../../components/modalconfirmasi/SuccessToast";
+import PenyebabSection from "../../components/IdentifikasiRisk/PenyebabSection";
 
 const unitsByKlaster = {
   Management: [
@@ -30,8 +30,6 @@ const unitsByKlaster = {
   ],
 };
 
-
-
 const kategoriOptions = [
   "Keuangan",
   "Kebijakan",
@@ -50,7 +48,12 @@ const kategoriPenyebab = [
   "environment",
 ];
 
-export default function FormRisiko({ onSave, onCancel }) {
+export default function FormRisiko({
+  selectedRisk,
+  isEditMode,
+  onSave,
+  onCancel,
+}) {
   const [formData, setFormData] = useState({
     klaster: "",
     unit: "",
@@ -62,11 +65,54 @@ export default function FormRisiko({ onSave, onCancel }) {
     ucc: "",
   });
 
+  const [showModal, setShowModal] = useState(false);
+  const [penyebabBaru, setPenyebabBaru] = useState({
+    kategori: "",
+    deskripsiUtama: "",
+    deskripsiSub: [],
+  });
+  const [editingIndex, setEditingIndex] = useState(null);
   const [successOpen, setSuccessOpen] = useState(false);
   const [errorOpen, setErrorOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  
+
+  useEffect(() => {
+    if (isEditMode && selectedRisk) {
+      setFormData({
+        klaster: selectedRisk.cluster || "",
+        unit: selectedRisk.unit || "",
+        namaRisiko: selectedRisk.name || "",
+        kategori: selectedRisk.category || "",
+        deskripsi: selectedRisk.description || "",
+        dampak: selectedRisk.impact || "",
+        ucc: selectedRisk.uc_c || "",
+        penyebab: Array.isArray(selectedRisk.causes)
+  ? selectedRisk.causes.map((c) => ({
+      kategori: c.category || "",
+      deskripsiUtama: c.main_cause || "",
+      deskripsiSub: Array.isArray(c.sub_causes)
+        ? c.sub_causes.map((sub) =>
+            typeof sub === "string" ? sub : sub.sub_cause
+          )
+        : [],
+    
+            }))
+          : [],
+      });
+    } else {
+      setFormData({
+        klaster: "",
+        unit: "",
+        namaRisiko: "",
+        kategori: "",
+        deskripsi: "",
+        penyebab: [],
+        dampak: "",
+        ucc: "",
+      });
+    }
+  }, [isEditMode, selectedRisk]);
 
   const isFormValid =
     formData.klaster &&
@@ -78,33 +124,27 @@ export default function FormRisiko({ onSave, onCancel }) {
     formData.ucc &&
     formData.penyebab.length > 0;
 
-  const [showModal, setShowModal] = useState(false);
-  const [penyebabBaru, setPenyebabBaru] = useState({
-    kategori: "",
-    deskripsiUtama: "",
-    deskripsiSub: [],
-  });
-  
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const savePenyebab = () => {
-    if (!penyebabBaru.kategori || !penyebabBaru.deskripsiUtama.trim()) {
-      console.warn("Penyebab baru tidak valid, batal simpan");
-      return;
-    }
-    setFormData((prev) => ({
-      ...prev,
-      penyebab: [...prev.penyebab, penyebabBaru],
-    }));
-    setShowModal(false);
+  const handleAddPenyebab = () => {
     setPenyebabBaru({ kategori: "", deskripsiUtama: "", deskripsiSub: [""] });
+    setEditingIndex(null);
+    setShowModal(true);
   };
 
-  const handleAddPenyebab = () => setShowModal(true);
+  const handleEditPenyebab = (index) => {
+    const item = formData.penyebab[index];
+    setPenyebabBaru({
+      kategori: item.kategori,
+      deskripsiUtama: item.deskripsiUtama,
+      deskripsiSub: [...(item.deskripsiSub || [])],
+    });
+    setEditingIndex(index);
+    setShowModal(true);
+  };
 
   const handlePenyebabChange = (key, val) => {
     setPenyebabBaru((prev) => ({ ...prev, [key]: val }));
@@ -116,83 +156,98 @@ export default function FormRisiko({ onSave, onCancel }) {
     setPenyebabBaru((prev) => ({ ...prev, deskripsiSub: updated }));
   };
 
-  const addSubDeskripsi = () =>
+  const addSubDeskripsi = () => {
     setPenyebabBaru((prev) => ({
       ...prev,
       deskripsiSub: [...prev.deskripsiSub, ""],
     }));
+  };
 
-  const hapusSubDeskripsi = (index) =>
+  const hapusSubDeskripsi = (index) => {
     setPenyebabBaru((prev) => ({
       ...prev,
       deskripsiSub: prev.deskripsiSub.filter((_, i) => i !== index),
     }));
+  };
 
-  const handleRemovePenyebab = (i) => {
+  const savePenyebab = () => {
+    if (!penyebabBaru.kategori || !penyebabBaru.deskripsiUtama.trim()) {
+      setToastMessage("Kategori dan deskripsi penyebab utama wajib diisi.");
+      setErrorOpen(true);
+      return;
+    }
+
+    if (editingIndex !== null) {
+      // Edit
+      setFormData((prev) => {
+        const updated = [...prev.penyebab];
+        updated[editingIndex] = penyebabBaru;
+        return { ...prev, penyebab: updated };
+      });
+    } else {
+      // Tambah baru
+      setFormData((prev) => ({
+        ...prev,
+        penyebab: [...prev.penyebab, penyebabBaru],
+      }));
+    }
+
+    setShowModal(false);
+    setEditingIndex(null);
+    setPenyebabBaru({ kategori: "", deskripsiUtama: "", deskripsiSub: [] });
+  };
+
+  const handleRemovePenyebab = (index) => {
     setFormData((prev) => ({
       ...prev,
-      penyebab: prev.penyebab.filter((_, idx) => idx !== i),
+      penyebab: prev.penyebab.filter((_, i) => i !== index),
     }));
   };
 
-  
-
-  // Fungsi untuk transform data formData ke payload backend
-  function preparePayload(data) {
-    return {
-      cluster: data.klaster,
-      unit: data.unit,
-      name: data.namaRisiko,
-      category: data.kategori,
-      description: data.deskripsi,
-      impact: parseInt(data.dampak, 10),
-      uc_c: data.ucc === "",
-      causes: Array.isArray(data.penyebab)
-        ? data.penyebab.map((p) => ({
-            category: p.kategori,
-            main_cause: p.deskripsiUtama,
-            sub_causes:
-              Array.isArray(p.deskripsiSub) && p.deskripsiSub.length > 0
-                ? p.deskripsiSub
-                : null, 
-          }))
-        : [],
-    };
-  }
-  
+  const preparePayload = (data) => ({
+    cluster: data.klaster,
+    unit: data.unit,
+    name: data.namaRisiko,
+    category: data.kategori,
+    description: data.deskripsi,
+    impact: data.dampak,
+    uc_c: data.ucc === "",
+    causes: data.penyebab.map((p) => ({
+      category: p.kategori,
+      main_cause: p.deskripsiUtama,
+      sub_causes:
+        p.deskripsiSub && p.deskripsiSub.length > 0 ? p.deskripsiSub : null,
+    })),
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!isFormValid) {
       setToastMessage("Harap lengkapi semua data risiko terlebih dahulu.");
       setErrorOpen(true);
-      return; 
+      return;
     }
 
-    setIsSaving(true); 
+    setIsSaving(true);
 
     try {
       const payload = preparePayload(formData);
-      const savedItem = await onSave(payload);
-
-      if (savedItem) {
+      const saved = await onSave(payload);
+      if (saved) {
         setToastMessage("Data risiko berhasil disimpan.");
         setSuccessOpen(true);
-        onCancel(); 
+        onCancel();
       } else {
-        throw new Error("Gagal menyimpan data.");
+        throw new Error();
       }
     } catch (err) {
-      console.error("Gagal menyimpan:", err);
-      setToastMessage("Gagal menyimpan data risiko. Silakan coba lagi.");
+      console.error(err);
+      setToastMessage("Terjadi kesalahan saat menyimpan.");
       setErrorOpen(true);
     } finally {
-      setIsSaving(false); 
+      setIsSaving(false);
     }
   };
-  
-  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -202,7 +257,6 @@ export default function FormRisiko({ onSave, onCancel }) {
           onClose={() => setSuccessOpen(false)}
         />
       )}
-
       {errorOpen && (
         <ErrorToast
           message={toastMessage}
@@ -210,14 +264,22 @@ export default function FormRisiko({ onSave, onCancel }) {
         />
       )}
 
+      <PenyebabSection
+        penyebabList={formData.penyebab}
+        onAdd={handleAddPenyebab}
+        onRemove={handleRemovePenyebab}
+        onEdit={handleEditPenyebab}
+        isEditMode={isEditMode}
+      />
+
       <FormFields
         formData={formData}
         handleChange={handleChange}
         unitsByKlaster={unitsByKlaster}
         kategoriOptions={kategoriOptions}
-        onSave={onSave}
         onCancel={onCancel}
         handleAddPenyebab={handleAddPenyebab}
+        handleEditPenyebab={handleEditPenyebab}
         handleRemovePenyebab={handleRemovePenyebab}
         isFormValid={isFormValid}
         isSaving={isSaving}
@@ -226,7 +288,10 @@ export default function FormRisiko({ onSave, onCancel }) {
       {showModal && (
         <ModalPenyebab
           penyebabBaru={penyebabBaru}
-          onClose={() => setShowModal(false)}
+          onClose={() => {
+            setShowModal(false);
+            setEditingIndex(null);
+          }}
           onSave={savePenyebab}
           onChange={handlePenyebabChange}
           kategoriPenyebab={kategoriPenyebab}
