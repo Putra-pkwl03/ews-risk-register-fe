@@ -145,7 +145,7 @@ export default function FormRisiko({ onSave, onCancel }) {
       name: data.namaRisiko,
       category: data.kategori,
       description: data.deskripsi,
-      impact: parseInt(data.dampak, 10),
+      impact: data.dampak,
       uc_c: data.ucc === "",
       causes: Array.isArray(data.penyebab)
         ? data.penyebab.map((p) => ({

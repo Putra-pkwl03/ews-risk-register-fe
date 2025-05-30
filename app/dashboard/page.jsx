@@ -7,6 +7,7 @@ import api from '../lib/api';
 import ManageUsers from '../components/manage-users/ManageUsers';
 import IdentifikasiRisikoTable from "../components/IdentifikasiRisk/IdentifikasiRisk";
 import AnalisisRisiko from "../components/AnalisisRisiko/AnalisisRisiko";
+import FormAnalisis from '../components/AnalisisRisiko/FormAnalisis';
 
 
 export default function Dashboard() {
@@ -55,6 +56,8 @@ export default function Dashboard() {
         <IdentifikasiRisikoTable />
       ) : page === "analisis-risiko" ? (
         <AnalisisRisiko />
+      ) : page === "form-analisis" ? (
+        <FormAnalisis />
       ) : (
         <div className="flex items-center justify-center h-full">
           <h1 className="text-2xl font-bold text-black">
