@@ -432,11 +432,8 @@ export default function IdentifikasiRisikoTable() {
                         <button
                           onClick={() => {
                             const params = new URLSearchParams();
-                            params.set("page", "analisis-risiko");
-
-                            const encodedId = btoa(item.id); 
-                            params.set("id", encodedId);
-
+                            params.set("page", "form-analisis");
+                            params.set("id", item.id); // id asli langsung
                             router.push(`/dashboard?${params.toString()}`);
                           }}
                           title="Add"
