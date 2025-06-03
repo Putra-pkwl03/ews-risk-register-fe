@@ -48,6 +48,7 @@ export default function Login() {
       localStorage.setItem("token", res.data.access_token);
       localStorage.setItem("role", res.data.user.role);
       localStorage.setItem("name", res.data.user.name);
+      localStorage.setItem("userId", res.data.user.id); 
       router.replace("/dashboard");
     } catch (err) {
       setError("Login gagal. Periksa kembali kredensial Anda.");

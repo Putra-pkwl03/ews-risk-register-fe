@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getAllRiskAnalysis } from "../../lib/RiskAnalysis";
+import { getAllRiskAnalysis, sendToMenris } from "../../lib/RiskAnalysis";
 import LoadingSkeleton from "../loadings/LoadingSkeleton";
 import FormAnalisis from "../../components/AnalisisRisiko/FormAnalisis";
 
-export default function DetailRisiko() {
+export default function DetailRisiko({ setNotifCount }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const encodedId = searchParams.get("id");
@@ -20,6 +20,13 @@ export default function DetailRisiko() {
   const [isDetailMode, setIsDetailMode] = useState(false);
   const [showFormAnalisis, setShowFormAnalisis] = useState(false);
   const [analisisRisiko, setAnalisisRisiko] = useState([]);
+
+
+    useEffect(() => {
+      if (typeof setNotifCount === "function") {
+        // setNotifCount(0);
+      }
+    }, [setNotifCount]);
 
   useEffect(() => {
     setLoading(true);
@@ -76,14 +83,12 @@ export default function DetailRisiko() {
 
     return matchSearch && matchKategori;
   });
-  
 
   const sortedData = [...filteredData].sort((a, b) => {
     if (sortOrder === "Ascending") return a.score - b.score;
     if (sortOrder === "Descending") return b.score - a.score;
     return 0;
   });
-  
 
   const openFormAnalisis = (risk) => {
     setSelectedRisk(risk);
@@ -118,7 +123,6 @@ export default function DetailRisiko() {
     setShowFormAnalisis(false);
   };
 
-
   const statusIcons = {
     draft: "/icons/draft.svg",
     pending: "/icons/pending.svg",
@@ -126,6 +130,20 @@ export default function DetailRisiko() {
     validated_rejected: "/icons/rejected.svg",
   };
 
+  const handleSend = async (id) => {
+    try {
+      const response = await sendToMenris(id);
+      console.log("Respons dari server:", response);
+
+      alert("Risiko berhasil dikirim ke Koordinator Manajemen Risiko");
+
+      const updated = await getAllRiskAnalysis();
+      setAnalisisRisiko(updated);
+    } catch (error) {
+      console.error("Error kirim risiko:", error);
+      alert("Terjadi kesalahan saat mengirim risiko");
+    }
+  };
 
   return (
     <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
@@ -325,7 +343,8 @@ export default function DetailRisiko() {
                       />
                     </button>
                     <button
-                      onClick={() => handleSent(item)}
+                      type="button"
+                      onClick={() => handleSend(item.id)}
                       title="Sent to menris"
                     >
                       <img

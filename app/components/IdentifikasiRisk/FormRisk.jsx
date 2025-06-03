@@ -224,27 +224,27 @@ export default function FormRisiko({
   
 
   // Fungsi untuk transform data formData ke payload backend
-  function preparePayload(data) {
-    return {
-      cluster: data.klaster,
-      unit: data.unit,
-      name: data.namaRisiko,
-      category: data.kategori,
-      description: data.deskripsi,
-      impact: data.dampak,
-      uc_c: data.ucc === "",
-      causes: Array.isArray(data.penyebab)
-        ? data.penyebab.map((p) => ({
-            category: p.kategori,
-            main_cause: p.deskripsiUtama,
-            sub_causes:
-              Array.isArray(p.deskripsiSub) && p.deskripsiSub.length > 0
-                ? p.deskripsiSub
-                : null, 
-          }))
-        : [],
-    };
-  }
+  // function preparePayload(data) {
+  //   return {
+  //     cluster: data.klaster,
+  //     unit: data.unit,
+  //     name: data.namaRisiko,
+  //     category: data.kategori,
+  //     description: data.deskripsi,
+  //     impact: data.dampak,
+  //     uc_c: data.ucc === "",
+  //     causes: Array.isArray(data.penyebab)
+  //       ? data.penyebab.map((p) => ({
+  //           category: p.kategori,
+  //           main_cause: p.deskripsiUtama,
+  //           sub_causes:
+  //             Array.isArray(p.deskripsiSub) && p.deskripsiSub.length > 0
+  //               ? p.deskripsiSub
+  //               : null, 
+  //         }))
+  //       : [],
+  //   };
+  // }
   
 
   const handleSubmit = async (e) => {
