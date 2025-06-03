@@ -6,8 +6,8 @@ import {
   getAllRiskAnalysis,
   fetchRiskAnalysis,
   deleteRiskAnalysis,
+  sendToMenris,
 } from "../../lib/RiskAnalysis";
-import { getAllRiskAnalysis, sendToMenris } from "../../lib/RiskAnalysis";
 import LoadingSkeleton from "../loadings/LoadingSkeleton";
 import FormAnalisis from "../AnalisisRisiko/FormAnalisis";
 import DetailAnalisisRisiko from "../AnalisisRisiko/DetailAnalisisRisiko";
@@ -433,16 +433,6 @@ export default function DetailRisiko({ setNotifCount }) {
                           <img
                             src="/icons/hapus.svg"
                             alt="Delete Icon"
-                            className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
-                          />
-                        </button>
-                        <button
-                          onClick={() => handleSaveAnalisis(item)}
-                          title="add risk analisys"
-                        >
-                          <img
-                            src="/icons/sent.svg"
-                            alt="Sent"
                             className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
                           />
                         </button>

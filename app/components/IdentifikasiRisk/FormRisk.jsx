@@ -205,21 +205,21 @@ export default function FormRisiko({
   };
 
 
-  const preparePayload = (data) => ({
-    cluster: data.klaster,
-    unit: data.unit,
-    name: data.namaRisiko,
-    category: data.kategori,
-    description: data.deskripsi,
-    impact: data.dampak,
-    uc_c: data.ucc === "",
-    causes: data.penyebab.map((p) => ({
-      category: p.kategori,
-      main_cause: p.deskripsiUtama,
-      sub_causes:
-        p.deskripsiSub && p.deskripsiSub.length > 0 ? p.deskripsiSub : null,
-    })),
-  });
+  // const preparePayload = (data) => ({
+  //   cluster: data.klaster,
+  //   unit: data.unit,
+  //   name: data.namaRisiko,
+  //   category: data.kategori,
+  //   description: data.deskripsi,
+  //   impact: data.dampak,
+  //   uc_c: data.ucc === "",
+  //   causes: data.penyebab.map((p) => ({
+  //     category: p.kategori,
+  //     main_cause: p.deskripsiUtama,
+  //     sub_causes:
+  //       p.deskripsiSub && p.deskripsiSub.length > 0 ? p.deskripsiSub : null,
+  //   })),
+  // });
 
   
 
@@ -312,13 +312,13 @@ export default function FormRisiko({
         />
       )}
 
-      <PenyebabSection
+      {/* <PenyebabSection
         penyebabList={formData.penyebab}
         onAdd={handleAddPenyebab}
         onRemove={handleRemovePenyebab}
         onEdit={handleEditPenyebab}
         isEditMode={isEditMode}
-      />
+      /> */}
 
       <FormFields
         formData={formData}

@@ -33,34 +33,23 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
     }
   }, [data]);
 
-  if (!data || !riskAnalysisData) {
-    return (
-      <div className="absolute inset-0 bg-white bg-opacity-60 flex justify-center items-center z-50">
-        <SpinnerLoader />
-      </div>
-    );
-  }
+  const isLoading = !data || !riskAnalysisData;
 
-  // Ambil data utama
   const riskAnalysis = Array.isArray(riskAnalysisData)
     ? riskAnalysisData[0]
     : riskAnalysisData;
-  const risk = riskAnalysis.risk || {};
-  const creatorName = riskAnalysis.creator?.name || "Unknown";
+  const risk = riskAnalysis?.risk || {};
+  const creatorName = riskAnalysis?.creator?.name || "Unknown";
 
-  // Format nilai UC_C (0 = UC, 1 = C)
   const uc_c_display =
     risk.uc_c === 0 ? "UC" : risk.uc_c === 1 ? "C" : risk.uc_c || "-";
 
-  // Format grading dengan warna
   const gradingColorClass =
-    gradingColors[riskAnalysis.grading?.toLowerCase()] ||
+    gradingColors[riskAnalysis?.grading?.toLowerCase()] ||
     "bg-gray-400 text-white";
 
-  // Format status dengan warna
-  const statusColorClass = statusColors[risk.status] || "bg-gray-300";
+  const statusColorClass = statusColors[risk?.status] || "bg-gray-300";
 
-  // Format tanggal
   function formatDate(dateStr) {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
@@ -73,10 +62,12 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
     });
   }
 
-  const causes = risk.causes ?? [];
-
-  return (
-    <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 mx-auto">
+  return isLoading ? (
+    <div className="fixed inset-0 flex justify-center items-center">
+      <SpinnerLoader />
+    </div>
+  ) : (
+    <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 mx-auto">
       <button
         onClick={() => {
           const params = new URLSearchParams(window.location.search);
@@ -87,7 +78,7 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
         }}
         className="flex items-center text-sm text-gray-600 hover:text-blue-600 mb-6 hover:cursor-pointer"
       >
-        <ArrowLeftIcon className="w-5 h-5 mr-1 " />
+        <ArrowLeftIcon className="w-5 h-5 mr-1" />
         Kembali
       </button>
 
@@ -105,44 +96,44 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
           value={risk.description || "-"}
           spanFull
         />
-        {/* Causes & Sub Causes */}
         <div>
-          <h3>Penyebab</h3>
+          <h3 className="mb-2 font-semibold text-gray-800">Penyebab</h3>
           {risk.causes && risk.causes.length > 0 ? (
-            risk.causes.map((cause) => (
-              <div
-                key={cause.id}
-                className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200 text-gray-800"
-              >
-                <div className="mb-2">
-                  <strong className="text-[16px] font-semibold">
-                    Kategori:
-                  </strong>{" "}
-                  <span className="capitalize text-[14px]">
-                    {cause.category}
-                  </span>
-                </div>
-                <div className="mb-2">
-                  <strong className="text-[16px] font-semibold">
-                    Penyebab Utama:
-                  </strong>{" "}
-                  <span className="capitalize text-[14px]">
-                    {" "}
-                    {cause.main_cause}
-                  </span>
-                </div>
-                {cause.sub_causes && cause.sub_causes.length > 0 && (
-                  <div className="ml-4 mt-3 text-[14px] text-gray-600 font-semibold">
-                    <strong>Sub Penyebab:</strong>
-                    <ul className="list-disc list-inside mt-1 space-y-1 text-[14px]">
-                      {cause.sub_causes.map((sub) => (
-                        <li key={sub.id}>{sub.sub_cause}</li>
-                      ))}
-                    </ul>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {risk.causes.map((cause) => (
+                <div
+                  key={cause.id}
+                  className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-gray-800"
+                >
+                  <div className="mb-2">
+                    <strong className="text-[16px] font-semibold">
+                      Kategori:
+                    </strong>{" "}
+                    <span className="capitalize text-[14px]">
+                      {cause.category}
+                    </span>
                   </div>
-                )}
-              </div>
-            ))
+                  <div className="mb-2">
+                    <strong className="text-[16px] font-semibold">
+                      Penyebab Utama:
+                    </strong>{" "}
+                    <span className="capitalize text-[14px]">
+                      {cause.main_cause}
+                    </span>
+                  </div>
+                  {cause.sub_causes && cause.sub_causes.length > 0 && (
+                    <div className="ml-4 mt-3 text-[14px] text-gray-600 font-semibold">
+                      <strong>Sub Penyebab:</strong>
+                      <ul className="list-disc list-inside mt-1 space-y-1 text-[14px]">
+                        {cause.sub_causes.map((sub) => (
+                          <li key={sub.id}>{sub.sub_cause}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           ) : (
             <p className="text-gray-500">Tidak ada penyebab yang tercatat.</p>
           )}
@@ -180,14 +171,11 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
             <div
               className={`px-3 py-2 inline-flex items-center gap-2 rounded-2xl text-white text-sm capitalize ${statusColorClass}`}
             >
-              {/* Kamu bisa tambahkan icon sesuai status jika mau */}
               {risk.status || "-"}
             </div>
           }
         />
       </div>
-
-      {/* Kamu bisa tambahkan bagian lain seperti penyebab jika data tersedia */}
 
       <button
         onClick={onClose}
@@ -197,6 +185,7 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
       </button>
     </div>
   );
+  
 }
 
 function DetailItem({

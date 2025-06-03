@@ -36,6 +36,7 @@ export async function getAllRiskAnalysis() {
 export async function fetchRiskAnalysisById(id) {
   try {
     const response = await api.get(`/risk-analysis/${id}`); // pastikan endpoint-nya sesuai
+    console.log(response.data);
     return response.data;
   } catch (error) {
     throw new Error("Gagal mengambil data analisis risiko berdasarkan ID analisis");
