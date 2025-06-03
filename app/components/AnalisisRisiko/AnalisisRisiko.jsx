@@ -7,6 +7,7 @@ import {
   fetchRiskAnalysis,
   deleteRiskAnalysis,
 } from "../../lib/RiskAnalysis";
+import { getAllRiskAnalysis, sendToMenris } from "../../lib/RiskAnalysis";
 import LoadingSkeleton from "../loadings/LoadingSkeleton";
 import FormAnalisis from "../AnalisisRisiko/FormAnalisis";
 import DetailAnalisisRisiko from "../AnalisisRisiko/DetailAnalisisRisiko";
@@ -14,7 +15,7 @@ import ConfirmDeleteModal from "../modalconfirmasi/DeleteModal";
 import SuccessToast from "../modalconfirmasi/SuccessToast";
 import Pagination from "../manage-users/Pagenations";
 
-export default function DetailRisiko() {
+export default function DetailRisiko({ setNotifCount }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const encodedId = searchParams.get("id");
@@ -38,6 +39,13 @@ export default function DetailRisiko() {
   const [risk, setRisk] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
+
+
+    useEffect(() => {
+      if (typeof setNotifCount === "function") {
+        // setNotifCount(0);
+      }
+    }, [setNotifCount]);
 
   useEffect(() => {
     setLoading(true);
@@ -154,34 +162,6 @@ export default function DetailRisiko() {
     return "Rendah";
   };
 
-  const openFormAnalisis = (risk) => {
-    setSelectedRisk(risk);
-    setShowFormAnalisis(true);
-  };
-
-  const handleSaveAnalisis = (analisisData) => {
-    const id = analisisData.id || generateRandomString();
-
-    // Cek apakah data dengan ID tersebut sudah pernah ditambahkan
-    const isAlreadyExists = analisisRisiko.some((item) => item.id === id);
-    if (isAlreadyExists) {
-      setToastMessage("Data ini sudah pernah ditambahkan.");
-      setToastOpen(true);
-      return;
-    }
-
-    const updatedData = {
-      ...analisisData,
-      id,
-    };
-
-    setAnalisisRisiko((prev) => [...prev, updatedData]);
-    setShowFormAnalisis(false);
-
-    setToastMessage("Data berhasil ditambahkan");
-    setToastOpen(true);
-  };
-
   const filteredData = analisisRisiko.filter((item) => {
     const matchSearch = item.risk?.name
       ?.toLowerCase()
@@ -199,6 +179,39 @@ export default function DetailRisiko() {
     return 0;
   });
 
+  const openFormAnalisis = (risk) => {
+    setSelectedRisk(risk);
+    setShowFormAnalisis(true);
+  };
+
+  const handleSaveAnalisis = (analisisData) => {
+    const id = analisisData.id || generateRandomString();
+    const skor = calculateScore(
+      analisisData.severity,
+      analisisData.probability
+    );
+    const bandsrisiko = getBandsRisiko(skor);
+
+    const updatedData = {
+      ...analisisData,
+      id,
+      skor,
+      bandsrisiko,
+    };
+
+    setAnalisisRisiko((prev) => {
+      const index = prev.findIndex((item) => item.id === updatedData.id);
+      if (index !== -1) {
+        const updated = [...prev];
+        updated[index] = updatedData;
+        return updated;
+      }
+      return [...prev, updatedData];
+    });
+
+    setShowFormAnalisis(false);
+  };
+
   const statusIcons = {
     draft: "/icons/draft.svg",
     pending: "/icons/pending.svg",
@@ -215,6 +228,21 @@ export default function DetailRisiko() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const handleSend = async (id) => {
+    try {
+      const response = await sendToMenris(id);
+      console.log("Respons dari server:", response);
+
+      alert("Risiko berhasil dikirim ke Koordinator Manajemen Risiko");
+
+      const updated = await getAllRiskAnalysis();
+      setAnalisisRisiko(updated);
+    } catch (error) {
+      console.error("Error kirim risiko:", error);
+      alert("Terjadi kesalahan saat mengirim risiko");
+    }
+  };
 
   return (
     <>
@@ -382,7 +410,6 @@ export default function DetailRisiko() {
                       )}
                       {item.risk?.status || "-"}
                     </td>
-
                     <td className="p-2 text-sm">
                       <div className="flex flex-row justify-center items-center gap-2">
                         <button onClick={() => handleDetailClick(item)}>
@@ -419,6 +446,17 @@ export default function DetailRisiko() {
                             className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
                           />
                         </button>
+                    <button
+                      type="button"
+                      onClick={() => handleSend(item.id)}
+                      title="Sent to menris"
+                    >
+                      <img
+                        src="/icons/sent.svg"
+                        alt="Sent"
+                        className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
+                      />
+                    </button>
                       </div>
                     </td>
                   </tr>

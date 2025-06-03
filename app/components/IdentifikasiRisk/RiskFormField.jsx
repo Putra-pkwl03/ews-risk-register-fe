@@ -25,6 +25,8 @@ export default function FormFields({
   const [showNoteModal, setShowNoteModal] = useState(false);
   const handleOpenNoteModal = () => setShowNoteModal(true);
   const handleCloseNoteModal = () => setShowNoteModal(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md text-gray-900 max-w-4xl mx-auto mt-8">
@@ -144,7 +146,9 @@ export default function FormFields({
         penyebabList={formData.penyebab}
         onAdd={handleAddPenyebab}
         onRemove={handleRemovePenyebab}
+        isEditMode={isEditMode}
       />
+
       <div className="flex justify-end gap-4 mt-6">
         <button
           onClick={onCancel}

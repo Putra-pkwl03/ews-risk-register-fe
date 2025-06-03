@@ -2,9 +2,14 @@
 import { useEffect, useState } from "react";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { getUsers } from "../../lib/userApi"; 
+import FishboneModal from "../diagram/FishboneModal";
+import FishboneChart from "../diagram/FishboneChart";
+
 
 export default function DetailRisikoCard({ risk, onClose }) {
+
   const [users, setUsers] = useState([]);
+  const [showFishbone, setShowFishbone] = useState(false);
   const uc_c_display = risk.uc_c === 0 ? "UC" : risk.uc_c === 1 ? "C" : risk.uc_c;
 
   useEffect(() => {
@@ -14,6 +19,9 @@ export default function DetailRisikoCard({ risk, onClose }) {
   }, []);
 
   if (!risk) return null;
+
+
+
 
   const creatorName =
     users.find((u) => u.id === risk.created_by)?.name || "Unknown";
@@ -64,9 +72,17 @@ export default function DetailRisikoCard({ risk, onClose }) {
 
       {/* Causes & Sub Causes */}
       <div>
-        <h3 className="text-[16px] text-gray-600 font-semibold mb-4">
-          Penyebab (Causes)
-        </h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-[16px] text-gray-600 font-semibold">
+            Penyebab (Causes)
+          </h3>
+          <button
+            onClick={() => setShowFishbone(true)}
+            className="text-sm px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+          >
+            Lihat Fishbone
+          </button>
+        </div>
         {risk.causes && risk.causes.length > 0 ? (
           risk.causes.map((cause) => (
             <div
@@ -102,6 +118,13 @@ export default function DetailRisikoCard({ risk, onClose }) {
           <p className="text-gray-500">Tidak ada penyebab yang tercatat.</p>
         )}
       </div>
+
+      <FishboneModal
+        isOpen={showFishbone}
+        onClose={() => setShowFishbone(false)}
+      >
+        <FishboneChart causes={risk.causes || []} riskName={risk.name} />
+      </FishboneModal>
     </div>
   );
 }
@@ -118,6 +141,7 @@ function DetailItem({ label, value, capitalize = false, spanFull = false }) {
       >
         {value}
       </div>
+
     </div>
   );
 }
@@ -133,4 +157,6 @@ function formatDate(dateStr) {
     hour: "2-digit",
     minute: "2-digit",
   });
+
+
 }

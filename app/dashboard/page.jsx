@@ -1,37 +1,44 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Layout from './Layout';
-import api from '../lib/api'; 
-import ManageUsers from '../components/manage-users/ManageUsers';
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Layout from "./Layout";
+import api from "../lib/api";
+import ManageUsers from "../components/manage-users/ManageUsers";
 import IdentifikasiRisikoTable from "../components/IdentifikasiRisk/IdentifikasiRisk";
 import AnalisisRisiko from "../components/AnalisisRisiko/AnalisisRisiko";
-import FormAnalisis from '../components/AnalisisRisiko/FormAnalisis';
+import FormAnalisis from "../components/AnalisisRisiko/FormAnalisis";
+import RiskActionMenris from "../components/AnalisisRisiko/RiskAnalysisMenris";
+
 
 
 export default function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const page = searchParams.get('page');
+  const page = searchParams.get("page");
+
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
+
+  // Kelola notifCount dan resetAt di sini
+  const [notifCount, setNotifCount] = useState(0);
+  const [resetAt, setResetAt] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token || token === 'undefined' || token.trim() === '') {
-      router.replace('/login');
+    const token = localStorage.getItem("token");
+    if (!token || token === "undefined" || token.trim() === "") {
+      router.replace("/login");
     } else {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      api.get('/me')
+      api
+        .get("/me")
         .then((res) => {
           setUser(res.data);
           setLoading(false);
         })
-        .catch((err) => {
-          console.error('Gagal mengambil user:', err);
-          router.replace('/login');
+        .catch(() => {
+          router.replace("/login");
         });
     }
   }, [router]);
@@ -46,10 +53,15 @@ export default function Dashboard() {
       </div>
     );
   }
-  
 
   return (
-    <Layout>
+    <Layout
+      notifCount={notifCount}
+      setNotifCount={setNotifCount}
+      resetAt={resetAt}
+      setResetAt={setResetAt}
+      role={user?.role}
+    >
       {page === "manage-users" ? (
         <ManageUsers />
       ) : page === "identifikasi-risiko" ? (
@@ -58,6 +70,8 @@ export default function Dashboard() {
         <AnalisisRisiko />
       ) : page === "form-analisis" ? (
         <FormAnalisis />
+      ) : page === "analisis-risiko-menris" ? (
+        <RiskActionMenris  />
       ) : (
         <div className="flex items-center justify-center h-full">
           <h1 className="text-2xl font-bold text-black">
