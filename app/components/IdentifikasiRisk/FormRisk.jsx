@@ -69,9 +69,8 @@ export default function FormRisiko({
   const [penyebabBaru, setPenyebabBaru] = useState({
     kategori: "",
     deskripsiUtama: "",
-    deskripsiSub: [],
+    deskripsiSub: [""],
   });
-  const [editingIndex, setEditingIndex] = useState(null);
   const [successOpen, setSuccessOpen] = useState(false);
   const [errorOpen, setErrorOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -88,15 +87,14 @@ export default function FormRisiko({
         dampak: selectedRisk.impact || "",
         ucc: selectedRisk.uc_c || "",
         penyebab: Array.isArray(selectedRisk.causes)
-  ? selectedRisk.causes.map((c) => ({
-      kategori: c.category || "",
-      deskripsiUtama: c.main_cause || "",
-      deskripsiSub: Array.isArray(c.sub_causes)
-        ? c.sub_causes.map((sub) =>
-            typeof sub === "string" ? sub : sub.sub_cause
-          )
-        : [],
-    
+          ? selectedRisk.causes.map((c) => ({
+              kategori: c.category || "",
+              deskripsiUtama: c.main_cause || "",
+              deskripsiSub: Array.isArray(c.sub_causes)
+                ? c.sub_causes.map((sub) =>
+                    typeof sub === "string" ? sub : sub.sub_cause
+                  )
+                : [],
             }))
           : [],
       });
@@ -131,18 +129,6 @@ export default function FormRisiko({
 
   const handleAddPenyebab = () => {
     setPenyebabBaru({ kategori: "", deskripsiUtama: "", deskripsiSub: [""] });
-    setEditingIndex(null);
-    setShowModal(true);
-  };
-
-  const handleEditPenyebab = (index) => {
-    const item = formData.penyebab[index];
-    setPenyebabBaru({
-      kategori: item.kategori,
-      deskripsiUtama: item.deskripsiUtama,
-      deskripsiSub: [...(item.deskripsiSub || [])],
-    });
-    setEditingIndex(index);
     setShowModal(true);
   };
 
@@ -177,23 +163,13 @@ export default function FormRisiko({
       return;
     }
 
-    if (editingIndex !== null) {
-      // Edit
-      setFormData((prev) => {
-        const updated = [...prev.penyebab];
-        updated[editingIndex] = penyebabBaru;
-        return { ...prev, penyebab: updated };
-      });
-    } else {
-      // Tambah baru
-      setFormData((prev) => ({
-        ...prev,
-        penyebab: [...prev.penyebab, penyebabBaru],
-      }));
-    }
+    // langsung tambah penyebabBaru ke formData.penyebab
+    setFormData((prev) => ({
+      ...prev,
+      penyebab: [...prev.penyebab, penyebabBaru],
+    }));
 
     setShowModal(false);
-    setEditingIndex(null);
     setPenyebabBaru({ kategori: "", deskripsiUtama: "", deskripsiSub: [] });
   };
 
@@ -203,7 +179,6 @@ export default function FormRisiko({
       penyebab: prev.penyebab.filter((_, i) => i !== index),
     }));
   };
-
 
   const preparePayload = (data) => ({
     cluster: data.klaster,
@@ -220,32 +195,6 @@ export default function FormRisiko({
         p.deskripsiSub && p.deskripsiSub.length > 0 ? p.deskripsiSub : null,
     })),
   });
-
-  
-
-  // Fungsi untuk transform data formData ke payload backend
-  // function preparePayload(data) {
-  //   return {
-  //     cluster: data.klaster,
-  //     unit: data.unit,
-  //     name: data.namaRisiko,
-  //     category: data.kategori,
-  //     description: data.deskripsi,
-  //     impact: data.dampak,
-  //     uc_c: data.ucc === "",
-  //     causes: Array.isArray(data.penyebab)
-  //       ? data.penyebab.map((p) => ({
-  //           category: p.kategori,
-  //           main_cause: p.deskripsiUtama,
-  //           sub_causes:
-  //             Array.isArray(p.deskripsiSub) && p.deskripsiSub.length > 0
-  //               ? p.deskripsiSub
-  //               : null, 
-  //         }))
-  //       : [],
-  //   };
-  // }
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -291,13 +240,13 @@ export default function FormRisiko({
         />
       )}
 
-      <PenyebabSection
+      {/* <PenyebabSection
         penyebabList={formData.penyebab}
         onAdd={handleAddPenyebab}
         onRemove={handleRemovePenyebab}
-        onEdit={handleEditPenyebab}
-        isEditMode={isEditMode}
-      />
+        // hapus onEdit karena fitur edit dihilangkan
+        isEditMode={false}
+      /> */}
 
       <FormFields
         formData={formData}
@@ -306,7 +255,7 @@ export default function FormRisiko({
         kategoriOptions={kategoriOptions}
         onCancel={onCancel}
         handleAddPenyebab={handleAddPenyebab}
-        handleEditPenyebab={handleEditPenyebab}
+        // hapus handleEditPenyebab dari props
         handleRemovePenyebab={handleRemovePenyebab}
         isFormValid={isFormValid}
         isSaving={isSaving}
@@ -317,7 +266,6 @@ export default function FormRisiko({
           penyebabBaru={penyebabBaru}
           onClose={() => {
             setShowModal(false);
-            setEditingIndex(null);
           }}
           onSave={savePenyebab}
           onChange={handlePenyebabChange}

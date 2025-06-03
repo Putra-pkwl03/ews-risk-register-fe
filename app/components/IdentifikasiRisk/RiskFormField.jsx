@@ -1,7 +1,6 @@
 import PenyebabSection from "../../components/IdentifikasiRisk/PenyebabSection";
 import { useState } from "react";
 import RiskNoteModal from "./RiskNoteModal";
-import ModalPenyebab from "./ModalPenyebab";
 
 export default function FormFields({
   formData,
@@ -21,12 +20,9 @@ export default function FormFields({
     deskripsiSub: [],
   };
   const [penyebabBaru, setPenyebabBaru] = useState(defaultPenyebab);
-  const [showPenyebabModal, setShowPenyebabModal] = useState(false);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const handleOpenNoteModal = () => setShowNoteModal(true);
   const handleCloseNoteModal = () => setShowNoteModal(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md text-gray-900 max-w-4xl mx-auto mt-8">
@@ -114,7 +110,7 @@ export default function FormFields({
             onChange={handleChange}
             className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </div> 
+        </div>
 
         <div>
           <label className="block mb-2 font-semibold">UC/C</label>
@@ -146,7 +142,6 @@ export default function FormFields({
         penyebabList={formData.penyebab}
         onAdd={handleAddPenyebab}
         onRemove={handleRemovePenyebab}
-        isEditMode={isEditMode}
       />
 
       <div className="flex justify-end gap-4 mt-6">

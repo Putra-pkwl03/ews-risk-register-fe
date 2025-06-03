@@ -1,17 +1,15 @@
-import { Plus, X, Pencil } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
 export default function PenyebabSection({
   penyebabList = [],
   onRemove,
   onAdd,
-  onEdit,
   isEditMode = false,
 }) {
   return (
     <div className="mt-6">
       <div className="flex justify-between items-center mb-3">
         <h4 className="text-xl font-semibold">Penyebab Risiko</h4>
-
         {!isEditMode && (
           <button
             type="button"
@@ -35,19 +33,11 @@ export default function PenyebabSection({
           className="mb-4 p-4 border border-gray-300 rounded-md bg-gray-50 relative"
         >
           <button
-            onClick={() => (isEditMode ? onEdit(idx) : onRemove(idx))}
-            className={`absolute top-2 right-2 ${
-              isEditMode
-                ? "text-blue-500 hover:text-blue-700"
-                : "text-red-500 hover:text-red-700"
-            }`}
-            aria-label={
-              isEditMode
-                ? `Edit penyebab ${p.kategori}`
-                : `Hapus penyebab ${p.kategori}`
-            }
+            onClick={() => onRemove(idx)}
+            className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+            aria-label={`Hapus penyebab ${p.kategori}`}
           >
-            {isEditMode ? <Pencil size={20} /> : <X size={20} />}
+            <X size={20} />
           </button>
 
           <h5 className="font-semibold">{p.kategori || "-"}</h5>
