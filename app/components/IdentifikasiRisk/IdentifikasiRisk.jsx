@@ -246,7 +246,7 @@ export default function IdentifikasiRisikoTable() {
                   <option value="Pending">Pending</option>
                   <option value="Approved">Approved</option>
                   <option value="Rejected">Rejected</option>
-                  <option value="Dampak">Dampak</option>
+                  <option value="Dampak">UC/C</option>
                 </select>
                 <img
                   src="/icons/chevron-down.svg"
@@ -376,7 +376,7 @@ export default function IdentifikasiRisikoTable() {
                         </div>
                       ))}
                     </td>
-                    <td className="p-2 text-center">{item.impact}</td>
+                    <td className="p-2">{item.impact}</td>
                     <td className="p-2 text-center">
                       {item.uc_c === 1
                         ? "C"
@@ -433,7 +433,8 @@ export default function IdentifikasiRisikoTable() {
                           onClick={() => {
                             const params = new URLSearchParams();
                             params.set("page", "form-analisis");
-                            params.set("id", item.id); // id asli langsung
+                            params.set("mode", "add");
+                            params.set("riskId", item.id); // <- hanya kirim riskId
                             router.push(`/dashboard?${params.toString()}`);
                           }}
                           title="Add"
