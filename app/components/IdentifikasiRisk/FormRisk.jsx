@@ -205,25 +205,47 @@ export default function FormRisiko({
   };
 
 
-  const preparePayload = (data) => ({
-    cluster: data.klaster,
-    unit: data.unit,
-    name: data.namaRisiko,
-    category: data.kategori,
-    description: data.deskripsi,
-    impact: data.dampak,
-    uc_c: data.ucc === "",
-    causes: data.penyebab.map((p) => ({
-      category: p.kategori,
-      main_cause: p.deskripsiUtama,
-      sub_causes:
-        p.deskripsiSub && p.deskripsiSub.length > 0 ? p.deskripsiSub : null,
-    })),
-  });
+  // const preparePayload = (data) => ({
+  //   cluster: data.klaster,
+  //   unit: data.unit,
+  //   name: data.namaRisiko,
+  //   category: data.kategori,
+  //   description: data.deskripsi,
+  //   impact: data.dampak,
+  //   uc_c: data.ucc === "",
+  //   causes: data.penyebab.map((p) => ({
+  //     category: p.kategori,
+  //     main_cause: p.deskripsiUtama,
+  //     sub_causes:
+  //       p.deskripsiSub && p.deskripsiSub.length > 0 ? p.deskripsiSub : null,
+  //   })),
+  // });
 
   
 
   // Fungsi untuk transform data formData ke payload backend
+  function preparePayload(data) {
+    return {
+      cluster: data.klaster,
+      unit: data.unit,
+      name: data.namaRisiko,
+      category: data.kategori,
+      description: data.deskripsi,
+      impact: data.dampak,
+      uc_c: data.ucc === "C" ? 1 : 0,
+      causes: Array.isArray(data.penyebab)
+        ? data.penyebab.map((p) => ({
+            category: p.kategori,
+            main_cause: p.deskripsiUtama,
+            sub_causes:
+              Array.isArray(p.deskripsiSub) && p.deskripsiSub.length > 0
+                ? p.deskripsiSub
+                : null, 
+          }))
+        : [],
+    };
+  }
+  
   // function preparePayload(data) {
   //   return {
   //     cluster: data.klaster,
@@ -245,7 +267,6 @@ export default function FormRisiko({
   //       : [],
   //   };
   // }
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -291,13 +312,13 @@ export default function FormRisiko({
         />
       )}
 
-      <PenyebabSection
+      {/* <PenyebabSection
         penyebabList={formData.penyebab}
         onAdd={handleAddPenyebab}
         onRemove={handleRemovePenyebab}
         onEdit={handleEditPenyebab}
         isEditMode={isEditMode}
-      />
+      /> */}
 
       <FormFields
         formData={formData}
