@@ -1,22 +1,56 @@
 import api from "./api";
 
-// Fungsi untuk simpan data analisis risiko (POST)
+// Simpan data analisis risiko (POST untuk create, PUT untuk update)
 export async function saveRiskAnalysis(data) {
   try {
-    const response = await api.post("/risk-analysis", data);
-    return response.data;
+    if (data.id) {
+      const response = await api.put(`/risk-analysis/${data.id}`, data);
+      return response.data;
+    } else {
+      const response = await api.post("/risk-analysis", data);
+      return response.data;
+    }
   } catch (error) {
-    throw new Error("Gagal menyimpan data analisis risiko");
+    // Cek apakah error response dari axios ada
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Gagal menyimpan data analisis risiko";
+
+    throw new Error(message);
   }
 }
 
-// Fungsi baru untuk ambil semua data analisis risiko (GET)
+// Ambil semua data analisis risiko (GET)
 export async function getAllRiskAnalysis() {
   try {
     const response = await api.get("/risk-analysis");
     return response.data;
   } catch (error) {
     throw new Error("Gagal mengambil data analisis risiko");
+  }
+}
+
+// Ambil data analisis risiko berdasarkan ID analisis
+export async function fetchRiskAnalysisById(id) {
+  try {
+    const response = await api.get(`/risk-analysis/${id}`); // pastikan endpoint-nya sesuai
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    throw new Error("Gagal mengambil data analisis risiko berdasarkan ID analisis");
+  }
+}
+
+export async function deleteRiskAnalysis(id) {
+  try {
+    const response = await api.delete(`/risk-analysis/${id}`);
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message || error.message || "Gagal menghapus data";
+    throw new Error(message);
   }
 }
 
@@ -49,5 +83,3 @@ export async function validateRisk(id, payload) {
     throw new Error("Gagal memvalidasi risiko");
   }
 }
-
-
