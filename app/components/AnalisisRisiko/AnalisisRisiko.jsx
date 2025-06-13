@@ -14,6 +14,9 @@ import DetailAnalisisRisiko from "../AnalisisRisiko/DetailAnalisisRisiko";
 import ConfirmDeleteModal from "../modalconfirmasi/DeleteModal";
 import SuccessToast from "../modalconfirmasi/SuccessToast";
 import Pagination from "../manage-users/Pagenations";
+import MiniSpinner from "../loadings/MiniSpinner";
+import ConfirmModal from "../modalconfirmasi/ConfirmModal";
+import ErrorToast from "../modalconfirmasi/ErrorToast";
 
 export default function DetailRisiko({ setNotifCount }) {
   const searchParams = useSearchParams();
@@ -38,14 +41,20 @@ export default function DetailRisiko({ setNotifCount }) {
   const [toastOpen, setToastOpen] = useState(false);
   const [risk, setRisk] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loadingId, setLoadingId] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [errorToastOpen, setErrorToastOpen] = useState(false);
+  const [errorToastMessage, setErrorToastMessage] = useState("");
+
+
   const itemsPerPage = 7;
 
-
-    useEffect(() => {
-      if (typeof setNotifCount === "function") {
-        // setNotifCount(0);
-      }
-    }, [setNotifCount]);
+  useEffect(() => {
+    if (typeof setNotifCount === "function") {
+      // setNotifCount(0);
+    }
+  }, [setNotifCount]);
 
   useEffect(() => {
     setLoading(true);
@@ -230,19 +239,32 @@ export default function DetailRisiko({ setNotifCount }) {
   );
 
   const handleSend = async (id) => {
+    setLoadingId(id); // aktifkan loading hanya untuk id ini
+
     try {
       const response = await sendToMenris(id);
-      console.log("Respons dari server:", response);
 
-      alert("Risiko berhasil dikirim ke Koordinator Manajemen Risiko");
+      setToastMessage(
+        "Risiko berhasil dikirim ke Koordinator Manajemen Risiko"
+      );
+      setToastOpen(true);
 
       const updated = await getAllRiskAnalysis();
       setAnalisisRisiko(updated);
+
+      setShowModal(false); // tutup modal kalau ada
     } catch (error) {
-      console.error("Error kirim risiko:", error);
-      alert("Terjadi kesalahan saat mengirim risiko");
+
+      // Munculkan error toast dengan pesan dari backend
+      setErrorToastMessage(
+        error.message || "Terjadi kesalahan saat mengirim risiko"
+      );
+      setErrorToastOpen(true);
+    } finally {
+      setLoadingId(null); // matikan loading
     }
   };
+  
 
   return (
     <>
@@ -436,17 +458,30 @@ export default function DetailRisiko({ setNotifCount }) {
                             className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
                           />
                         </button>
-                    <button
-                      type="button"
-                      onClick={() => handleSend(item.id)}
-                      title="Sent to menris"
-                    >
-                      <img
-                        src="/icons/sent.svg"
-                        alt="Sent"
-                        className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
-                      />
-                    </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedId(item.id);
+                            setShowModal(true);
+                          }}
+                          title="Sent to menris"
+                          disabled={loadingId === item.id}
+                          className={
+                            loadingId === item.id
+                              ? "cursor-not-allowed opacity-50"
+                              : ""
+                          }
+                        >
+                          {loadingId === item.id ? (
+                            <MiniSpinner />
+                          ) : (
+                            <img
+                              src="/icons/sent.svg"
+                              alt="Sent"
+                              className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
+                            />
+                          )}
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -469,6 +504,15 @@ export default function DetailRisiko({ setNotifCount }) {
               }}
             />
           )}
+          <ConfirmModal
+            isOpen={showModal}
+            message="Apakah Anda yakin ingin mengirim ke Menris?"
+            onConfirm={() => {
+              setShowModal(false);
+              handleSend(selectedId);
+            }}
+            onCancel={() => setShowModal(false)}
+          />
           <ConfirmDeleteModal
             isOpen={deleteModalOpen}
             onClose={closeDeleteModal}
@@ -479,6 +523,11 @@ export default function DetailRisiko({ setNotifCount }) {
             message={toastMessage}
             isOpen={toastOpen}
             onClose={() => setToastOpen(false)}
+          />
+          <ErrorToast
+            message={errorToastMessage}
+            isOpen={errorToastOpen}
+            onClose={() => setErrorToastOpen(false)}
           />
           <div className="text-sm text-gray-600 ml-4">
             <Pagination

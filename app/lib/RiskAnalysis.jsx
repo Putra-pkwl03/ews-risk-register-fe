@@ -60,7 +60,12 @@ export async function sendToMenris(id) {
     const response = await api.post(`/risk-analysis/${id}/send`);
     return response.data;
   } catch (error) {
-    throw new Error("Gagal mengirim data ke Koordinator Manajemen Risiko");
+    // Tangkap pesan error asli dari backend agar bisa digunakan di frontend
+    const message =
+      error.response?.data?.message ||
+      error.message ||
+      "Gagal mengirim data ke Koordinator Manajemen Risiko";
+    throw new Error(message);
   }
 }
 

@@ -7,6 +7,7 @@ import {
   fetchRiskAnalysisById,
 } from "../../lib/RiskAnalysis";
 import SuccessToast from "../modalconfirmasi/SuccessToast";
+import ErrorToast from "../modalconfirmasi/ErrorToast";
 
 // 🔸 Menentukan warna berdasarkan grading
 const getGradingClass = (grading) => {
@@ -32,7 +33,6 @@ export default function FormAnalisis({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const [showSuccess, setShowSuccess] = useState(false);
   const [riskAnalysisId, setRiskAnalysisId] = useState(null);
   const [riskId, setRiskId] = useState(propRiskId || "");
@@ -41,9 +41,10 @@ export default function FormAnalisis({
     severity: defaultSeverity,
     probability: defaultProbability,
   });
-
   const idFromQuery = searchParams.get("id");
   const riskIdFromQuery = searchParams.get("riskId");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showError, setShowError] = useState(false);
 
   // 🔸 Atur riskId dari parameter URL jika tidak ada dari props
   useEffect(() => {
@@ -138,12 +139,12 @@ export default function FormAnalisis({
       alert("Isi semua data dengan benar dan pastikan Risk ID tersedia.");
       return;
     }
-  
+
     const severity = parseInt(form.severity);
     const probability = parseInt(form.probability);
     const score = severity * probability;
     const grading = getBandsRisiko(score);
-  
+
     const payload = {
       risk_id: riskId,
       severity,
@@ -151,15 +152,15 @@ export default function FormAnalisis({
       score,
       grading,
     };
-  
+
     if (riskAnalysisId) payload.id = riskAnalysisId;
-  
+
     try {
       setIsSaving(true);
       const result = await saveRiskAnalysis(payload);
-  
+
       if (onSave) onSave({ ...result, severity, probability, score, grading });
-  
+
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
@@ -168,13 +169,16 @@ export default function FormAnalisis({
         router.push("/dashboard?page=analisis-risiko");
       }, 2000);
     } catch (error) {
-      alert(`Gagal menyimpan data: ${error.message || "Terjadi kesalahan"}`);
+      let message = "Data analisis risiko ini sudah ada";
+      setErrorMessage(message);
+      setShowError(true);
+      setTimeout(() => {
+        router.push("/dashboard?page=analisis-risiko");
+      }, 1500);
     } finally {
       setIsSaving(false);
     }
   }, [form, isValid, riskId, riskAnalysisId, onSave, onClose, router]);
-  
-   
 
   // 🔸 Tombol batal
   const handleCancel = useCallback(() => {
@@ -269,9 +273,15 @@ export default function FormAnalisis({
           </div>
         </div>
       </div>
-
       {showSuccess && (
         <SuccessToast message="Data analisis risiko berhasil disimpan!" />
+      )}
+      {showError && (
+        <ErrorToast
+          message={errorMessage}
+          isOpen={showError}
+          onClose={() => setShowError(false)}
+        />
       )}
     </>
   );

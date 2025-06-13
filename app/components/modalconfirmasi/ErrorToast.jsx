@@ -24,7 +24,7 @@ export default function ErrorToast({
       <ExclamationTriangleIcon className="w-5 h-5 mr-2" />
       <span className="text-sm flex-1">{message}</span>
       <button onClick={onClose}>
-        <XMarkIcon className="w-4 h-4 ml-2 hover:text-gray-200" />
+        <XMarkIcon className="w-4 h-4 ml-2 hover:text-gray-200 hover:cursor-pointer" />
       </button>
     </div>
   );

@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import FormRisiko from "./FormRisk";
 import RiskService from "../../lib/RiskService";
+import RisikoTable from "../IdentifikasiRisk/RisikoTable";
 import LoadingSkeleton from "../loadings/LoadingSkeleton";
 import ConfirmDeleteModal from "../../components/modalconfirmasi/DeleteModal";
 import ErrorToast from "../../components/modalconfirmasi/ErrorToast";
 import SuccessToast from "../../components/modalconfirmasi/SuccessToast";
 import DetailRisikoCard from "../../components/IdentifikasiRisk/DetailRisikoCard";
-import Pagination from "../manage-users/Pagenations"; 
+import Pagination from "../manage-users/Pagenations";
 
 export default function IdentifikasiRisikoTable() {
   const [data, setData] = useState([]);
@@ -28,8 +29,9 @@ export default function IdentifikasiRisikoTable() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [addedRiskIds, setAddedRiskIds] = useState([]);
   const router = useRouter();
-  const itemsPerPage = 5; 
+  const itemsPerPage = 5;
 
   const handleCancel = () => {
     setShowForm(false);
@@ -56,15 +58,15 @@ export default function IdentifikasiRisikoTable() {
     setIsModalOpen(true);
   };
 
-  const generateRandomString = (length = 10) => {
-    const chars =
-      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let result = "";
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-  };
+  // const generateRandomString = (length = 10) => {
+  //   const chars =
+  //     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  //   let result = "";
+  //   for (let i = 0; i < length; i++) {
+  //     result += chars.charAt(Math.floor(Math.random() * chars.length));
+  //   }
+  //   return result;
+  // };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -276,7 +278,6 @@ export default function IdentifikasiRisikoTable() {
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
                 />
               </div>
-
               <button
                 onClick={handleAdd}
                 className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 hover:cursor-pointer px-3 py-1.5 rounded-md"
@@ -299,169 +300,18 @@ export default function IdentifikasiRisikoTable() {
               </button>
             </div>
           </div>
-
-          <table className="w-full text-sm sm:text-base">
-            <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
-              <tr>
-                <th className="p-2">Klaster</th>
-                <th className="p-2">Unit</th>
-                <th className="p-2">Nama Risiko</th>
-                <th className="p-2">Kategori</th>
-                <th className="p-2">Deskripsi</th>
-                <th className="p-2">Penyebab</th>
-                <th className="p-2">Dampak</th>
-                <th className="p-2">UC/C</th>
-                <th className="p-2 text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={9} className="py-4 text-center">
-                    <LoadingSkeleton />
-                  </td>
-                </tr>
-              ) : displayedData.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="text-center py-4 text-gray-400">
-                    Tidak ada data ditemukan.
-                  </td>
-                </tr>
-              ) : (
-                paginatedData.map((item, idx) => (
-                  <tr
-                    key={item.id}
-                    className={`text-[12px] text-[#292D32] transition-colors border-b border-gray-200 ${
-                      idx % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
-                    } hover:bg-gray-100`}
-                  >
-                    <td className="p-2">{item.cluster}</td>
-                    <td className="p-2">{item.unit}</td>
-                    <td className="p-2">{item.name}</td>
-                    <td className="p-2">{item.category}</td>
-                    <td className="p-2 max-w-[100px]">
-                      <div className="truncate max-w-[200px]">
-                        {item.description}
-                      </div>
-                    </td>
-                    <td className="p-2 text-xs max-w-[250px]">
-                      {item.causes?.map((cause) => (
-                        <div key={cause.id} className="mb-2">
-                          {/* Kategori tetap tampil */}
-                          <p>
-                            <strong>Kategori :</strong>{" "}
-                            {cause.category || "Man"}
-                          </p>
-
-                          {/* Utama satu baris dengan ... jika panjang */}
-                          <p
-                            className="truncate whitespace-nowrap overflow-hidden text-ellipsis"
-                            title={cause.main_cause}
-                          >
-                            <strong>Utama :</strong> {cause.main_cause}
-                          </p>
-
-                          {/* Sub selalu tampil penuh */}
-                          <p
-                            className="truncate whitespace-nowrap overflow-hidden text-ellipsis"
-                            title={cause.sub_causes
-                              ?.map((sub) => sub.sub_cause)
-                              .join(", ")}
-                          >
-                            <strong>Sub :</strong>{" "}
-                            {cause.sub_causes
-                              ?.map((sub) => sub.sub_cause)
-                              .join(", ")}
-                          </p>
-                        </div>
-                      ))}
-                    </td>
-                    <td className="p-2">{item.impact}</td>
-                    <td className="p-2 text-center">
-                      {item.uc_c === 1
-                        ? "C"
-                        : item.uc_c === 0
-                        ? "UC"
-                        : item.uc_c}
-                    </td>
-                    <td className="p-2 text-sm m:p-3">
-                      <div className="flex flex-row justify-center items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setSelectedRisk(item);
-                            setIsDetailMode(true);
-
-                            const randomRef = generateRandomString();
-
-                            // Update URL tanpa reload
-                            const params = new URLSearchParams(
-                              window.location.search
-                            );
-                            params.set("ref", randomRef);
-                            const newUrl = `${
-                              window.location.pathname
-                            }?${params.toString()}`;
-                            window.history.pushState({}, "", newUrl);
-                          }}
-                          title="Detail"
-                        >
-                          <img
-                            src="/icons/detail.svg"
-                            alt="Detail Icon"
-                            className="h-5 w-5 min-w-[20px] min-h-[20px] hover:opacity-80 hover:cursor-pointer"
-                          />
-                        </button>
-
-                        <button onClick={() => handleEdit(item)} title="Edit">
-                          <img
-                            src="/icons/edit.svg"
-                            alt="Edit Icon"
-                            className="h-5 w-5 min-w-[20px] min-h-[20px] hover:opacity-80 hover:cursor-pointer"
-                          />
-                        </button>
-                        <button
-                          onClick={() => openDeleteModal(item.id)}
-                          title="Delete"
-                        >
-                          <img
-                            src="/icons/hapus.svg"
-                            alt="Delete Icon"
-                            className="h-5 w-5 min-w-[20px] min-h-[20px] hover:opacity-80 hover:cursor-pointer"
-                          />
-                        </button>
-                        <button
-                          onClick={() => {
-                            const params = new URLSearchParams();
-                            params.set("page", "form-analisis");
-                            params.set("mode", "add");
-                            params.set("riskId", item.id); // <- hanya kirim riskId
-                            router.push(`/dashboard?${params.toString()}`);
-                          }}
-                          title="Add"
-                          className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 hover:cursor-pointer px-3 py-1.5 rounded-md"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          {/* Table */}
+          <RisikoTable
+            isLoading={isLoading}
+            displayedData={displayedData}
+            paginatedData={paginatedData}
+            setSelectedRisk={setSelectedRisk}
+            setIsDetailMode={setIsDetailMode}
+            handleEdit={handleEdit}
+            openDeleteModal={openDeleteModal}
+            addedRiskIds={addedRiskIds}
+            setAddedRiskIds={setAddedRiskIds}
+          />
           <div className="text-sm text-gray-600 ml-4">
             <Pagination
               currentPage={currentPage}
