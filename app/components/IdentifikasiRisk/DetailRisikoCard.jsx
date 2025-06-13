@@ -78,7 +78,7 @@ export default function DetailRisikoCard({ risk, onClose }) {
           </h3>
           <button
             onClick={() => setShowFishbone(true)}
-            className="text-sm px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+            className="text-sm px-3 py-1  text-blue-500 hover:text-blue-700"
           >
             Lihat Fishbone
           </button>

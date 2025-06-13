@@ -15,7 +15,7 @@ import ConfirmDeleteModal from "../modalconfirmasi/DeleteModal";
 import SuccessToast from "../modalconfirmasi/SuccessToast";
 import Pagination from "../manage-users/Pagenations";
 
-export default function DetailRisiko({ setNotifCount }) {
+export default function DetailRisiko() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const encodedId = searchParams.get("id");
@@ -40,12 +40,6 @@ export default function DetailRisiko({ setNotifCount }) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
 
-
-    useEffect(() => {
-      if (typeof setNotifCount === "function") {
-        // setNotifCount(0);
-      }
-    }, [setNotifCount]);
 
   useEffect(() => {
     setLoading(true);
@@ -105,7 +99,7 @@ export default function DetailRisiko({ setNotifCount }) {
   };
 
   const handleDetailClick = (risk) => {
-    console.log("Risk yang diklik:", risk);
+    // console.log("Risk yang diklik:", risk);
     setSelectedRisk(risk);
     setShowDetail(true);
   };
