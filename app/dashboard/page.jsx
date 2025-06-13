@@ -9,20 +9,19 @@ import IdentifikasiRisikoTable from "../components/IdentifikasiRisk/Identifikasi
 import AnalisisRisiko from "../components/AnalisisRisiko/AnalisisRisiko";
 import FormAnalisis from "../components/AnalisisRisiko/FormAnalisis";
 import RiskActionMenris from "../components/AnalisisRisiko/RiskAnalysisMenris";
-
-
+import PenangananRisiko from "../components/penangananrisiko/PenangananRisiko";
+import EvaluasiRisiko from "../components/evaluasi/EvaluasiRisiko";
+import AddMitigation from "../components/evaluasi/AddMitigations"; 
+import EditMitigation from "../components/evaluasi/EditMitigations";
+import DetailRiskMitigation from "../components/evaluasi/DetailRiskMitigation";
 
 export default function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const page = searchParams.get("page");
+  const page = searchParams.get("page") || "";
 
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-
-  // Kelola notifCount dan resetAt di sini
-  const [notifCount, setNotifCount] = useState(0);
-  const [resetAt, setResetAt] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -54,12 +53,78 @@ export default function Dashboard() {
     );
   }
 
+  // Parsing page 
+  if (page.startsWith("evaluasi-risiko")) {
+    const parts = page.split("/");
+
+    if (parts.length === 1) {
+      return (
+        <Layout
+          notifCount={0}
+          setNotifCount={() => {}}
+          resetAt={null}
+          setResetAt={() => {}}
+          role={user?.role}
+        >
+          <EvaluasiRisiko />
+        </Layout>
+      );
+    }
+
+    if (parts.length === 3 && parts[2] === "detail") {
+      const riskId = parts[1];
+      return (
+        <Layout
+          notifCount={0}
+          setNotifCount={() => {}}
+          resetAt={null}
+          setResetAt={() => {}}
+          role={user?.role}
+        >
+          <DetailRiskMitigation riskId={riskId} />
+        </Layout>
+      );
+    }
+    
+
+    if (parts.length === 4 && parts[2] === "edit-mitigations") {
+      const mitigationId = parts[3];
+      return (
+        <Layout
+          notifCount={0}
+          setNotifCount={() => {}}
+          resetAt={null}
+          setResetAt={() => {}}
+          role={user?.role}
+        >
+          <EditMitigation mitigationId={mitigationId} />
+        </Layout>
+      );
+    }
+
+    if (parts.length === 3 && parts[2] === "add-mitigations") {
+      const riskId = parts[1];
+      return (
+        <Layout
+          notifCount={0}
+          setNotifCount={() => {}}
+          resetAt={null}
+          setResetAt={() => {}}
+          role={user?.role}
+        >
+          <AddMitigation riskId={riskId} />
+        </Layout>
+      );
+    }
+  }
+
+  // Mapping page 
   return (
     <Layout
-      notifCount={notifCount}
-      setNotifCount={setNotifCount}
-      resetAt={resetAt}
-      setResetAt={setResetAt}
+      notifCount={0}
+      setNotifCount={() => {}}
+      resetAt={null}
+      setResetAt={() => {}}
       role={user?.role}
     >
       {page === "manage-users" ? (
@@ -71,7 +136,9 @@ export default function Dashboard() {
       ) : page === "form-analisis" ? (
         <FormAnalisis />
       ) : page === "analisis-risiko-menris" ? (
-        <RiskActionMenris  />
+        <RiskActionMenris />
+      ) : page === "penanganan-risiko" ? (
+        <PenangananRisiko />
       ) : (
         <div className="flex items-center justify-center h-full">
           <h1 className="text-2xl font-bold text-black">

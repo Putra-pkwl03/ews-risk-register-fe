@@ -10,12 +10,7 @@ import LoadingSkeleton from "../loadings/LoadingSkeleton";
 import RejectModal from "../../components/AnalisisRisiko/RejectModal";
 import ConfirmApproveModal from "../../components/modalconfirmasi/ConfirmApproveModal";
 
-export default function RiskActionMenris({ setNotifCount }) {
-  useEffect(() => {
-    if (typeof setNotifCount === "function") {
-      // setNotifCount(0);
-    }
-  }, [setNotifCount]);
+export default function RiskActionMenris() {
 
   const [dataRisiko, setDataRisiko] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

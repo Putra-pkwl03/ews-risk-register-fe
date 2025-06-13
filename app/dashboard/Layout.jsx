@@ -29,7 +29,7 @@ export default function Layout({
         <NotificationListener onCountUpdate={setNotifCount} resetAt={resetAt} />
       )}
 
-      {role === "koordinator_unit" && (
+      {["koordinator_unit", "koordinator_mutu"].includes(role) && (
         <RiskValidationNotificationListener
           onCountUpdate={setNotifCount}
           resetAt={resetAt}
@@ -51,7 +51,7 @@ export default function Layout({
         }`}
       >
         <Navbar toggleSidebar={toggleSidebar} />
-        <main className="p-4">{children}</main>
+        <main className="p-4 w-full ">{children}</main>
       </div>
     </div>
   );

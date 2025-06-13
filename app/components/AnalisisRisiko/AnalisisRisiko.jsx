@@ -18,7 +18,7 @@ import MiniSpinner from "../loadings/MiniSpinner";
 import ConfirmModal from "../modalconfirmasi/ConfirmModal";
 import ErrorToast from "../modalconfirmasi/ErrorToast";
 
-export default function DetailRisiko({ setNotifCount }) {
+export default function DetailRisiko() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const encodedId = searchParams.get("id");
@@ -114,7 +114,7 @@ export default function DetailRisiko({ setNotifCount }) {
   };
 
   const handleDetailClick = (risk) => {
-    console.log("Risk yang diklik:", risk);
+    // console.log("Risk yang diklik:", risk);
     setSelectedRisk(risk);
     setShowDetail(true);
   };

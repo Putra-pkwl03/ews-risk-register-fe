@@ -7,6 +7,8 @@ import {
   ExclamationTriangleIcon,
   UsersIcon,
   XMarkIcon,
+  ShieldCheckIcon,
+  DocumentCheckIcon,
 } from "@heroicons/react/24/outline";
 import { LayoutDashboardIcon, LogOutIcon, ChartBarIcon, } from "lucide-react";
 
@@ -149,7 +151,6 @@ export default function Sidebar({
               />
               {isOpen && <span className="text-sm">Dashboard</span>}
             </motion.li>
-
             {/* Identifikasi Risiko */}
             {role === "koordinator_unit" && (
               <motion.li
@@ -177,7 +178,6 @@ export default function Sidebar({
                 {isOpen && <span className="text-sm">Identifikasi Risiko</span>}
               </motion.li>
             )}
-
             {/* Analisis Risiko untuk Koordinator Unit */}
             {role === "koordinator_unit" && (
               <motion.li
@@ -185,7 +185,7 @@ export default function Sidebar({
                 onClick={() => {
                   handleNavigate("analisis-risiko");
                   if (notifCount > 0) {
-                    setResetAt(Date.now()); // trigger reset di listener
+                    setResetAt(Date.now());
                   }
                 }}
                 className={`relative flex items-center transition-all duration-200 cursor-pointer rounded-md
@@ -212,7 +212,6 @@ export default function Sidebar({
                 )}
               </motion.li>
             )}
-
             {/* Menu Analisis Risiko untuk Koordinator Menris (tidak berubah) */}
             {role === "koordinator_menris" && (
               <motion.li
@@ -250,30 +249,69 @@ export default function Sidebar({
               </motion.li>
             )}
 
-            {/* Manage Users */}
-            {role === "admin" && (
-              <motion.li
-                variants={itemVariants}
-                onClick={() => handleNavigate("manage-users")}
-                className={`flex items-center transition-all duration-200 cursor-pointer rounded
-                ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
-                ${
-                  page === "manage-users"
-                    ? "bg-[#5932EA] text-white"
-                    : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
-                }
-                w-full
-              `}
-              >
-                <UsersIcon
-                  className={`h-6 w-6 flex-shrink-0 ${
-                    page === "manage-users" ? "text-white" : "text-[#9197B3]"
-                  }`}
-                />
-                {isOpen && <span className="text-sm">Manage Users</span>}
-              </motion.li>
-            )}
-          </ul>
+            {/* Penanganan Risiko - Khusus Koordinator Mutu */}
+            {role === "koordinator_mutu" && (
+              <>
+                <motion.li
+                  variants={itemVariants}
+                  onClick={() => {
+                    handleNavigate("penanganan-risiko");
+                    if (notifCount > 0 && onResetNotif) {
+                      onResetNotif();
+                    }
+                  }}
+                  className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
+                    ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                    ${
+                      page === "penanganan-risiko"
+                        ? "bg-[#5932EA] text-white"
+                        : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                    }
+                    w-full
+                  `}
+                            >
+                              <ShieldCheckIcon
+                                className={`h-6 w-6 flex-shrink-0 ${
+                                  page === "penanganan-risiko"
+                                    ? "text-white"
+                                    : "text-[#9197B3]"
+                                }`}
+                              />
+                              {isOpen && <span className="text-sm">Analisys Risiko</span>}
+
+                              {notifCount > 0 && (
+                                <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
+                                  {notifCount}
+                                </span>
+                              )}
+                            </motion.li>
+
+                            {/* Menu baru Evaluasi Risiko tanpa notif */}
+                            <motion.li
+                              variants={itemVariants}
+                              onClick={() => handleNavigate("evaluasi-risiko")}
+                              className={`flex items-center transition-all duration-200 cursor-pointer rounded
+                    ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                    ${
+                      page === "evaluasi-risiko"
+                        ? "bg-[#5932EA] text-white"
+                        : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                    }
+                    w-full
+                  `}
+                            >
+                              < DocumentCheckIcon
+                                className={`h-6 w-6 flex-shrink-0 ${
+                                  page === "evaluasi-risiko"
+                                    ? "text-white"
+                                    : "text-[#9197B3]"
+                                }`}
+                              />
+                              {isOpen && <span className="text-sm">Evaluasi Risiko</span>}
+                            </motion.li>
+                          </>
+                        )}
+                 </ul>
 
           {/* Logout */}
           <motion.div variants={itemVariants} className="p-2">

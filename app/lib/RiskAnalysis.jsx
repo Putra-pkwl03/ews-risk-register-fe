@@ -35,7 +35,7 @@ export async function getAllRiskAnalysis() {
 // Ambil data analisis risiko berdasarkan ID analisis
 export async function fetchRiskAnalysisById(id) {
   try {
-    const response = await api.get(`/risk-analysis/${id}`); // pastikan endpoint-nya sesuai
+    const response = await api.get(`/risk-analysis/${id}`); 
     console.log(response.data);
     return response.data;
   } catch (error) {
@@ -86,5 +86,64 @@ export async function validateRisk(id, payload) {
     return response.data;
   } catch (error) {
     throw new Error("Gagal memvalidasi risiko");
+  }
+}
+
+// Ambil data risiko dengan status validated_approved dan validated_rejected
+export async function getValidatedRisks() {
+  try {
+    const response = await api.get("/risk-validations/validated");
+    return response.data;
+  } catch (error) {
+    throw new Error("Gagal mengambil data risiko yang sudah divalidasi");
+  }
+}
+
+
+// Simpan data risk appetite (POST)
+export async function saveRiskAppetite(data) {
+  try {
+    const response = await api.post('/risk-appetite', data);
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      'Gagal menyimpan data risk appetite';
+    throw new Error(message);
+  }
+}
+
+// Edit keputusan risk appetite (decision)
+export async function editRiskAppetiteDecision(id, decision) {
+  try {
+    const response = await api.patch(`/risk-appetite/${id}/decision`, { decision });
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      'Gagal memperbarui keputusan risk appetite';
+    throw new Error(message);
+  }
+}
+
+
+// Edit nilai controllability risk appetite
+export async function editRiskAppetiteControllability(id, controllability) {
+  try {
+    const response = await api.put(`/risk-appetite/${id}/controllability`, {
+      controllability,
+    });
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      'Gagal memperbarui controllability risk appetite';
+    throw new Error(message);
   }
 }
