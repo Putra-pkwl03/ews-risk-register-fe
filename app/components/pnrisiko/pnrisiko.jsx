@@ -13,6 +13,7 @@ import AddEffectivenessModal from "../pnrisiko/EffectivitasModal";
 import DetailRiskHandling from "../pnrisiko/DetailRiskHandling";
 import ConfirmSendModal from "../../components/modalconfirmasi/SentKepalapuskesmasModal";
 import ConfirmDeleteModal from "../../components/modalconfirmasi/DeleteModal";
+import ReviewNoteModal from "../managementrisiko/RiviewNoteModal"; 
 
 import {
   EyeIcon,
@@ -32,7 +33,9 @@ export default function Pnrisiko() {
   const [sendItemId, setSendItemId] = useState(null);
     const [editingItem, setEditingItem] = useState(null);
     const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
-    const [deleteItemId, setDeleteItemId] = useState(null);
+  const [deleteItemId, setDeleteItemId] = useState(null);
+    const [noteModalOpen, setNoteModalOpen] = useState(false);
+  const [selectedNote, setSelectedNote] = useState("");
 
   useEffect(() => {
     fetchRiskHandlings()
@@ -51,9 +54,11 @@ export default function Pnrisiko() {
   }
 
   return (
-    <div className="p-6 bg-white rounded shadow-md overflow-x-auto relative">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">Penanganan Risiko</h1>
+    <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <h5 className="text-[20px] text-black font-semibold">
+          Penanganan Risiko
+        </h5>
         <button
           onClick={() => {
             const uniqueRisks = data
@@ -65,7 +70,7 @@ export default function Pnrisiko() {
             setRisks(uniqueRisks);
             setModalOpen(true);
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full sm:w-auto cursor-pointer"
         >
           + Add Efektivitas
         </button>
@@ -79,44 +84,65 @@ export default function Pnrisiko() {
       )}
 
       {data.length > 0 && (
-        <table className="min-w-full bg-white text-sm text-left border rounded">
-          <thead className="bg-gray-100 text-gray-700 uppercase">
+        <table className="w-full text-sm sm:text-base">
+          <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
             <tr>
-              <th className="px-4 py-2 border">No</th>
-              <th className="px-4 py-2 border">Risiko</th>
-              <th className="px-4 py-2 border">Unit</th>
-              <th className="px-4 py-2 border">Efektivitas</th>
-              <th className="px-4 py-2 border">Signature</th>
-              <th className="px-4 py-2 border">Handled By</th>
-              <th className="px-4 py-2 border">Reviewer</th>
-              <th className="px-4 py-2 border">Tanggal</th>
-              <th className="px-4 py-2 border text-center">Aksi</th>
+              <th className="p-2">No</th>
+              <th className="p-2">Risiko</th>
+              <th className="p-2">Unit</th>
+              <th className="p-2">Efektivitas</th>
+              <th className="p-2">Signature</th>
+              <th className="p-2">Handled By</th>
+              <th className="p-2">Reviewer</th>
+              <th className="p-2">Catatan</th>
+              <th className="p-2">Tanggal</th>
+              <th className="p-2 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {data.map((item, i) => (
               <tr key={item.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border">{i + 1}</td>
-                <td className="px-4 py-2 border">{item.risk?.name}</td>
-                <td className="px-4 py-2 border">{item.risk?.unit}</td>
-                <td className="px-4 py-2 border">{item.effectiveness}</td>
-                <td className="px-4 py-2 border">
-                  {item.approval_signature || "-"}
+                <td className="p-2">{i + 1}</td>
+                <td className="p-2">{item.risk?.name}</td>
+                <td className="p-2">{item.risk?.unit}</td>
+                <td className="p-2">{item.effectiveness}</td>
+                <td className="p-2">
+                  {item.approval_signature ? (
+                    <img
+                      src={item.approval_signature}
+                      alt="Signature"
+                      className="h-12 object-contain"
+                    />
+                  ) : (
+                    "-"
+                  )}
                 </td>
-                <td className="px-4 py-2 border">
-                  {item.handler?.name || "-"}
+                <td className="py-2 ">{item.handler?.name || "-"}</td>
+                <td className="py-2 ">{item.reviewer?.name || "-"}</td>
+                <td className="py-2 ">
+                  {item.review_notes ? (
+                    <button
+                      className="text-red-600 hover:underline cursor-pointer"
+                      onClick={() => {
+                        setSelectedNote(item.review_notes);
+                        setNoteModalOpen(true);
+                      }}
+                    >
+                      {item.review_notes.split(" ").slice(0, 3).join(" ") +
+                        "..."}
+                    </button>
+                  ) : (
+                    "-"
+                  )}
                 </td>
-                <td className="px-4 py-2 border">
-                  {item.reviewer?.name || "-"}
-                </td>
-                <td className="px-4 py-2 border">
+                <td className="py-2">
                   {new Date(item.created_at).toLocaleString()}
                 </td>
-                <td className="px-4 py-2 border text-center">
-                  <div className="flex items-center justify-center space-x-2">
+                <td className="p-2 text-sm m:p-3">
+                  <div className="flex flex-row justify-center items-center gap-2">
                     <button
                       onClick={() => setSelectedItem(item)}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-blue-600 hover:text-blue-800 cursor-pointer"
                       title="Detail"
                     >
                       <EyeIcon className="w-5 h-5" />
@@ -130,30 +156,55 @@ export default function Pnrisiko() {
                               index === self.findIndex((r) => r.id === risk.id)
                           );
                         setRisks(uniqueRisks);
-                        setEditingItem(item); // ? kirim item ke modal
+                        setEditingItem(item);
                         setModalOpen(true);
                       }}
-                      className="text-yellow-500 hover:text-yellow-700"
+                      disabled={
+                        item.is_sent &&
+                        !(item.is_approved === false || item.is_approved === 0)
+                      }
+                      className={`text-yellow-500 hover:text-yellow-700 ${
+                        item.is_sent &&
+                        !(item.is_approved === false || item.is_approved === 0)
+                          ? "opacity-50 cursor-not-allowed"
+                          : "cursor-pointer"
+                      }`}
                       title="Edit"
                     >
                       <PencilSquareIcon className="w-5 h-5" />
                     </button>
+
                     <button
                       onClick={() => {
                         setDeleteItemId(item.id);
                         setConfirmDeleteOpen(true);
                       }}
-                      className="text-red-600 hover:text-red-800"
+                      disabled={
+                        item.is_sent &&
+                        !(item.is_approved === false || item.is_approved === 0)
+                      }
+                      className={`text-red-600 hover:text-red-800 ${
+                        item.is_sent &&
+                        !(item.is_approved === false || item.is_approved === 0)
+                          ? "opacity-50 cursor-not-allowed"
+                          : "cursor-pointer"
+                      }`}
                       title="Hapus"
                     >
                       <TrashIcon className="w-5 h-5" />
                     </button>
+
                     <button
                       onClick={() => {
                         setSendItemId(item.id);
                         setConfirmSendOpen(true);
                       }}
-                      className="text-green-600 hover:text-green-800"
+                      disabled={item.is_sent && !item.review_notes}
+                      className={`text-green-600 hover:text-green-800 ${
+                        item.is_sent && !item.review_notes
+                          ? "opacity-50 cursor-not-allowed"
+                          : "cursor-pointer"
+                      }`}
                       title="Kirim ke Kepala Puskesmas"
                     >
                       <PaperAirplaneIcon className="w-5 h-5 rotate-45" />
@@ -202,6 +253,8 @@ export default function Pnrisiko() {
           try {
             await sendToKepala(sendItemId);
             alert("Notifikasi berhasil dikirim ke kepala puskesmas.");
+            const updated = await fetchRiskHandlings();
+            setData(updated.data);
           } catch (err) {
             alert(err.message);
           } finally {
@@ -229,6 +282,12 @@ export default function Pnrisiko() {
             setDeleteItemId(null);
           }
         }}
+      />
+
+      <ReviewNoteModal
+        isOpen={noteModalOpen}
+        onClose={() => setNoteModalOpen(false)}
+        note={selectedNote}
       />
     </div>
   );
