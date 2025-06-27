@@ -15,6 +15,8 @@ import AddMitigation from "../components/evaluasi/AddMitigations";
 import EditMitigation from "../components/evaluasi/EditMitigations";
 import DetailRiskMitigation from "../components/evaluasi/DetailRiskMitigation";
 import Pnrisiko from "../components/pnrisiko/pnrisiko";
+import Risikokepalapuskesmas from "../components/managementrisiko/RisikokepalaPuskesmas";
+
 
 
 export default function Dashboard() {
@@ -143,6 +145,8 @@ export default function Dashboard() {
         <PenangananRisiko />
       ) : page === "menu-penanganan-risiko" ? (
         <Pnrisiko />    
+      ) : page === "manajemen-risiko" ? (
+        <Risikokepalapuskesmas />
       ) : (
         <div className="flex items-center justify-center h-full">
           <h1 className="text-2xl font-bold text-black">
