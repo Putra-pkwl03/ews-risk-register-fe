@@ -173,10 +173,28 @@ export default function DetailRiskHandling({ item, onClose }) {
 }
 
 function DetailItem({ label, value, spanFull = false }) {
+  const isImage =
+    typeof value === "string" &&
+    (value.startsWith("http") ||
+      value.startsWith("/") ||
+      value.startsWith("data:image/"));
+
   return (
     <div className={`${spanFull ? "md:col-span-2" : ""}`}>
       <div className="text-gray-500 font-medium mb-1">{label}</div>
-      <div className="p-3 bg-gray-100 rounded-xl">{value ?? "-"}</div>
+      <div className="p-3 bg-gray-100 rounded-xl">
+        {isImage ? (
+          <img
+            src={value}
+            alt={label}
+            className="max-h-10"
+          />
+        ) : (
+          value ?? "-"
+        )}
+      </div>
     </div>
   );
 }
+
+
