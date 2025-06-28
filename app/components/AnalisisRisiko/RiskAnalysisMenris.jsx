@@ -9,17 +9,23 @@ import {
 import LoadingSkeleton from "../loadings/LoadingSkeleton";
 import RejectModal from "../../components/AnalisisRisiko/RejectModal";
 import ConfirmApproveModal from "../../components/modalconfirmasi/ConfirmApproveModal";
+import Pagination from "../manage-users/Pagenations";
+import SuccessToast from "../modalconfirmasi/SuccessToast";
+import ErrorToast from "../modalconfirmasi/ErrorToast";
 
 export default function RiskActionMenris() {
-
   const [dataRisiko, setDataRisiko] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
   const [selectedRiskId, setSelectedRiskId] = useState(null);
   const [showApproveModal, setShowApproveModal] = useState(false);
-
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isRejectModalOpen, setRejectModalOpen] = useState(false);
   const [rejectId, setRejectId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchData = async () => {
     try {
@@ -33,6 +39,13 @@ export default function RiskActionMenris() {
     }
   };
 
+  const statusIcons = {
+    draft: "/icons/draft.svg",
+    pending: "/icons/pending.svg",
+    validated_approved: "/icons/approved.svg",
+    validated_rejected: "/icons/rejected.svg",
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -44,13 +57,15 @@ export default function RiskActionMenris() {
         is_approved: true,
         notes: null,
       });
-      alert("Risiko berhasil divalidasi dan disetujui.");
+      setSuccessMessage("Risiko berhasil divalidasi dan disetujui.");
+      setShowSuccessToast(true);
       setShowApproveModal(false);
       setSelectedRiskId(null);
       fetchData();
     } catch (error) {
       console.error("Gagal memvalidasi risiko:", error);
-      alert("Terjadi kesalahan saat menyetujui.");
+      setErrorMessage("Terjadi kesalahan saat menyetujui.");
+      setShowErrorToast(true);
     }
   };
 
@@ -68,15 +83,25 @@ export default function RiskActionMenris() {
         is_approved: false,
         notes: reason,
       });
-      alert(`Risiko ditolak dengan alasan:\n${reason}`);
+
+      setSuccessMessage(`Risiko ditolak dengan alasan: ${reason}`);
+      setShowSuccessToast(true);
+
       setRejectModalOpen(false);
       setRejectId(null);
       fetchData();
     } catch (error) {
       console.error("Gagal menolak risiko:", error);
-      alert("Terjadi kesalahan saat menolak.");
+      setErrorMessage("Terjadi kesalahan saat menolak.");
+      setShowErrorToast(true);
     }
   };
+
+  const totalPages = Math.ceil(dataRisiko.length / itemsPerPage);
+  const paginatedRisiko = dataRisiko.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
@@ -93,11 +118,11 @@ export default function RiskActionMenris() {
               <th className="p-2">Unit</th>
               <th className="p-2">Cluster</th>
               <th className="p-2">Kategori</th>
-              <th className="p-2">Severity</th>
-              <th className="p-2">Probability</th>
-              <th className="p-2">Score</th>
-              <th className="p-2">Grading</th>
-              <th className="p-2">Status</th>
+              <th className="p-2 text-center">Severity</th>
+              <th className="p-2 text-center">Probability</th>
+              <th className="p-2 text-center">Score</th>
+              <th className="p-2 text-center">Grading</th>
+              <th className="p-2 text-center">Status</th>
               <th className="p-2 text-center">Aksi</th>
             </tr>
           </thead>
@@ -108,14 +133,14 @@ export default function RiskActionMenris() {
                   Memuat data...
                 </td>
               </tr>
-            ) : dataRisiko.length === 0 ? (
+            ) : paginatedRisiko.length === 0 ? (
               <tr>
                 <td colSpan={9} className="py-6 text-center text-gray-400">
                   Tidak ada data risiko tersedia.
                 </td>
               </tr>
             ) : (
-              dataRisiko.map((item, index) => (
+              paginatedRisiko.map((item, index) => (
                 <tr
                   key={item.id}
                   className={`text-[12px] text-[#292D32] border-b border-gray-200 ${
@@ -126,47 +151,68 @@ export default function RiskActionMenris() {
                   <td className="p-2">{item.unit || "-"}</td>
                   <td className="p-2">{item.cluster || "-"}</td>
                   <td className="p-2">{item.category || "-"}</td>
-                  <td className="p-2">{item.analysis?.severity || "-"}</td>
-                  <td className="p-2">{item.analysis?.probability || "-"}</td>
-                  <td className="p-2">{item.analysis?.score || "-"}</td>
-
-                  <td className="p-2">
+                  <td className="p-2 text-center">
+                    {item.analysis?.severity || "-"}
+                  </td>
+                  <td className="p-2 text-center">
+                    {item.analysis?.probability || "-"}
+                  </td>
+                  <td className="p-2 text-center">
+                    {item.analysis?.score || "-"}
+                  </td>
+                  <td className="p-2 text-center">
                     <span
-                      className={`capitalize text-[12px] font-medium px-2 py-1 rounded-md border
-                    ${
-                      item.analysis?.grading?.toLowerCase() === "sangat tinggi"
-                        ? "bg-red-800 text-white"
-                        : item.analysis?.grading?.toLowerCase() === "tinggi"
-                        ? "bg-red-500 text-white"
-                        : item.analysis?.grading?.toLowerCase() === "sedang"
-                        ? "bg-yellow-400 text-black"
-                        : item.analysis?.grading?.toLowerCase() === "rendah"
-                        ? "bg-green-700 text-white"
-                        : item.analysis?.grading?.toLowerCase() ===
-                          "sangat rendah"
-                        ? "bg-green-400 text-black"
-                        : "bg-gray-300 text-gray-700"
-                    }`}
+                      className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border 
+                        ${
+                          item.analysis?.grading?.toLowerCase() ===
+                          "sangat tinggi"
+                            ? "bg-red-800 text-white"
+                            : item.analysis?.grading?.toLowerCase() === "tinggi"
+                            ? "bg-red-500 text-white"
+                            : item.analysis?.grading?.toLowerCase() === "sedang"
+                            ? "bg-yellow-400 text-white"
+                            : item.analysis?.grading?.toLowerCase() === "rendah"
+                            ? "bg-green-700 text-white"
+                            : item.analysis?.grading?.toLowerCase() ===
+                              "sangat rendah"
+                            ? "bg-green-400 text-white"
+                            : "bg-gray-400 text-white"
+                        }`}
                     >
                       {item.analysis?.grading || "-"}
                     </span>
                   </td>
-
-                  <td className="p-2">
-                    <span
-                      className={`capitalize text-[12px] font-medium px-2 py-1 rounded-md border
-      ${
-        item.status?.toLowerCase() === "pending"
-          ? "bg-yellow-400 text-black"
-          : item.status?.toLowerCase() === "approved"
-          ? "bg-green-600 text-white"
-          : item.status?.toLowerCase() === "rejected"
-          ? "bg-red-500 text-white"
-          : "bg-gray-300 text-gray-700"
-      }`}
-                    >
-                      {item.status || "-"}
-                    </span>
+                  <td
+                    className={`px-1 py-0.5 capitalize flex items-center justify-center gap-1 mt-3.5 rounded-2xl text-white text-center
+                    ${
+                      item.status === "draft"
+                        ? "bg-gray-400"
+                        : item.status === "pending"
+                        ? "bg-yellow-500"
+                        : item.status === "validated_approved"
+                        ? "bg-green-500"
+                        : item.status === "validated_rejected"
+                        ? "bg-red-500"
+                        : "bg-gray-300"
+                    }`}
+                  >
+                    {item.status ? (
+                      <>
+                        {/* Jika ada ikon status */}
+                        {statusIcons[item.status] && (
+                          <img
+                            src={statusIcons[item.status]}
+                            alt={`${item.status} icon`}
+                            className="w-3 h-3"
+                          />
+                        )}
+                        <span className="ml-1">
+                          {item.status.replaceAll("_", " ")}
+                        </span>
+                      </>
+                    ) : (
+                      <span>-</span>
+                    )}
                   </td>
 
                   <td className="p-2 text-center space-x-2">
@@ -175,13 +221,13 @@ export default function RiskActionMenris() {
                         setSelectedRiskId(item.id);
                         setShowApproveModal(true);
                       }}
-                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-xs font-medium"
+                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-xs font-medium hover:cursor-pointer"
                     >
                       Setuju
                     </button>
                     <button
                       onClick={() => handleRejectClick(item.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs font-medium"
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs font-medium hover:cursor-pointer"
                     >
                       Tolak
                     </button>
@@ -192,17 +238,32 @@ export default function RiskActionMenris() {
           </tbody>
         </table>
       )}
-
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        itemsPerPage={itemsPerPage}
+        totalItems={dataRisiko.length}
+      />
       <ConfirmApproveModal
         isOpen={showApproveModal}
         onClose={() => setShowApproveModal(false)}
         onConfirm={handleApprove}
       />
-
       <RejectModal
         isOpen={isRejectModalOpen}
         onClose={() => setRejectModalOpen(false)}
         onSubmit={handleRejectSubmit}
+      />
+      <SuccessToast
+        isOpen={showSuccessToast}
+        message={successMessage}
+        onClose={() => setShowSuccessToast(false)}
+      />
+      <ErrorToast
+        isOpen={showErrorToast}
+        message={errorMessage}
+        onClose={() => setShowErrorToast(false)}
       />
     </div>
   );

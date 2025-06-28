@@ -13,20 +13,28 @@ export default function PenangananRisiko() {
   const [risks, setRisks] = useState([]);
   const [selectedRisk, setSelectedRisk] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalItems = risks.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   // Fungsi fetch ulang data risiko
   const fetchValidatedRisks = async () => {
+    setIsLoading(true); // ← mulai loading
     try {
       const data = await getValidatedRisks();
-      console.log(data)
+      console.log(data);
       setRisks(data);
     } catch (error) {
       console.error(error.message);
+    } finally {
+      setIsLoading(false); // ← selesai loading
     }
   };
+  
 
   useEffect(() => {
     fetchValidatedRisks();
@@ -88,6 +96,12 @@ export default function PenangananRisiko() {
       modalOpen={modalOpen}
       onCloseModal={handleCloseModal}
       onDecisionChange={handleDecisionChange}
+      isLoading={isLoading}
+      currentPage={currentPage}
+      totalPages={totalPages}
+      setCurrentPage={setCurrentPage}
+      itemsPerPage={itemsPerPage}
+      totalItems={totalItems}
     />
   );
 }

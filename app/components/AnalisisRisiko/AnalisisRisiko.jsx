@@ -50,11 +50,11 @@ export default function DetailRisiko() {
 
   const itemsPerPage = 7;
 
-  useEffect(() => {
-    if (typeof setNotifCount === "function") {
-      // setNotifCount(0);
-    }
-  }, [setNotifCount]);
+//   useEffect(() => {
+//     if (typeof setNotifCount === "function") {
+//       // setNotifCount(0);
+//     }
+//   }, [setNotifCount]);
 
   useEffect(() => {
     setLoading(true);
@@ -391,19 +391,19 @@ export default function DetailRisiko() {
                     <td className="p-2 text-center">
                       <span
                         className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border 
-                    ${
-                      item.grading?.toLowerCase() === "sangat tinggi"
-                        ? "bg-red-800 text-white"
-                        : item.grading?.toLowerCase() === "tinggi"
-                        ? "bg-red-500 text-white"
-                        : item.grading?.toLowerCase() === "sedang"
-                        ? "bg-yellow-400 text-white"
-                        : item.grading?.toLowerCase() === "rendah"
-                        ? "bg-green-700 text-white"
-                        : item.grading?.toLowerCase() === "sangat rendah"
-                        ? "bg-green-400 text-white"
-                        : "bg-gray-400 text-white"
-                    }`}
+                        ${
+                          item.grading?.toLowerCase() === "sangat tinggi"
+                            ? "bg-red-800 text-white"
+                            : item.grading?.toLowerCase() === "tinggi"
+                            ? "bg-red-500 text-white"
+                            : item.grading?.toLowerCase() === "sedang"
+                            ? "bg-yellow-400 text-white"
+                            : item.grading?.toLowerCase() === "rendah"
+                            ? "bg-green-700 text-white"
+                            : item.grading?.toLowerCase() === "sangat rendah"
+                            ? "bg-green-400 text-white"
+                            : "bg-gray-400 text-white"
+                        }`}
                       >
                         {item.grading || "-"}
                       </span>

@@ -9,11 +9,11 @@ export default function RejectModal({ isOpen, onClose, onSubmit }) {
 
   const handleSubmit = () => {
     onSubmit(reason);
-    setReason(""); 
+    setReason("");
   };
 
   return (
-          <div className="fixed inset-0 bg-black/40 flex items-center text-gray-900 justify-center z-50">
+    <div className="fixed inset-0 bg-black/40 flex items-center text-gray-900 justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-lg relative max-h-[80vh] overflow-y-auto">
         <h3 className="text-lg font-semibold mb-3">Alasan Menolak Risiko</h3>
         <textarea
@@ -25,16 +25,16 @@ export default function RejectModal({ isOpen, onClose, onSubmit }) {
         />
         <div className="flex justify-end space-x-3">
           <button
-            className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400"
+            className="w-[90px] h-[42px] text-sm text-red-600 border border-red-400 rounded-lg hover:bg-red-100 transition duration-300 ease-in-out hover:cursor-pointer"
             onClick={() => {
               setReason("");
               onClose();
             }}
           >
-            Batal
+            Cancel
           </button>
           <button
-            className="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700"
+            className="w-[90px] h-[42px] text-sm text-blue-600 bg-transparent border border-blue-500 rounded-lg transition duration-300 ease-in-out hover:text-blue hover:bg-blue-100 hover:cursor-pointer"
             onClick={handleSubmit}
             disabled={!reason.trim()}
           >

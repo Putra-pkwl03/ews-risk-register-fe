@@ -8,9 +8,13 @@ import {
   UsersIcon,
   XMarkIcon,
   ShieldCheckIcon,
-  DocumentCheckIcon,
 } from "@heroicons/react/24/outline";
-import { LayoutDashboardIcon, LogOutIcon, ChartBarIcon, } from "lucide-react";
+import {
+  LayoutDashboardIcon,
+  LogOutIcon,
+  ChartBarIcon,
+  ClipboardList,
+} from "lucide-react";
 
 export default function Sidebar({
   isOpen,
@@ -269,28 +273,28 @@ export default function Sidebar({
                     }
                     w-full
                   `}
-                            >
-                              <ShieldCheckIcon
-                                className={`h-6 w-6 flex-shrink-0 ${
-                                  page === "penanganan-risiko"
-                                    ? "text-white"
-                                    : "text-[#9197B3]"
-                                }`}
-                              />
-                              {isOpen && <span className="text-sm">Analisys Risiko</span>}
+                >
+                  <ShieldCheckIcon
+                    className={`h-6 w-6 flex-shrink-0 ${
+                      page === "penanganan-risiko"
+                        ? "text-white"
+                        : "text-[#9197B3]"
+                    }`}
+                  />
+                  {isOpen && <span className="text-sm">Analisis Risiko</span>}
 
-                              {notifCount > 0 && (
-                                <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
-                                  {notifCount}
-                                </span>
-                              )}
-                            </motion.li>
+                  {notifCount > 0 && (
+                    <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
+                      {notifCount}
+                    </span>
+                  )}
+                </motion.li>
 
-                            {/* Menu baru Evaluasi Risiko tanpa notif */}
-                            <motion.li
-                              variants={itemVariants}
-                              onClick={() => handleNavigate("evaluasi-risiko")}
-                              className={`flex items-center transition-all duration-200 cursor-pointer rounded
+                {/* Menu baru Evaluasi Risiko tanpa notif */}
+                <motion.li
+                  variants={itemVariants}
+                  onClick={() => handleNavigate("evaluasi-risiko")}
+                  className={`flex items-center transition-all duration-200 cursor-pointer rounded
                     ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
                     ${
                       page === "evaluasi-risiko"
@@ -299,19 +303,40 @@ export default function Sidebar({
                     }
                     w-full
                   `}
-                            >
-                              < DocumentCheckIcon
-                                className={`h-6 w-6 flex-shrink-0 ${
-                                  page === "evaluasi-risiko"
-                                    ? "text-white"
-                                    : "text-[#9197B3]"
-                                }`}
-                              />
-                              {isOpen && <span className="text-sm">Evaluasi Risiko</span>}
-                            </motion.li>
-                          </>
-                        )}
-                 </ul>
+                >
+                  <ClipboardList
+                    className={`h-6 w-6 flex-shrink-0 ${
+                      page === "evaluasi-risiko"
+                        ? "text-white"
+                        : "text-[#9197B3]"
+                    }`}
+                  />
+                  {isOpen && <span className="text-sm">Evaluasi Risiko</span>}
+                </motion.li>
+              </>
+            )}
+            {/* Manage Users */}
+            {role === "admin" && (
+              <motion.li
+                variants={itemVariants}
+                onClick={() => handleNavigate("manage-users")}
+                className={`flex items-center transition-all duration-200 cursor-pointer rounded w-full 
+                  ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"} 
+                  ${
+                    page === "manage-users"
+                      ? "bg-[#5932EA] text-white"
+                      : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                  }`}
+              >
+                <UsersIcon
+                  className={`h-6 w-6 flex-shrink-0 ${
+                    page === "manage-users" ? "text-white" : "text-[#9197B3]"
+                  }`}
+                />
+                {isOpen && <span className="text-sm">Manage Users</span>}
+              </motion.li>
+            )}
+          </ul>
 
           {/* Logout */}
           <motion.div variants={itemVariants} className="p-2">
