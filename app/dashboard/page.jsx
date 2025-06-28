@@ -14,6 +14,10 @@ import EvaluasiRisiko from "../components/evaluasi/EvaluasiRisiko";
 import AddMitigation from "../components/evaluasi/AddMitigations"; 
 import EditMitigation from "../components/evaluasi/EditMitigations";
 import DetailRiskMitigation from "../components/evaluasi/DetailRiskMitigation";
+import Pnrisiko from "../components/pnrisiko/pnrisiko";
+import Risikokepalapuskesmas from "../components/managementrisiko/RisikokepalaPuskesmas";
+
+
 
 export default function Dashboard() {
   const router = useRouter();
@@ -139,6 +143,10 @@ export default function Dashboard() {
         <RiskActionMenris />
       ) : page === "penanganan-risiko" ? (
         <PenangananRisiko />
+      ) : page === "menu-penanganan-risiko" ? (
+        <Pnrisiko />    
+      ) : page === "manajemen-risiko" ? (
+        <Risikokepalapuskesmas />
       ) : (
         <div className="flex items-center justify-center h-full">
           <h1 className="text-2xl font-bold text-black">

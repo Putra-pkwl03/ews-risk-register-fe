@@ -14,7 +14,10 @@ import {
   LogOutIcon,
   ChartBarIcon,
   ClipboardList,
+  DocumentCheckIcon,
+  ClipboardDocumentListIcon,
 } from "lucide-react";
+
 
 export default function Sidebar({
   isOpen,
@@ -281,7 +284,8 @@ export default function Sidebar({
                         : "text-[#9197B3]"
                     }`}
                   />
-                  {isOpen && <span className="text-sm">Analisis Risiko</span>}
+
+                  {isOpen && <span className="text-sm">Analisys Risiko</span>}
 
                   {notifCount > 0 && (
                     <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
@@ -315,6 +319,57 @@ export default function Sidebar({
                 </motion.li>
               </>
             )}
+            {/* Menu Penanganan Risiko - Koordinator Mutu & Koordinator Unit */}
+            {(role === "koordinator_mutu" || role === "koordinator_unit") && (
+              <motion.li
+                variants={itemVariants}
+                onClick={() => handleNavigate("menu-penanganan-risiko")}
+                className={`flex items-center transition-all duration-200 cursor-pointer rounded
+                ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                ${
+                  page === "menu-penanganan-risiko"
+                    ? "bg-[#5932EA] text-white"
+                    : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                }
+                w-full
+              `}
+              >
+                <ShieldCheckIcon
+                  className={`h-6 w-6 flex-shrink-0 ${
+                    page === "menu-penanganan-risiko"
+                      ? "text-white"
+                      : "text-[#9197B3]"
+                  }`}
+                />
+                {isOpen && <span className="text-sm">Penanganan Risiko</span>}
+              </motion.li>
+            )}
+
+            {role === "kepala_puskesmas" && (
+              <motion.li
+                variants={itemVariants}
+                onClick={() => handleNavigate("manajemen-risiko")}
+                className={`flex items-center transition-all duration-200 cursor-pointer rounded
+                ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                ${
+                  page === "manajemen-risiko"
+                    ? "bg-[#5932EA] text-white"
+                    : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                }
+                w-full
+              `}
+              >
+                < ClipboardDocumentListIcon
+                  className={`h-6 w-6 flex-shrink-0 ${
+                    page === "manajemen-risiko"
+                      ? "text-white"
+                      : "text-[#9197B3]"
+                  }`}
+                />
+                {isOpen && <span className="text-sm">Manajemen Risiko</span>}
+              </motion.li>
+            )}
+
             {/* Manage Users */}
             {role === "admin" && (
               <motion.li
