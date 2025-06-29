@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Layout from "./Layout";
 import api from "../lib/api";
+
 import ManageUsers from "../components/manage-users/ManageUsers";
 import IdentifikasiRisikoTable from "../components/IdentifikasiRisk/IdentifikasiRisk";
 import AnalisisRisiko from "../components/AnalisisRisiko/AnalisisRisiko";
@@ -17,8 +18,6 @@ import DetailRiskMitigation from "../components/evaluasi/DetailRiskMitigation";
 import Pnrisiko from "../components/pnrisiko/pnrisiko";
 import Risikokepalapuskesmas from "../components/managementrisiko/RisikokepalaPuskesmas";
 
-
-
 export default function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -27,13 +26,15 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
 
+  const [notifCount, setNotifCount] = useState(0);
+  const [resetAt, setResetAt] = useState(null);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token || token === "undefined" || token.trim() === "") {
       router.replace("/login");
     } else {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
       api
         .get("/me")
         .then((res) => {
@@ -57,17 +58,17 @@ export default function Dashboard() {
     );
   }
 
-  // Parsing page 
+  // Parsing page untuk evaluasi-risiko
   if (page.startsWith("evaluasi-risiko")) {
     const parts = page.split("/");
 
     if (parts.length === 1) {
       return (
         <Layout
-          notifCount={0}
-          setNotifCount={() => {}}
-          resetAt={null}
-          setResetAt={() => {}}
+          notifCount={notifCount}
+          setNotifCount={setNotifCount}
+          resetAt={resetAt}
+          setResetAt={setResetAt}
           role={user?.role}
         >
           <EvaluasiRisiko />
@@ -79,26 +80,25 @@ export default function Dashboard() {
       const riskId = parts[1];
       return (
         <Layout
-          notifCount={0}
-          setNotifCount={() => {}}
-          resetAt={null}
-          setResetAt={() => {}}
+          notifCount={notifCount}
+          setNotifCount={setNotifCount}
+          resetAt={resetAt}
+          setResetAt={setResetAt}
           role={user?.role}
         >
           <DetailRiskMitigation riskId={riskId} />
         </Layout>
       );
     }
-    
 
     if (parts.length === 4 && parts[2] === "edit-mitigations") {
       const mitigationId = parts[3];
       return (
         <Layout
-          notifCount={0}
-          setNotifCount={() => {}}
-          resetAt={null}
-          setResetAt={() => {}}
+          notifCount={notifCount}
+          setNotifCount={setNotifCount}
+          resetAt={resetAt}
+          setResetAt={setResetAt}
           role={user?.role}
         >
           <EditMitigation mitigationId={mitigationId} />
@@ -110,10 +110,10 @@ export default function Dashboard() {
       const riskId = parts[1];
       return (
         <Layout
-          notifCount={0}
-          setNotifCount={() => {}}
-          resetAt={null}
-          setResetAt={() => {}}
+          notifCount={notifCount}
+          setNotifCount={setNotifCount}
+          resetAt={resetAt}
+          setResetAt={setResetAt}
           role={user?.role}
         >
           <AddMitigation riskId={riskId} />
@@ -122,13 +122,13 @@ export default function Dashboard() {
     }
   }
 
-  // Mapping page 
+  // Mapping halaman utama lainnya
   return (
     <Layout
-      notifCount={0}
-      setNotifCount={() => {}}
-      resetAt={null}
-      setResetAt={() => {}}
+      notifCount={notifCount}
+      setNotifCount={setNotifCount}
+      resetAt={resetAt}
+      setResetAt={setResetAt}
       role={user?.role}
     >
       {page === "manage-users" ? (
@@ -144,7 +144,7 @@ export default function Dashboard() {
       ) : page === "penanganan-risiko" ? (
         <PenangananRisiko />
       ) : page === "menu-penanganan-risiko" ? (
-        <Pnrisiko />    
+        <Pnrisiko />
       ) : page === "manajemen-risiko" ? (
         <Risikokepalapuskesmas />
       ) : (
