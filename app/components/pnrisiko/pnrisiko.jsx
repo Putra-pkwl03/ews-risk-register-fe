@@ -1,4 +1,3 @@
-// File: app/dashboard/pnrisiko/page.js
 "use client";
 
 import { useEffect, useState } from "react";
@@ -13,14 +12,10 @@ import AddEffectivenessModal from "../pnrisiko/EffectivitasModal";
 import DetailRiskHandling from "../pnrisiko/DetailRiskHandling";
 import ConfirmSendModal from "../../components/modalconfirmasi/SentKepalapuskesmasModal";
 import ConfirmDeleteModal from "../../components/modalconfirmasi/DeleteModal";
-import ReviewNoteModal from "../managementrisiko/RiviewNoteModal"; 
-
-import {
-  EyeIcon,
-  PencilSquareIcon,
-  TrashIcon,
-  PaperAirplaneIcon,
-} from "@heroicons/react/24/outline";
+import ReviewNoteModal from "../managementrisiko/RiviewNoteModal";
+import Pagination from "../manage-users/Pagenations";
+import SuccessToast from "../modalconfirmasi/SuccessToast";
+import ErrorToast from "../modalconfirmasi/ErrorToast";
 
 export default function Pnrisiko() {
   const [data, setData] = useState([]);
@@ -31,11 +26,27 @@ export default function Pnrisiko() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [confirmSendOpen, setConfirmSendOpen] = useState(false);
   const [sendItemId, setSendItemId] = useState(null);
-    const [editingItem, setEditingItem] = useState(null);
-    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
-    const [noteModalOpen, setNoteModalOpen] = useState(false);
+  const [noteModalOpen, setNoteModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState("");
+  const [loadingId, setLoadingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const totalItems = data.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const [successToast, setSuccessToast] = useState({
+    isOpen: false,
+    message: "",
+  });
+  const [errorToast, setErrorToast] = useState({ isOpen: false, message: "" });
+
+  // Data yang ditampilkan di halaman saat ini:
+  const paginatedData = data.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   useEffect(() => {
     fetchRiskHandlings()
@@ -70,56 +81,85 @@ export default function Pnrisiko() {
             setRisks(uniqueRisks);
             setModalOpen(true);
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full sm:w-auto cursor-pointer"
+          className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 hover:cursor-pointer px-3 py-1.5 rounded-md"
         >
-          + Add Efektivitas
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          Add Efektivitas
         </button>
       </div>
 
-      {loading && <p>Memuat data...</p>}
       {error && <p className="text-red-500">{error}</p>}
 
-      {!loading && data.length === 0 && (
-        <p className="text-gray-500">Belum ada data penanganan risiko.</p>
-      )}
-
-      {data.length > 0 && (
-        <table className="w-full text-sm sm:text-base">
-          <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
+      <table className="w-full text-sm sm:text-base">
+        <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
+          <tr>
+            <th className="p-2">No</th>
+            <th className="p-2">Risiko</th>
+            <th className="p-2">Unit</th>
+            <th className="p-2">Efektivitas</th>
+            <th className="p-2">Signature</th>
+            <th className="p-2">Handled By</th>
+            <th className="p-2">Reviewer</th>
+            <th className="p-2">Catatan</th>
+            <th className="p-2 text-center">Tanggal</th>
+            <th className="p-2 text-center">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            Array.from({ length: 5 }).map((_, rowIndex) => (
+              <tr key={rowIndex} className="animate-pulse">
+                {Array.from({ length: 10 }).map((_, colIndex) => (
+                  <td key={colIndex} className="p-2">
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : paginatedData.length === 0 ? (
             <tr>
-              <th className="p-2">No</th>
-              <th className="p-2">Risiko</th>
-              <th className="p-2">Unit</th>
-              <th className="p-2">Efektivitas</th>
-              <th className="p-2">Signature</th>
-              <th className="p-2">Handled By</th>
-              <th className="p-2">Reviewer</th>
-              <th className="p-2">Catatan</th>
-              <th className="p-2">Tanggal</th>
-              <th className="p-2 text-center">Aksi</th>
+              <td colSpan={10} className="text-center py-4 text-gray-500">
+                Belum ada data penanganan risiko.
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {data.map((item, i) => (
-              <tr key={item.id} className="hover:bg-gray-50">
-                <td className="p-2">{i + 1}</td>
+          ) : (
+            paginatedData.map((item, i) => (
+              <tr key={item.id} className="hover:bg-gray-50 text-black">
+                <td className="p-2 text-center">{i + 1}</td>
                 <td className="p-2">{item.risk?.name}</td>
                 <td className="p-2">{item.risk?.unit}</td>
-                <td className="p-2">{item.effectiveness}</td>
+                <td className="p-2 text-center">{item.effectiveness}</td>
                 <td className="p-2">
                   {item.approval_signature ? (
                     <img
                       src={item.approval_signature}
                       alt="Signature"
-                      className="h-12 object-contain"
+                      className="h-6 object-contain"
                     />
                   ) : (
                     "-"
                   )}
                 </td>
-                <td className="py-2 ">{item.handler?.name || "-"}</td>
-                <td className="py-2 ">{item.reviewer?.name || "-"}</td>
-                <td className="py-2 ">
+                <td className="py-2 text-center">
+                  {item.handler?.name || "-"}
+                </td>
+                <td className="py-2 text-center">
+                  {item.reviewer?.name || "-"}
+                </td>
+                <td className="py-2">
                   {item.review_notes ? (
                     <button
                       className="text-red-600 hover:underline cursor-pointer"
@@ -135,17 +175,29 @@ export default function Pnrisiko() {
                     "-"
                   )}
                 </td>
-                <td className="py-2">
+                <td className="py-2 text-center">
                   {new Date(item.created_at).toLocaleString()}
                 </td>
-                <td className="p-2 text-sm m:p-3">
-                  <div className="flex flex-row justify-center items-center gap-2">
+                <td className="p-2 text-sm m:p-3 text-center">
+                  <div className="flex flex-row justify-center items-center text-center gap-2">
                     <button
-                      onClick={() => setSelectedItem(item)}
-                      className="text-blue-600 hover:text-blue-800 cursor-pointer"
+                      onClick={() => {
+                        setSelectedItem(item);
+                        const params = new URLSearchParams(
+                          window.location.search
+                        );
+                        const newUrl = `${
+                          window.location.pathname
+                        }?${params.toString()}`;
+                        window.history.pushState({}, "", newUrl);
+                      }}
                       title="Detail"
                     >
-                      <EyeIcon className="w-5 h-5" />
+                      <img
+                        src="/icons/detail.svg"
+                        alt="Detail Icon"
+                        className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
+                      />
                     </button>
                     <button
                       onClick={() => {
@@ -163,17 +215,21 @@ export default function Pnrisiko() {
                         item.is_sent &&
                         !(item.is_approved === false || item.is_approved === 0)
                       }
-                      className={`text-yellow-500 hover:text-yellow-700 ${
-                        item.is_sent &&
-                        !(item.is_approved === false || item.is_approved === 0)
-                          ? "opacity-50 cursor-not-allowed"
-                          : "cursor-pointer"
-                      }`}
                       title="Edit"
                     >
-                      <PencilSquareIcon className="w-5 h-5" />
+                      <img
+                        src="/icons/edit.svg"
+                        alt="Edit Icon"
+                        className={`h-5 w-5 ${
+                          item.is_sent &&
+                          !(
+                            item.is_approved === false || item.is_approved === 0
+                          )
+                            ? "opacity-50 cursor-not-allowed"
+                            : "hover:cursor-pointer"
+                        }`}
+                      />
                     </button>
-
                     <button
                       onClick={() => {
                         setDeleteItemId(item.id);
@@ -183,40 +239,53 @@ export default function Pnrisiko() {
                         item.is_sent &&
                         !(item.is_approved === false || item.is_approved === 0)
                       }
-                      className={`text-red-600 hover:text-red-800 ${
-                        item.is_sent &&
-                        !(item.is_approved === false || item.is_approved === 0)
-                          ? "opacity-50 cursor-not-allowed"
-                          : "cursor-pointer"
-                      }`}
-                      title="Hapus"
+                      title="Delete"
                     >
-                      <TrashIcon className="w-5 h-5" />
+                      <img
+                        src="/icons/hapus.svg"
+                        alt="Delete Icon"
+                        className={`h-5 w-5 ${
+                          item.is_sent &&
+                          !(
+                            item.is_approved === false || item.is_approved === 0
+                          )
+                            ? "opacity-50 cursor-not-allowed"
+                            : "hover:cursor-pointer"
+                        }`}
+                      />
                     </button>
-
                     <button
                       onClick={() => {
                         setSendItemId(item.id);
                         setConfirmSendOpen(true);
                       }}
-                      disabled={item.is_sent && !item.review_notes}
-                      className={`text-green-600 hover:text-green-800 ${
-                        item.is_sent && !item.review_notes
-                          ? "opacity-50 cursor-not-allowed"
-                          : "cursor-pointer"
-                      }`}
+                      disabled={
+                        (item.is_sent && !item.review_notes) ||
+                        loadingId === item.id
+                      }
                       title="Kirim ke Kepala Puskesmas"
+                      className={`${
+                        (item.is_sent && !item.review_notes) ||
+                        loadingId === item.id
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:cursor-pointer"
+                      }`}
                     >
-                      <PaperAirplaneIcon className="w-5 h-5 rotate-45" />
+                      <img
+                        src="/icons/sent.svg"
+                        alt="Sent"
+                        className="h-5 w-5 hover:opacity-80"
+                      />
                     </button>
                   </div>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            ))
+          )}
+        </tbody>
+      </table>
 
+      {/* Modal */}
       <AddEffectivenessModal
         isOpen={modalOpen}
         onClose={() => {
@@ -228,14 +297,21 @@ export default function Pnrisiko() {
           try {
             if (editingItem) {
               await updateRiskHandling(editingItem.id, formData);
+              setSuccessToast({
+                isOpen: true,
+                message: "Data berhasil diperbarui",
+              });
             } else {
               await createRiskHandling(formData);
+              setSuccessToast({
+                isOpen: true,
+                message: "Data berhasil ditambahkan",
+              });
             }
-
             const updated = await fetchRiskHandlings();
             setData(updated.data);
           } catch (err) {
-            alert(err.message);
+            setErrorToast({ isOpen: true, message: err.message });
           } finally {
             setModalOpen(false);
             setEditingItem(null);
@@ -251,13 +327,18 @@ export default function Pnrisiko() {
         }}
         onConfirm={async () => {
           try {
+            setLoadingId(sendItemId);
             await sendToKepala(sendItemId);
-            alert("Notifikasi berhasil dikirim ke kepala puskesmas.");
+            setSuccessToast({
+              isOpen: true,
+              message: "Notifikasi berhasil dikirim ke kepala puskesmas.",
+            });
             const updated = await fetchRiskHandlings();
             setData(updated.data);
           } catch (err) {
-            alert(err.message);
+            setErrorToast({ isOpen: true, message: err.message });
           } finally {
+            setLoadingId(null);
             setConfirmSendOpen(false);
             setSendItemId(null);
           }
@@ -273,21 +354,41 @@ export default function Pnrisiko() {
         onConfirm={async () => {
           try {
             await deleteRiskHandling(deleteItemId);
+            setSuccessToast({
+              isOpen: true,
+              message: "Data berhasil dihapus.",
+            });
             const updated = await fetchRiskHandlings();
             setData(updated.data);
           } catch (err) {
-            alert(err.message);
+            setErrorToast({ isOpen: true, message: err.message });
           } finally {
             setConfirmDeleteOpen(false);
             setDeleteItemId(null);
           }
         }}
       />
-
+      <SuccessToast
+        message={successToast.message}
+        isOpen={successToast.isOpen}
+        onClose={() => setSuccessToast({ isOpen: false, message: "" })}
+      />
+      <ErrorToast
+        message={errorToast.message}
+        isOpen={errorToast.isOpen}
+        onClose={() => setErrorToast({ isOpen: false, message: "" })}
+      />
       <ReviewNoteModal
         isOpen={noteModalOpen}
         onClose={() => setNoteModalOpen(false)}
         note={selectedNote}
+      />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        itemsPerPage={itemsPerPage}
+        totalItems={totalItems}
       />
     </div>
   );

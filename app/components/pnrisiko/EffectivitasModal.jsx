@@ -60,11 +60,13 @@ export default function AddEffectivenessModal({ isOpen, onClose, onSubmit, editi
             <select
               value={riskId}
               onChange={(e) => setRiskId(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 hover:cursor-pointer"
               required
               disabled={!!editingItem}
             >
-              <option value="" disabled>Pilih Risiko</option>
+              <option value="" disabled>
+                Pilih Risiko
+              </option>
               {risks.map((risk) => (
                 <option key={risk.id} value={risk.id}>
                   {risk.name} - {risk.unit}
@@ -74,11 +76,13 @@ export default function AddEffectivenessModal({ isOpen, onClose, onSubmit, editi
           </div>
 
           <div className="mb-4">
-            <label className="block mb-1 text-sm font-medium">Efektivitas</label>
+            <label className="block mb-1 text-sm font-medium">
+              Efektivitas
+            </label>
             <select
               value={effectiveness}
               onChange={(e) => setEffectiveness(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 hover:cursor-pointer"
               required
             >
               <option value="TE">Tidak Efektif</option>
@@ -91,16 +95,16 @@ export default function AddEffectivenessModal({ isOpen, onClose, onSubmit, editi
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 bg-gray-200 rounded"
+              className="w-[90px] h-[42px] hover:cursor-pointer text-sm text-red-600 border border-red-400 rounded-lg hover:bg-red-100 transition duration-300 ease-in-out"
             >
-              Batal
+              Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded"
+              className="w-[90px] h-[42px] text-sm border rounded-lg transition duration-300 ease-in-out flex items-center justify-center text-blue-600 border-blue-500 hover:bg-blue-100 hover:text-blue-700 hover:cursor-pointer"
             >
-              {loading ? "Menyimpan..." : "Simpan"}
+              {loading ? "Menyimpan..." : "Save"}
             </button>
           </div>
         </form>

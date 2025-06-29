@@ -350,15 +350,15 @@ export default function DetailRisiko() {
           <table className="w-full text-sm sm:text-base table-auto border border-gray-200">
             <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
               <tr>
-                <th className="p-2">Klaster</th>
-                <th className="p-2">Unit</th>
-                <th className="p-2">Nama Risiko</th>
-                <th className="p-2 text-center">Severity</th>
-                <th className="p-2 text-center">Probability</th>
-                <th className="p-2 text-center">Skor</th>
-                <th className="p-2 text-center">Bands Risiko</th>
-                <th className="p-2 text-center">Status</th>
-                <th className="p-2 text-center">Aksi</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Klaster</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Unit</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Nama Risiko</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Severity</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Probability</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Skor</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Bands Risiko</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Status</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>

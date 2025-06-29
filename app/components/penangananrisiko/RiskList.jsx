@@ -37,7 +37,7 @@ export default function RiskList({
         </p>
       ) : (
         <table className="w-full text-sm sm:text-base">
-          <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
+          <thead className="bg-gray-100 text-[#5932EA] text-left border-b-[1px] border-gray-200">
             <tr>
               {[
                 "Cluster",
@@ -55,7 +55,9 @@ export default function RiskList({
               ].map((title, i) => (
                 <th
                   key={i}
-                  className={`p-2 ${title === "Aksi" ? "text-center" : ""}`}
+                  className={`p-2 text-[14px] sm:p-3 sm:text-bas ${
+                    title === "Aksi" ? "text-center" : ""
+                  }`}
                 >
                   {title}
                 </th>

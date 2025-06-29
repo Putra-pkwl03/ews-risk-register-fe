@@ -14,8 +14,7 @@ import {
   LogOutIcon,
   ChartBarIcon,
   ClipboardList,
-  DocumentCheckIcon,
-  ClipboardDocumentListIcon,
+  ClipboardListIcon,
 } from "lucide-react";
 
 
@@ -359,7 +358,7 @@ export default function Sidebar({
                 w-full
               `}
               >
-                < ClipboardDocumentListIcon
+                <ClipboardListIcon
                   className={`h-6 w-6 flex-shrink-0 ${
                     page === "manajemen-risiko"
                       ? "text-white"
