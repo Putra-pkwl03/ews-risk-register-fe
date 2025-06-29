@@ -1,12 +1,16 @@
+// components/RiskHandlingNotificationListener.js
 import { useEffect, useState, useRef } from "react";
 import echo from "../../utils/echo";
 
-export default function NotificationListener({ onCountUpdate, resetAt }) {
+export default function RiskHandlingNotificationListener({
+  onCountUpdate,
+  resetAt,
+}) {
   const [notifications, setNotifications] = useState([]);
   const [userId, setUserId] = useState(null);
   const isSubscribed = useRef(false);
 
-  // Ambil userId dari localStorage (dengan fallback retry)
+  // Ambil userId
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("userId");
@@ -16,7 +20,7 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
         const retry = setInterval(() => {
           const retryUserId = localStorage.getItem("userId");
           if (retryUserId) {
-            console.log("[NOTIF-ANALYSIS] userId ditemukan setelah retry");
+            console.log("[NOTIF-HANDLING] userId ditemukan setelah retry");
             setUserId(retryUserId);
             clearInterval(retry);
           }
@@ -26,7 +30,7 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
     }
   }, []);
 
-  const localStorageKey = userId ? `notif_${userId}` : null;
+  const localStorageKey = userId ? `notif_handling_${userId}` : null;
 
   // Ambil dari localStorage
   useEffect(() => {
@@ -39,20 +43,20 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
           setNotifications(parsed);
         }
       } catch (err) {
-        console.error("[NOTIF-ANALYSIS] Gagal parsing localStorage:", err);
+        console.error("[NOTIF-HANDLING] Gagal parsing localStorage:", err);
       }
     }
   }, [localStorageKey]);
 
-  // Listener Echo
+  // Subscribe Echo
   useEffect(() => {
     if (!userId || !localStorageKey || !echo || isSubscribed.current) return;
 
-    const channel = echo.channel("risk-analysis");
+    const channel = echo.channel("risk-handling");
     if (!channel || typeof channel.listen !== "function") return;
 
     const handler = (notification) => {
-      console.log("[NOTIF-ANALYSIS] Diterima:", notification);
+      console.log("[NOTIF-HANDLING] Diterima:", notification);
       setNotifications((prev) => {
         const exists = prev.some((n) => n.id === notification.id);
         if (exists) return prev;
@@ -62,16 +66,16 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
       });
     };
 
-    channel.listen(".notification-menris", handler);
+    channel.listen(".notification-handling", handler);
     isSubscribed.current = true;
 
     return () => {
-      echo.leave("risk-analysis");
+      echo.leave("risk-handling");
       isSubscribed.current = false;
     };
   }, [userId, localStorageKey]);
 
-  // Simpan dan update badge count
+  // Update count
   useEffect(() => {
     if (!localStorageKey) return;
     localStorage.setItem(localStorageKey, JSON.stringify(notifications));
@@ -81,9 +85,10 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
     }
   }, [notifications, onCountUpdate, localStorageKey]);
 
-  // Reset notifikasi (mark as read)
+  // Reset saat diklik menu
   useEffect(() => {
-    if (!resetAt || !localStorageKey) return;
+    if (!localStorageKey || !resetAt) return;
+
     setNotifications((prev) => {
       const updated = prev.map((n) => ({ ...n, isRead: true }));
       localStorage.setItem(localStorageKey, JSON.stringify(updated));

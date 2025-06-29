@@ -1,12 +1,12 @@
+// components/ReviewHandlingNotificationListener.js
 import { useEffect, useState, useRef } from "react";
 import echo from "../../utils/echo";
 
-export default function NotificationListener({ onCountUpdate, resetAt }) {
+export default function ReviewHandlingNotificationListener({ onCountUpdate, resetAt }) {
   const [notifications, setNotifications] = useState([]);
   const [userId, setUserId] = useState(null);
   const isSubscribed = useRef(false);
 
-  // Ambil userId dari localStorage (dengan fallback retry)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("userId");
@@ -16,7 +16,7 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
         const retry = setInterval(() => {
           const retryUserId = localStorage.getItem("userId");
           if (retryUserId) {
-            console.log("[NOTIF-ANALYSIS] userId ditemukan setelah retry");
+            console.log("[NOTIF-REVIEW] userId ditemukan setelah retry");
             setUserId(retryUserId);
             clearInterval(retry);
           }
@@ -26,9 +26,8 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
     }
   }, []);
 
-  const localStorageKey = userId ? `notif_${userId}` : null;
+  const localStorageKey = userId ? `notif_review_${userId}` : null;
 
-  // Ambil dari localStorage
   useEffect(() => {
     if (!localStorageKey) return;
     const saved = localStorage.getItem(localStorageKey);
@@ -39,20 +38,19 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
           setNotifications(parsed);
         }
       } catch (err) {
-        console.error("[NOTIF-ANALYSIS] Gagal parsing localStorage:", err);
+        console.error("[NOTIF-REVIEW] Gagal parsing localStorage:", err);
       }
     }
   }, [localStorageKey]);
 
-  // Listener Echo
   useEffect(() => {
     if (!userId || !localStorageKey || !echo || isSubscribed.current) return;
 
-    const channel = echo.channel("risk-analysis");
+    const channel = echo.channel("review-handling");
     if (!channel || typeof channel.listen !== "function") return;
 
     const handler = (notification) => {
-      console.log("[NOTIF-ANALYSIS] Diterima:", notification);
+      console.log("[NOTIF-REVIEW] Diterima:", notification);
       setNotifications((prev) => {
         const exists = prev.some((n) => n.id === notification.id);
         if (exists) return prev;
@@ -62,16 +60,15 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
       });
     };
 
-    channel.listen(".notification-menris", handler);
+    channel.listen(".notification-review-handling", handler);
     isSubscribed.current = true;
 
     return () => {
-      echo.leave("risk-analysis");
+      echo.leave("review-handling");
       isSubscribed.current = false;
     };
   }, [userId, localStorageKey]);
 
-  // Simpan dan update badge count
   useEffect(() => {
     if (!localStorageKey) return;
     localStorage.setItem(localStorageKey, JSON.stringify(notifications));
@@ -81,9 +78,9 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
     }
   }, [notifications, onCountUpdate, localStorageKey]);
 
-  // Reset notifikasi (mark as read)
   useEffect(() => {
-    if (!resetAt || !localStorageKey) return;
+    if (!localStorageKey || !resetAt) return;
+
     setNotifications((prev) => {
       const updated = prev.map((n) => ({ ...n, isRead: true }));
       localStorage.setItem(localStorageKey, JSON.stringify(updated));

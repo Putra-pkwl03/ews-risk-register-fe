@@ -22,9 +22,17 @@ export default function Sidebar({
   isOpen,
   toggle,
   role,
-  notifCount,
-  onResetNotif,
-  setResetAt,
+  // notifCount,
+  // onResetNotif,
+  // setResetAt,
+  notifCountReview,
+  onResetNotifReview,
+  notifCountHandling,
+  onResetNotifHandling,
+  notifCountValidation,
+  onResetNotifValidation,
+  notifCountMenris,
+  onResetNotifMenris,
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -190,8 +198,8 @@ export default function Sidebar({
                 variants={itemVariants}
                 onClick={() => {
                   handleNavigate("analisis-risiko");
-                  if (notifCount > 0) {
-                    setResetAt(Date.now());
+                  if (notifCountValidation > 0 && onResetNotifValidation) {
+                    onResetNotifValidation();
                   }
                 }}
                 className={`relative flex items-center transition-all duration-200 cursor-pointer rounded-md
@@ -211,32 +219,33 @@ export default function Sidebar({
                 />
                 {isOpen && <span className="text-sm">Analisis Risiko</span>}
 
-                {notifCount > 0 && (
+                {notifCountValidation > 0 && (
                   <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
-                    {notifCount}
+                    {notifCountValidation}
                   </span>
                 )}
               </motion.li>
             )}
+
             {/* Menu Analisis Risiko untuk Koordinator Menris (tidak berubah) */}
             {role === "koordinator_menris" && (
               <motion.li
                 variants={itemVariants}
                 onClick={() => {
                   handleNavigate("analisis-risiko-menris");
-                  if (notifCount > 0 && onResetNotif) {
-                    onResetNotif();
+                  if (notifCountMenris > 0 && onResetNotifMenris) {
+                    onResetNotifMenris();
                   }
                 }}
                 className={`relative flex items-center transition-all duration-200 cursor-pointer rounded-md
-      ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
-      ${
-        page === "analisis-risiko-menris"
-          ? "bg-[#5932EA] text-white"
-          : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
-      }
-      w-full
-    `}
+                ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                ${
+                  page === "analisis-risiko-menris"
+                    ? "bg-[#5932EA] text-white"
+                    : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                }
+                w-full
+              `}
               >
                 <ChartBarIcon
                   className={`h-6 w-6 flex-shrink-0 ${
@@ -247,9 +256,9 @@ export default function Sidebar({
                 />
                 {isOpen && <span className="text-sm">Analisis Risiko</span>}
 
-                {notifCount > 0 && (
+                {notifCountMenris > 0 && (
                   <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
-                    {notifCount}
+                    {notifCountMenris}
                   </span>
                 )}
               </motion.li>
@@ -262,19 +271,19 @@ export default function Sidebar({
                   variants={itemVariants}
                   onClick={() => {
                     handleNavigate("penanganan-risiko");
-                    if (notifCount > 0 && onResetNotif) {
-                      onResetNotif();
+                    if (notifCountValidation > 0 && onResetNotifValidation) {
+                      onResetNotifValidation();
                     }
                   }}
                   className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
-                    ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
-                    ${
-                      page === "penanganan-risiko"
-                        ? "bg-[#5932EA] text-white"
-                        : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
-                    }
-                    w-full
-                  `}
+                ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                ${
+                  page === "penanganan-risiko"
+                    ? "bg-[#5932EA] text-white"
+                    : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                }
+                w-full
+              `}
                 >
                   <ShieldCheckIcon
                     className={`h-6 w-6 flex-shrink-0 ${
@@ -283,12 +292,10 @@ export default function Sidebar({
                         : "text-[#9197B3]"
                     }`}
                   />
-
-                  {isOpen && <span className="text-sm">Analisys Risiko</span>}
-
-                  {notifCount > 0 && (
+                  {isOpen && <span className="text-sm">Analisis Risiko</span>}
+                  {notifCountValidation > 0 && (
                     <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
-                      {notifCount}
+                      {notifCountValidation}
                     </span>
                   )}
                 </motion.li>
@@ -319,11 +326,16 @@ export default function Sidebar({
               </>
             )}
             {/* Menu Penanganan Risiko - Koordinator Mutu & Koordinator Unit */}
-            {(role === "koordinator_mutu" || role === "koordinator_unit") && (
+            {["koordinator_mutu", "koordinator_unit"].includes(role) && (
               <motion.li
                 variants={itemVariants}
-                onClick={() => handleNavigate("menu-penanganan-risiko")}
-                className={`flex items-center transition-all duration-200 cursor-pointer rounded
+                onClick={() => {
+                  handleNavigate("menu-penanganan-risiko");
+                  if (notifCountReview > 0 && onResetNotifReview) {
+                    onResetNotifReview(); // reset badge
+                  }
+                }}
+                className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
                 ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
                 ${
                   page === "menu-penanganan-risiko"
@@ -341,32 +353,58 @@ export default function Sidebar({
                   }`}
                 />
                 {isOpen && <span className="text-sm">Penanganan Risiko</span>}
+
+                {notifCountReview > 0 && (
+                  <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
+                    {notifCountReview}
+                  </span>
+                )}
               </motion.li>
             )}
 
             {role === "kepala_puskesmas" && (
-              <motion.li
-                variants={itemVariants}
-                onClick={() => handleNavigate("manajemen-risiko")}
-                className={`flex items-center transition-all duration-200 cursor-pointer rounded
-                ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
-                ${
-                  page === "manajemen-risiko"
-                    ? "bg-[#5932EA] text-white"
-                    : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
-                }
-                w-full
-              `}
-              >
-                <ClipboardListIcon
-                  className={`h-6 w-6 flex-shrink-0 ${
+              <>
+                {console.log(
+                  "[DEBUG Sidebar] notifCountHandling:",
+                  notifCountHandling
+                )}
+                {console.log("[DEBUG Sidebar] role:", role)}
+                {console.log("[DEBUG Sidebar] page:", page)}
+
+                <motion.li
+                  variants={itemVariants}
+                  onClick={() => {
+                    handleNavigate("manajemen-risiko");
+                    if (notifCountHandling > 0 && onResetNotifHandling) {
+                      onResetNotifHandling();
+                    }
+                  }}
+                  className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
+                  ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                  ${
                     page === "manajemen-risiko"
-                      ? "text-white"
-                      : "text-[#9197B3]"
-                  }`}
-                />
-                {isOpen && <span className="text-sm">Manajemen Risiko</span>}
-              </motion.li>
+                      ? "bg-[#5932EA] text-white"
+                      : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                  }
+                  w-full
+                `}
+                >
+                  <ClipboardDocumentListIcon
+                    className={`h-6 w-6 flex-shrink-0 ${
+                      page === "manajemen-risiko"
+                        ? "text-white"
+                        : "text-[#9197B3]"
+                    }`}
+                  />
+                  {isOpen && <span className="text-sm">Manajemen Risiko</span>}
+
+                  {notifCountHandling > 0 && (
+                    <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
+                      {notifCountHandling}
+                    </span>
+                  )}
+                </motion.li>
+              </>
             )}
 
             {/* Manage Users */}
@@ -401,6 +439,7 @@ export default function Sidebar({
             `}
               onClick={() => {
                 localStorage.removeItem("token");
+                localStorage.removeItem("userId");
                 window.location.href = "/login";
               }}
             >
