@@ -81,12 +81,15 @@ export default function Layout({ children, role }) {
       />
 
       <div
-        className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
-          isSidebarOpen ? "ml-40 sm:ml-48 md:ml-64" : "ml-16"
-        }`}
+        className={`flex-1 flex flex-col transition-all duration-300 ease-in-out
+    ${
+      isSidebarOpen
+        ? "ml-[160px] sm:ml-[192px] md:ml-[256px] overflow-x-hidden"
+        : "ml-[64px] sm:ml-[72px] md:ml-[60px]"
+    }`}
       >
         <Navbar toggleSidebar={toggleSidebar} />
-        <main className="p-4 w-full">{children}</main>
+        <main className="w-ful mt-18">{children}</main>
       </div>
     </div>
   );

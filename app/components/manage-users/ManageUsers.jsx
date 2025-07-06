@@ -7,7 +7,6 @@ import ConfirmDeleteModal from "../../components/modalconfirmasi/DeleteModal";
 import SuccessToast from "../../components/modalconfirmasi/SuccessToast";
 import ErrorToast from "../../components/modalconfirmasi/ErrorToast";
 import Pagination from "./Pagenations";
-import LoadingSkeleton from "../../components/loadings/LoadingSkeleton";
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
@@ -221,74 +220,78 @@ export default function ManageUsers() {
             </button>
           </div>
         </div>
+        <table className="w-full text-sm sm:text-base">
+          <thead className="bg-gray-100 text-[#5932EA] text-left border-b-[1px] border-gray-200">
+            <tr>
+              <th className="p-2 text-[14px] sm:p-3 sm:text-base">No</th>
+              <th className="p-2 text-[14px] sm:p-3 sm:text-base">Name</th>
+              <th className="p-2 text-[14px] sm:p-3 sm:text-base">Email</th>
+              <th className="p-2 text-[14px] sm:p-3 sm:text-base">Role</th>
+              <th className="p-2 text-[14px] sm:p-3 sm:text-base">
+                Created At
+              </th>
+              <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading
+              ? [...Array(6)].map((_, index) => (
+                  <tr key={index}>
+                    {[...Array(6)].map((_, i) => (
+                      <td key={i} className="p-3">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              : paginatedUsers.map((user, idx) => (
+                  <tr
+                    key={user.id}
+                    className={`text-[12px] text-[#292D32] transition-colors border-b-[1px] border-gray-200 ${
+                      idx % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
+                    } hover:bg-gray-200`}
+                  >
+                    <td className="p-2 text-[12px] sm:p-3">
+                      {startIdx + idx + 1}
+                    </td>
+                    <td className="p-2 text-[12px] sm:p-3">{user.name}</td>
+                    <td className="p-2 text-[12px] sm:p-3">{user.email}</td>
+                    <td className="p-2 text-[12px] sm:p-3 capitalize">
+                      {user.role.replace("_", " ")}
+                    </td>
+                    <td className="p-2 text-[12px] sm:p-3">
+                      {new Date(user.created_at).toLocaleDateString("id-ID", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </td>
+                    <td className="p-2 text-sm sm:p-3 flex gap-2 justify-center">
+                      <button onClick={() => handleEdit(user)} title="Edit">
+                        <img
+                          src="/icons/edit.svg"
+                          alt="Edit Icon"
+                          className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
+                        />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(user.id)}
+                        title="Delete"
+                      >
+                        <img
+                          src="/icons/hapus.svg"
+                          alt="Delete Icon"
+                          className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+          </tbody>
+        </table>
 
-        {loading ? (
-          <div className="p-4">
-            <LoadingSkeleton rows={8} columns={6} />
-          </div>
-        ) : (
-          <table className="w-full text-sm sm:text-base">
-            <thead className="bg-gray-100 text-[#5932EA] text-left border-b-[1px] border-gray-200">
-              <tr>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base">No</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Name</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Email</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Role</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base">
-                  Created At
-                </th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedUsers.map((user, idx) => (
-                <tr
-                  key={user.id}
-                  className={`text-[12px] text-[#292D32] transition-colors border-b-[1px] border-gray-200 ${
-                    idx % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
-                  } hover:bg-gray-200`}
-                >
-                  <td className="p-2 text-[12px] sm:p-3">
-                    {startIdx + idx + 1}
-                  </td>
-                  <td className="p-2 text-text-[12px] sm:p-3">{user.name}</td>
-                  <td className="p-2 text-[12px] sm:p-3">{user.email}</td>
-                  <td className="p-2 text-text-[12px] sm:p-3 capitalize">
-                    {user.role.replace("_", " ")}
-                  </td>
-                  <td className="p-2 text-[12px] sm:p-3">
-                    {new Date(user.created_at).toLocaleDateString("id-ID", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </td>
-                  <td className="p-2 text-sm sm:p-3 flex gap-2 justify-center">
-                    <button onClick={() => handleEdit(user)} title="Edit">
-                      <img
-                        src="/icons/edit.svg"
-                        alt="Edit Icon"
-                        className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
-                      />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(user.id)}
-                      title="Delete"
-                    >
-                      <img
-                        src="/icons/hapus.svg"
-                        alt="Delete Icon"
-                        className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
-                      />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
         <div className="text-sm text-gray-600 ml-4">
           <Pagination
             currentPage={currentPage}

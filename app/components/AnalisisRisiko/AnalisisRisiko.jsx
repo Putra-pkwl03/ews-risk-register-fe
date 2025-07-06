@@ -18,7 +18,7 @@ import MiniSpinner from "../loadings/MiniSpinner";
 import ConfirmModal from "../modalconfirmasi/ConfirmModal";
 import ErrorToast from "../modalconfirmasi/ErrorToast";
 
-export default function DetailRisiko() {
+export default function AnalisisRisiko() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const encodedId = searchParams.get("id");
@@ -39,7 +39,6 @@ export default function DetailRisiko() {
   const [risks, setRisks] = useState([]);
   const [toastMessage, setToastMessage] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
-  const [risk, setRisk] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingId, setLoadingId] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
@@ -177,10 +176,11 @@ export default function DetailRisiko() {
       .includes(searchTerm.toLowerCase());
 
     const matchKategori =
-      kategoriFilter === "All" || item.risk?.category === kategoriFilter;
+      kategoriFilter === "All" || item.risk?.status === kategoriFilter;
 
     return matchSearch && matchKategori;
   });
+  
 
   const sortedData = [...filteredData].sort((a, b) => {
     if (sortOrder === "Ascending") return a.score - b.score;
@@ -239,7 +239,7 @@ export default function DetailRisiko() {
   );
 
   const handleSend = async (id) => {
-    setLoadingId(id); // aktifkan loading hanya untuk id ini
+    setLoadingId(id); 
 
     try {
       const response = await sendToMenris(id);
@@ -252,16 +252,15 @@ export default function DetailRisiko() {
       const updated = await getAllRiskAnalysis();
       setAnalisisRisiko(updated);
 
-      setShowModal(false); // tutup modal kalau ada
+      setShowModal(false);
     } catch (error) {
 
-      // Munculkan error toast dengan pesan dari backend
       setErrorToastMessage(
         error.message || "Terjadi kesalahan saat mengirim risiko"
       );
       setErrorToastOpen(true);
     } finally {
-      setLoadingId(null); // matikan loading
+      setLoadingId(null);
     }
   };
   
@@ -311,12 +310,12 @@ export default function DetailRisiko() {
                   className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
                 >
                   <option value="All">All</option>
-                  <option value="Draft">Draft</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Rejected">Rejected</option>
-                  <option value="Dampak">Skor</option>
+                  <option value="draft">Draft</option>
+                  <option value="pending">Pending</option>
+                  <option value="validated_approved">Approved</option>
+                  <option value="validated_rejected">Rejected</option>
                 </select>
+
                 <img
                   src="/icons/chevron-down.svg"
                   alt="Filter Icon"
@@ -352,13 +351,27 @@ export default function DetailRisiko() {
               <tr>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base">Klaster</th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base">Unit</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Nama Risiko</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Severity</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Probability</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Skor</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Bands Risiko</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Status</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">Aksi</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">
+                  Nama Risiko
+                </th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
+                  Severity
+                </th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
+                  Probability
+                </th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
+                  Skor
+                </th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
+                  Bands Risiko
+                </th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
+                  Status
+                </th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -375,22 +388,29 @@ export default function DetailRisiko() {
                   </td>
                 </tr>
               ) : (
-                paginatedData.map((item, index) => (
-                  <tr
-                    key={item.id}
-                    className={`text-[12px] text-[#292D32] transition-colors border-b border-gray-200 ${
-                      index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
-                    } hover:bg-gray-100`}
-                  >
-                    <td className="p-2">{item.risk?.cluster || "-"}</td>
-                    <td className="p-2">{item.risk?.unit || "-"}</td>
-                    <td className="p-2">{item.risk?.name || "-"}</td>
-                    <td className="p-2 text-center">{item.severity}</td>
-                    <td className="p-2 text-center">{item.probability}</td>
-                    <td className="p-2 text-center">{item.score}</td>
-                    <td className="p-2 text-center">
-                      <span
-                        className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border 
+                paginatedData.map((item, index) => {
+                  const status = item.risk?.status;
+                  const isDisabled =
+                    status === "pending" || status === "validated_approved";
+
+                  return (
+                    <tr
+                      key={item.id}
+                      className={`text-[12px] text-[#292D32] transition-colors border-b border-gray-200 ${
+                        index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
+                      } hover:bg-gray-100`}
+                    >
+                      <td className="p-2 text-[12px] ">
+                        {item.risk?.cluster || "-"}
+                      </td>
+                      <td className="p-2">{item.risk?.unit || "-"}</td>
+                      <td className="p-2">{item.risk?.name || "-"}</td>
+                      <td className="p-2 text-center">{item.severity}</td>
+                      <td className="p-2 text-center">{item.probability}</td>
+                      <td className="p-2 text-center">{item.score}</td>
+                      <td className="p-2 text-center">
+                        <span
+                          className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border 
                         ${
                           item.grading?.toLowerCase() === "sangat tinggi"
                             ? "bg-red-800 text-white"
@@ -404,96 +424,121 @@ export default function DetailRisiko() {
                             ? "bg-green-400 text-white"
                             : "bg-gray-400 text-white"
                         }`}
-                      >
-                        {item.grading || "-"}
-                      </span>
-                    </td>
+                        >
+                          {item.grading || "-"}
+                        </span>
+                      </td>
 
-                    <td
-                      className={`px-1 py-0.5 relative capitalize flex items-center justify-center gap-1 mt-3.5 rounded-2xl text-white text-center ${
-                        item.risk?.status === "draft"
-                          ? "bg-gray-400"
-                          : item.risk?.status === "pending"
-                          ? "bg-yellow-500"
-                          : item.risk?.status === "validated_approved"
-                          ? "bg-green-500"
-                          : item.risk?.status === "validated_rejected"
-                          ? "bg-red-500"
-                          : ""
-                      }`}
-                      style={{ verticalAlign: "middle" }}
-                    >
-                      {item.risk?.status && (
-                        <img
-                          src={statusIcons[item.risk.status]}
-                          alt={`${item.risk.status} icon`}
-                          className="w-3 h-3"
-                        />
-                      )}
-                      {item.risk?.status || "-"}
-                    </td>
-                    <td className="p-2 text-sm">
-                      <div className="flex flex-row justify-center items-center gap-2">
-                        <button onClick={() => handleDetailClick(item)}>
+                      <td
+                        className={`px-1 py-0.5 relative capitalize flex items-center justify-center gap-1 mt-3.5 rounded-2xl text-white text-center ${
+                          item.risk?.status === "draft"
+                            ? "bg-gray-400"
+                            : item.risk?.status === "pending"
+                            ? "bg-yellow-500"
+                            : item.risk?.status === "validated_approved"
+                            ? "bg-green-500"
+                            : item.risk?.status === "validated_rejected"
+                            ? "bg-red-500"
+                            : ""
+                        }`}
+                        style={{ verticalAlign: "middle" }}
+                      >
+                        {item.risk?.status && (
                           <img
-                            src="/icons/detail.svg"
-                            alt="Detail Icon"
-                            className="h-5 w-5 min-w-[20px] min-h-[20px] hover:opacity-80 hover:cursor-pointer"
+                            src={statusIcons[item.risk.status]}
+                            alt={`${item.risk.status} icon`}
+                            className="w-3 h-3"
                           />
-                        </button>
-                        <button onClick={() => handleEdit(item)} title="Edit">
-                          <img
-                            src="/icons/edit.svg"
-                            alt="Edit Icon"
-                            className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
-                          />
-                        </button>
-                        <button
-                          onClick={() => openDeleteModal(item.id)}
-                          title="Hapus"
-                        >
-                          <img
-                            src="/icons/hapus.svg"
-                            alt="Delete Icon"
-                            className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
-                          />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedId(item.id);
-                            setShowModal(true);
-                          }}
-                          title="Sent to menris"
-                          disabled={loadingId === item.id}
-                          className={
-                            loadingId === item.id
-                              ? "cursor-not-allowed opacity-50"
-                              : ""
-                          }
-                        >
-                          {loadingId === item.id ? (
-                            <MiniSpinner />
-                          ) : (
+                        )}
+                        {item.risk?.status || "-"}
+                      </td>
+                      <td className="p-2 text-sm">
+                        <div className="flex flex-wrap justify-center sm:justify-start items-center gap-1.5">
+                          <button onClick={() => handleDetailClick(item)}>
                             <img
-                              src="/icons/sent.svg"
-                              alt="Sent"
+                              src="/icons/detail.svg"
+                              alt="Detail Icon"
                               className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
                             />
-                          )}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                          </button>
+                          <button
+                            onClick={() => handleEdit(item)}
+                            title={
+                              isDisabled
+                                ? "Risiko ini tidak dapat diedit karena sudah dikirim atau disetujui"
+                                : "Edit"
+                            }
+                            disabled={isDisabled}
+                            className={`${
+                              isDisabled ? "cursor-not-allowed opacity-40" : ""
+                            }`}
+                          >
+                            <img
+                              src="/icons/edit.svg"
+                              alt="Edit Icon"
+                              className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
+                            />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(item.id)}
+                            title={
+                              isDisabled
+                                ? "Risiko ini tidak dapat dihapus karena sudah dikirim atau disetujui"
+                                : "Hapus"
+                            }
+                            disabled={isDisabled}
+                            className={`${
+                              isDisabled ? "cursor-not-allowed opacity-40" : ""
+                            }`}
+                          >
+                            <img
+                              src="/icons/hapus.svg"
+                              alt="Delete Icon"
+                              className="h-5 w-5 hover:opacity-80 hover:cursor-pointer"
+                            />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isDisabled) return;
+                              setSelectedId(item.id);
+                              setShowModal(true);
+                            }}
+                            title={
+                              isDisabled
+                                ? "Risiko ini sudah dikirim atau disetujui"
+                                : "Kirim ke Menris"
+                            }
+                            disabled={isDisabled || loadingId === item.id}
+                            className={`${
+                              isDisabled || loadingId === item.id
+                                ? "cursor-not-allowed opacity-50"
+                                : ""
+                            }`}
+                          >
+                            {loadingId === item.id ? (
+                              <MiniSpinner />
+                            ) : (
+                              <img
+                                src="/icons/sent.svg"
+                                alt="Sent"
+                                className="h-4 w-4 hover:opacity-80 hover:cursor-pointer"
+                              />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
 
           {showFormAnalisis && (
             <FormAnalisis
-              id={editingRisk?.id} // Kirim id untuk edit
-              riskId={editingRisk?.risk_id} // Kirim riskId jika perlu
+              id={editingRisk?.id}
+              riskId={editingRisk?.risk_id}
               risk={selectedRisk}
               onSave={handleUpdate}
               defaultSeverity={editingRisk?.severity?.toString() || ""}

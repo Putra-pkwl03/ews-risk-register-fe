@@ -6,7 +6,6 @@ import {
   sendToMenris,
   validateRisk,
 } from "../../lib/RiskAnalysis";
-import LoadingSkeleton from "../loadings/LoadingSkeleton";
 import RejectModal from "../../components/AnalisisRisiko/RejectModal";
 import ConfirmApproveModal from "../../components/modalconfirmasi/ConfirmApproveModal";
 import Pagination from "../manage-users/Pagenations";
@@ -108,136 +107,132 @@ export default function RiskActionMenris() {
       <h5 className="text-[20px] text-black font-semibold mb-6">
         Daftar Risiko Analisis
       </h5>
-      {isLoading ? (
-        <LoadingSkeleton rows={5} columns={4} /> // ? Tampilkan efek loading
-      ) : (
-        <table className="w-full text-sm sm:text-base table-auto border border-gray-200">
-          <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
+
+      <table className="w-full text-sm sm:text-base table-auto border border-gray-200">
+        <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
+          <tr>
+            <th className="p-2">Nama Risiko</th>
+            <th className="p-2">Unit</th>
+            <th className="p-2">Cluster</th>
+            <th className="p-2">Kategori</th>
+            <th className="p-2 text-center">Severity</th>
+            <th className="p-2 text-center">Probability</th>
+            <th className="p-2 text-center">Score</th>
+            <th className="p-2 text-center">Grading</th>
+            <th className="p-2 text-center">Status</th>
+            <th className="p-2 text-center">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {isLoading ? (
+            Array.from({ length: 5 }).map((_, rowIndex) => (
+              <tr key={rowIndex} className="animate-pulse">
+                {Array.from({ length: 10 }).map((_, colIndex) => (
+                  <td key={colIndex} className="p-2">
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : paginatedRisiko.length === 0 ? (
             <tr>
-              <th className="p-2">Nama Risiko</th>
-              <th className="p-2">Unit</th>
-              <th className="p-2">Cluster</th>
-              <th className="p-2">Kategori</th>
-              <th className="p-2 text-center">Severity</th>
-              <th className="p-2 text-center">Probability</th>
-              <th className="p-2 text-center">Score</th>
-              <th className="p-2 text-center">Grading</th>
-              <th className="p-2 text-center">Status</th>
-              <th className="p-2 text-center">Aksi</th>
+              <td colSpan={9} className="py-6 text-center text-gray-400">
+                Tidak ada data risiko tersedia.
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={9} className="py-6 text-center text-gray-500">
-                  Memuat data...
+          ) : (
+            paginatedRisiko.map((item, index) => (
+              <tr
+                key={item.id}
+                className={`text-[12px] text-[#292D32] border-b border-gray-200 ${
+                  index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
+                } hover:bg-gray-100`}
+              >
+                <td className="p-2 font-semibold">{item.name || "-"}</td>
+                <td className="p-2">{item.unit || "-"}</td>
+                <td className="p-2">{item.cluster || "-"}</td>
+                <td className="p-2">{item.category || "-"}</td>
+                <td className="p-2 text-center">
+                  {item.analysis?.severity || "-"}
                 </td>
-              </tr>
-            ) : paginatedRisiko.length === 0 ? (
-              <tr>
-                <td colSpan={9} className="py-6 text-center text-gray-400">
-                  Tidak ada data risiko tersedia.
+                <td className="p-2 text-center">
+                  {item.analysis?.probability || "-"}
                 </td>
-              </tr>
-            ) : (
-              paginatedRisiko.map((item, index) => (
-                <tr
-                  key={item.id}
-                  className={`text-[12px] text-[#292D32] border-b border-gray-200 ${
-                    index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
-                  } hover:bg-gray-100`}
-                >
-                  <td className="p-2 font-semibold">{item.name || "-"}</td>
-                  <td className="p-2">{item.unit || "-"}</td>
-                  <td className="p-2">{item.cluster || "-"}</td>
-                  <td className="p-2">{item.category || "-"}</td>
-                  <td className="p-2 text-center">
-                    {item.analysis?.severity || "-"}
-                  </td>
-                  <td className="p-2 text-center">
-                    {item.analysis?.probability || "-"}
-                  </td>
-                  <td className="p-2 text-center">
-                    {item.analysis?.score || "-"}
-                  </td>
-                  <td className="p-2 text-center">
-                    <span
-                      className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border 
-                        ${
-                          item.analysis?.grading?.toLowerCase() ===
-                          "sangat tinggi"
-                            ? "bg-red-800 text-white"
-                            : item.analysis?.grading?.toLowerCase() === "tinggi"
-                            ? "bg-red-500 text-white"
-                            : item.analysis?.grading?.toLowerCase() === "sedang"
-                            ? "bg-yellow-400 text-white"
-                            : item.analysis?.grading?.toLowerCase() === "rendah"
-                            ? "bg-green-700 text-white"
-                            : item.analysis?.grading?.toLowerCase() ===
-                              "sangat rendah"
-                            ? "bg-green-400 text-white"
-                            : "bg-gray-400 text-white"
-                        }`}
-                    >
-                      {item.analysis?.grading || "-"}
-                    </span>
-                  </td>
-                  <td
-                    className={`px-1 py-0.5 capitalize flex items-center justify-center gap-1 mt-3.5 rounded-2xl text-white text-center
+                <td className="p-2 text-center">
+                  {item.analysis?.score || "-"}
+                </td>
+                <td className="p-2 text-center">
+                  <span
+                    className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border 
                     ${
-                      item.status === "draft"
-                        ? "bg-gray-400"
-                        : item.status === "pending"
-                        ? "bg-yellow-500"
-                        : item.status === "validated_approved"
-                        ? "bg-green-500"
-                        : item.status === "validated_rejected"
-                        ? "bg-red-500"
-                        : "bg-gray-300"
+                      item.analysis?.grading?.toLowerCase() === "sangat tinggi"
+                        ? "bg-red-800 text-white"
+                        : item.analysis?.grading?.toLowerCase() === "tinggi"
+                        ? "bg-red-500 text-white"
+                        : item.analysis?.grading?.toLowerCase() === "sedang"
+                        ? "bg-yellow-400 text-white"
+                        : item.analysis?.grading?.toLowerCase() === "rendah"
+                        ? "bg-green-700 text-white"
+                        : item.analysis?.grading?.toLowerCase() ===
+                          "sangat rendah"
+                        ? "bg-green-400 text-white"
+                        : "bg-gray-400 text-white"
                     }`}
                   >
-                    {item.status ? (
-                      <>
-                        {/* Jika ada ikon status */}
-                        {statusIcons[item.status] && (
-                          <img
-                            src={statusIcons[item.status]}
-                            alt={`${item.status} icon`}
-                            className="w-3 h-3"
-                          />
-                        )}
-                        <span className="ml-1">
-                          {item.status.replaceAll("_", " ")}
-                        </span>
-                      </>
-                    ) : (
-                      <span>-</span>
-                    )}
-                  </td>
+                    {item.analysis?.grading || "-"}
+                  </span>
+                </td>
 
-                  <td className="p-2 text-center space-x-2">
+                <td
+                  className={`px-1 py-0.5 relative capitalize flex items-center justify-center gap-1 mt-3.5 rounded-2xl text-white text-center 
+                  ${
+                    item.status === "draft"
+                      ? "bg-gray-400"
+                      : item.status === "pending"
+                      ? "bg-yellow-500"
+                      : item.status === "validated_approved"
+                      ? "bg-green-500"
+                      : item.status === "validated_rejected"
+                      ? "bg-red-500"
+                      : "bg-gray-300"
+                  }`}
+                  style={{ verticalAlign: "middle" }}
+                >
+                  {item.status && statusIcons[item.status] && (
+                    <img
+                      src={statusIcons[item.status]}
+                      alt={`${item.status} icon`}
+                      className="w-3 h-3 shrink-0"
+                    />
+                  )}
+                  <span className="truncate max-w-[100px]">
+                    {item.status?.replaceAll("_", " ") || "-"}
+                  </span>
+                </td>
+                <td className="p-2 text-center">
+                  <div className="flex justify-center items-center gap-1.5">
                     <button
                       onClick={() => {
                         setSelectedRiskId(item.id);
                         setShowApproveModal(true);
                       }}
-                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-xs font-medium hover:cursor-pointer"
+                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-xs font-medium"
                     >
                       Setuju
                     </button>
                     <button
                       onClick={() => handleRejectClick(item.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs font-medium hover:cursor-pointer"
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs font-medium"
                     >
                       Tolak
                     </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      )}
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

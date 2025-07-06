@@ -8,13 +8,14 @@ import {
   UsersIcon,
   XMarkIcon,
   ShieldCheckIcon,
+  ClipboardDocumentListIcon,
 } from "@heroicons/react/24/outline";
 import {
   LayoutDashboardIcon,
   LogOutIcon,
   ChartBarIcon,
   ClipboardList,
-  ClipboardListIcon,
+  FileDown,
 } from "lucide-react";
 
 
@@ -361,7 +362,7 @@ export default function Sidebar({
                 )}
               </motion.li>
             )}
-
+            {/* Kepala Puskesmas */}
             {role === "kepala_puskesmas" && (
               <>
                 {console.log(
@@ -371,6 +372,7 @@ export default function Sidebar({
                 {console.log("[DEBUG Sidebar] role:", role)}
                 {console.log("[DEBUG Sidebar] page:", page)}
 
+                {/* Menu Manajemen Risiko */}
                 <motion.li
                   variants={itemVariants}
                   onClick={() => {
@@ -380,14 +382,14 @@ export default function Sidebar({
                     }
                   }}
                   className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
-                  ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
-                  ${
-                    page === "manajemen-risiko"
-                      ? "bg-[#5932EA] text-white"
-                      : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
-                  }
-                  w-full
-                `}
+                    ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                    ${
+                      page === "manajemen-risiko"
+                        ? "bg-[#5932EA] text-white"
+                        : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                    }
+                    w-full
+                  `}
                 >
                   <ClipboardDocumentListIcon
                     className={`h-6 w-6 flex-shrink-0 ${
@@ -403,6 +405,28 @@ export default function Sidebar({
                       {notifCountHandling}
                     </span>
                   )}
+                </motion.li>
+                <motion.li
+                  variants={itemVariants}
+                  onClick={() => handleNavigate("download-laporan")}
+                  className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
+                    ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                    ${
+                      page === "download-laporan"
+                        ? "bg-[#5932EA] text-white"
+                        : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                    }
+                    w-full
+                  `}
+                >
+                  <FileDown
+                    className={`h-6 w-6 flex-shrink-0 ${
+                      page === "download-laporan"
+                        ? "text-white"
+                        : "text-[#9197B3]"
+                    }`}
+                  />
+                  {isOpen && <span className="text-sm">Download Laporan</span>}
                 </motion.li>
               </>
             )}

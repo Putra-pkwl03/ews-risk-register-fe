@@ -5,7 +5,6 @@ import { getValidatedRisks } from "../../lib/RiskAnalysis";
 import { getAllRiskMitigations } from "../../lib/RiskMitigations";
 import { useRouter } from "next/navigation";
 import { ShieldPlus } from "lucide-react";
-import LoadingSkeleton from "../loadings/LoadingSkeleton";
 import Pagination from "../manage-users/Pagenations";
 
 export default function EvaluasiRisiko() {
@@ -19,15 +18,15 @@ export default function EvaluasiRisiko() {
   const totalItems = risks.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  // Ambil data yang sesuai halaman
   const currentRisks = risks.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
   const onDetailClick = (risk) => {
     router.push(`/dashboard?page=evaluasi-risiko/${risk.id}/detail`);
   };
-  
+
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -46,9 +45,8 @@ export default function EvaluasiRisiko() {
     fetchData();
   }, []);
 
-  const findMitigationByRiskId = (riskId) => {
-    return mitigations.filter((m) => m.risk_id === riskId);
-  };
+  const findMitigationByRiskId = (riskId) =>
+    mitigations.filter((m) => m.risk_id === riskId);
 
   const shortDesc = (text) => {
     if (!text) return "-";
@@ -64,34 +62,58 @@ export default function EvaluasiRisiko() {
         </h5>
       </div>
 
-      {isLoading ? (
-        <LoadingSkeleton columns={5} />
-      ) : risks.length === 0 ? (
-        <p className="text-center text-gray-500">
-          Tidak ada data risiko yang sudah divalidasi.
-        </p>
-      ) : (
-        <table className="w-full text-sm sm:text-base">
-          <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
+      <table className="w-full text-sm sm:text-base">
+        <thead className="bg-gray-100 text-[#5932EA] text-left border-b border-gray-200">
+          <tr>
+            <th className="p-2  text-left text-[14px] sm:p-3 sm:text-base">
+              Cluster
+            </th>
+            <th className="p-2  text-left text-[14px] sm:p-3 sm:text-bas">
+              Unit
+            </th>
+            <th className="p-2  text-left text-[14px] sm:p-3 sm:text-bas">
+              Nama Risiko
+            </th>
+            <th className="p-2 text-left text-[14px] sm:p-3 sm:text-bas">
+              Mitigasi
+            </th>
+            <th className="p-2  text-center text-[14px] sm:p-3 sm:text-bas">
+              Controllability
+            </th>
+            <th className="p-2  text-center text-[14px] sm:p-3 sm:text-bas">
+              Scoring
+            </th>
+            <th className="p-2  text-center text-[14px] sm:p-3 sm:text-bas">
+              Decision
+            </th>
+            <th className="p-2 text-center text-[14px] sm:p-3 sm:text-bas">
+              Aksi
+            </th>
+          </tr>
+        </thead>
+
+        <tbody className="text-[#292D32]">
+          {isLoading ? (
+            Array.from({ length: 5 }).map((_, rowIndex) => (
+              <tr key={rowIndex} className="animate-pulse">
+                {Array.from({ length: 8 }).map((_, colIndex) => (
+                  <td key={colIndex} className="p-2">
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  </td>
+                ))}
+              </tr>
+            ))
+          ) : currentRisks.length === 0 ? (
             <tr>
-              {[
-                "Cluster",
-                "Unit",
-                "Nama Risiko",
-                "Mitigasi",
-                "Controllability",
-                "Scoring",
-                "Decision",
-                "Aksi",
-              ].map((title, i) => (
-                <th key={i} className="p-2">
-                  {title}
-                </th>
-              ))}
+              <td
+                colSpan={8}
+                className="text-center text-[12px] sm:text-base py-6 text-gray-500"
+              >
+                Tidak ada data risiko yang sudah divalidasi.
+              </td>
             </tr>
-          </thead>
-          <tbody className="text-[#292D32]">
-            {currentRisks.map((risk, idx) => {
+          ) : (
+            currentRisks.map((risk, idx) => {
               const mitigationsForRisk = findMitigationByRiskId(risk.id);
               return (
                 <tr
@@ -100,10 +122,10 @@ export default function EvaluasiRisiko() {
                     idx % 2 === 0 ? "bg-gray-50" : "bg-white"
                   } hover:bg-gray-100 transition-colors`}
                 >
-                  <td className="p-2">{risk.cluster}</td>
-                  <td className="p-2">{risk.unit}</td>
-                  <td className="p-2">{risk.name}</td>
-                  <td className="p-2">
+                  <td className="p-2 w-[20%] text-[12px]">{risk.cluster}</td>
+                  <td className="p-2 w-[10%] text-[12px]">{risk.unit}</td>
+                  <td className="p-2 w-[20%] text-[12px]">{risk.name}</td>
+                  <td className="p-2 w-[25%] text-[12px]">
                     {mitigationsForRisk.length > 0
                       ? mitigationsForRisk.map((m) => (
                           <div key={m.id} className="mb-2">
@@ -115,18 +137,17 @@ export default function EvaluasiRisiko() {
                         ))
                       : "-"}
                   </td>
-                  <td className="p-2 text-center">
+                  <td className="p-2 w-[5%] text-center text-[12px]">
                     {risk.risk_appetite?.controllability ?? "-"}
                   </td>
-                  <td className="p-2 text-center">
+                  <td className="p-2 w-[5%] text-center text-[12px]">
                     {risk.risk_appetite?.scoring ?? "-"}
                   </td>
-                  <td className="p-2 text-center capitalize">
+                  <td className="p-2 w-[10%] text-center capitalize text-[12px]">
                     {risk.risk_appetite?.decision ?? "-"}
                   </td>
-                  <td className="p-2 text-center">
+                  <td className="p-2 w-[5%] text-center">
                     <div className="flex justify-center items-center gap-2">
-                      {/* Tombol Detail */}
                       <button
                         onClick={() => onDetailClick(risk)}
                         className="p-1 rounded transition"
@@ -139,7 +160,6 @@ export default function EvaluasiRisiko() {
                         />
                       </button>
 
-                      {/* Tombol Add/Edit Mitigation */}
                       <button
                         onClick={() =>
                           router.push(
@@ -173,10 +193,11 @@ export default function EvaluasiRisiko() {
                   </td>
                 </tr>
               );
-            })}
-          </tbody>
-        </table>
-      )}
+            })
+          )}
+        </tbody>
+      </table>
+
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

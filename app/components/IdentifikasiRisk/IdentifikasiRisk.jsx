@@ -72,15 +72,14 @@ export default function IdentifikasiRisikoTable() {
     setCurrentPage(1);
   }, [searchTerm, kategoriFilter, sortOrder]);
 
-  const handleSave = async (newItem) => {
+  const handleSave = async (newItem, id = null) => {
     try {
-      if (isEditMode) {
-        await RiskService.update(newItem.id, newItem);
+      if (isEditMode && id) {
+        await RiskService.update(id, newItem);
       } else {
         await RiskService.create(newItem);
       }
 
-      // Setelah create/update, fetch ulang semua data dari server
       const risks = await RiskService.getAll();
       setData(risks);
 
@@ -99,6 +98,7 @@ export default function IdentifikasiRisikoTable() {
       return false;
     }
   };
+  
 
   const handleKategoriChange = (e) => {
     const value = e.target.value;

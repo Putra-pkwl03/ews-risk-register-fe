@@ -45,11 +45,10 @@ export default function RiskDetail({ risk, onBack }) {
         className="flex items-center text-sm text-gray-600 hover:text-blue-600 mb-6 hover:cursor-pointer"
       >
         <ArrowLeftIcon className="w-5 h-5 mr-1" />
-        Kembali
       </button>
 
       <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
-        Detail Risiko
+        Detail Analisis Risiko
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 mb-8">

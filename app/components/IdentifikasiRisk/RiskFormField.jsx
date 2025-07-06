@@ -13,6 +13,7 @@ export default function FormFields({
   handleRemovePenyebab,
   isFormValid,
   isSaving,
+  isEdit,
 }) {
   const defaultPenyebab = {
     kategori: "",
@@ -26,7 +27,10 @@ export default function FormFields({
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md text-gray-900 max-w-4xl mx-auto mt-8">
-      <h3 className="text-2xl font-semibold mr-2">Tambah Risiko Baru</h3>
+      <h3 className="text-2xl font-semibold mr-2 mb-4">
+        {isEdit ? "Edit Risiko" : "Tambah Risiko Baru"}
+      </h3>
+
       {/* Modal */}
       {showNoteModal && <RiskNoteModal onClose={handleCloseNoteModal} />}
       <div className="grid grid-cols-2 gap-6">

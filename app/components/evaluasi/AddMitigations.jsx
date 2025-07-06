@@ -157,24 +157,30 @@ export default function AddMitigation() {
         isOpen={showError}
         onClose={() => setShowError(false)}
       />
-      <div className="flex items-center gap-3 mb-5">
+      <div className="relative mb-5">
+        {/* Tombol back di kiri atas */}
         <button
           onClick={() => router.push("/dashboard?page=evaluasi-risiko")}
-          className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 hover:cursor-pointer"
+          className="absolute top-0 left-0 flex items-center space-x-2 text-gray-700 hover:text-gray-900 hover:cursor-pointer p-4"
           aria-label="Kembali"
         >
           <ArrowLeftIcon className="h-5 w-5 hover:text-blue-500" />
         </button>
-        <h3 className="text-xl font-semibold text-black">Mitigasi Risiko</h3>
+
+        {/* Judul di tengah, agak ke bawah */}
+        <div className="flex justify-center pt-8">
+          <h3 className="text-xl font-semibold text-black">Mitigasi Risiko</h3>
+        </div>
       </div>
-      {error && <div className="mb-4 text-red-600">{error}</div>}
+
+      {error && <div className="mb-2 text-red-600">{error}</div>}
 
       <form onSubmit={handleSubmit}>
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 p-4">
           {mitigations.map((m, mIdx) => (
             <div
               key={mIdx}
-              className="relative flex-1 min-w-[300px] p-4 rounded shadow-md text-black"
+              className="relative flex-1 min-w-[300px] p-4 rounded shadow text-black -mt-6"
             >
               {mIdx > 0 && (
                 <button
@@ -301,7 +307,7 @@ export default function AddMitigation() {
           </div>
         )}
 
-        <div className="mt-6 w-full">
+        <div className="mt-6 w-full p-4">
           <button
             type="submit"
             disabled={!isAllMitigationsFilled() || loading}

@@ -7,7 +7,7 @@ import ReviewModal from "../managementrisiko/ReviewModal";
 import ReviewNoteModal from "../managementrisiko/RiviewNoteModal";
 import {
   CheckCircleIcon,
-  DocumentArrowDownIcon,
+  // DocumentArrowDownIcon,
 } from "@heroicons/react/24/outline";
 import Pagination from "../manage-users/Pagenations";
 import SuccessToast from "../modalconfirmasi/SuccessToast";
@@ -222,7 +222,7 @@ export default function Risikokepalapuskesmas() {
                   <td className="px-2 py-2 text-center">
                     {item.handler?.name || "-"}
                   </td>
-                  <td className="px-2 py-2 text-center">
+                  <td className="px-2 py-2">
                     {item.reviewer?.name || "-"}
                   </td>
                   <td className="px-2 py-2">
@@ -280,13 +280,13 @@ export default function Risikokepalapuskesmas() {
                     >
                       <CheckCircleIcon className="w-5 h-5" />
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => exportToExcel(item)}
                       className="text-indigo-600 hover:text-indigo-800 cursor-pointer"
                       title="Download Excel"
                     >
                       <DocumentArrowDownIcon className="h-5 w-5" />
-                    </button>
+                    </button> */}
                   </td>
                 </tr>
               ))}

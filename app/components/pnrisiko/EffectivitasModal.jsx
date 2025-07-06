@@ -12,18 +12,25 @@ export default function AddEffectivenessModal({ isOpen, onClose, onSubmit, editi
   useEffect(() => {
     if (!isOpen) return;
 
-    // Ambil daftar risiko 
     const fetchRisks = async () => {
-        try {
-          const risks = await RiskService.getAll();
-          setRisks(risks || []);                  
-        } catch (err) {
-          console.error("Gagal memuat daftar risiko", err);
-        }
-      };
+      try {
+        const allRisks = await RiskService.getAll();
+
+        const filteredRisks = editingItem
+          ? allRisks 
+          : allRisks.filter(
+              (risk) => !risk.handlings || risk.handlings.length === 0
+            );
+
+        setRisks(filteredRisks || []);
+      } catch (err) {
+        console.error("Gagal memuat daftar risiko:", err);
+      }
+    };
 
     fetchRisks();
-  }, [isOpen]);
+  }, [isOpen, editingItem]);
+  
 
   useEffect(() => {
     if (editingItem) {

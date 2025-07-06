@@ -20,14 +20,11 @@ export default function DetailRisikoCard({ risk, onClose }) {
 
   if (!risk) return null;
 
-
-
-
   const creatorName =
     users.find((u) => u.id === risk.created_by)?.name || "Unknown";
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 mx-auto">
+    <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 mx-auto mt-3">
       <button
         onClick={() => {
           // Hapus query param `ref` dari URL
@@ -83,41 +80,53 @@ export default function DetailRisikoCard({ risk, onClose }) {
             Lihat Pohon Keputusan
           </button>
         </div>
+
         {risk.causes && risk.causes.length > 0 ? (
-          risk.causes.map((cause) => (
-            <div
-              key={cause.id}
-              className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200 text-gray-800"
-            >
-              <div className="mb-2">
-                <strong className="text-[16px] font-semibold">Kategori:</strong>{" "}
-                <span className="capitalize text-[14px]">{cause.category}</span>
-              </div>
-              <div className="mb-2">
-                <strong className="text-[16px] font-semibold">
-                  Penyebab Utama:
-                </strong>{" "}
-                <span className="capitalize text-[14px]">
-                  {" "}
-                  {cause.main_cause}
-                </span>
-              </div>
-              {cause.sub_causes && cause.sub_causes.length > 0 && (
-                <div className="ml-4 mt-3 text-[14px] text-gray-600 font-semibold">
-                  <strong>Sub Penyebab:</strong>
-                  <ul className="list-disc list-inside mt-1 space-y-1 text-[14px]">
-                    {cause.sub_causes.map((sub) => (
-                      <li key={sub.id}>{sub.sub_cause}</li>
-                    ))}
-                  </ul>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {risk.causes.map((cause) => (
+              <div
+                key={cause.id}
+                className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-gray-800"
+              >
+                <div className="mb-2">
+                  <strong className="text-[16px] font-semibold">
+                    Kategori:
+                  </strong>{" "}
+                  <span className="capitalize text-[14px]">
+                    {cause.category}
+                  </span>
                 </div>
-              )}
-            </div>
-          ))
+                <div className="mb-2">
+                  <strong className="text-[16px] font-semibold">
+                    Penyebab Utama:
+                  </strong>{" "}
+                  <span className="capitalize text-[14px]">
+                    {cause.main_cause}
+                  </span>
+                </div>
+                {cause.sub_causes && cause.sub_causes.length > 0 && (
+                  <div className="ml-4 mt-3 text-[14px] text-gray-600 font-semibold">
+                    <strong>Sub Penyebab:</strong>
+                    <ul className="list-disc list-inside mt-1 space-y-1 text-[14px]">
+                      {cause.sub_causes.map((sub) => (
+                        <li key={sub.id}>{sub.sub_cause}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         ) : (
           <p className="text-gray-500">Tidak ada penyebab yang tercatat.</p>
         )}
       </div>
+      <button
+        onClick={onClose}
+        className="mt-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl w-full hover:cursor-pointer"
+      >
+        Tutup Detail
+      </button>
 
       <FishboneModal
         isOpen={showFishbone}
