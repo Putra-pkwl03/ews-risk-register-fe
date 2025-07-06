@@ -17,6 +17,38 @@ export async function fetchRiskHandlings() {
   }
 }
 
+// Ambil semua data risk appetite untuk dahboard
+export async function fetchRiskAppetites() {
+  try {
+    const response = await api.get("/risk-appetites");
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Gagal mengambil data risk appetite";
+
+    throw new Error(message);
+  }
+}
+
+// endpoin public dashboard 
+export async function fetchRiskHandlingspublic() {
+  try {
+    const response = await api.get("/risk-handlings/all-public");
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      error.message ||
+      "Gagal mengambil data penanganan risiko";
+
+    throw new Error(message);
+  }
+}
+
 export async function createRiskHandling(data) {
   try {
     const response = await api.post("/risk-handlings", data);

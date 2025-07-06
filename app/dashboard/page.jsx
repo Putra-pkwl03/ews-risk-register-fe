@@ -18,6 +18,8 @@ import DetailRiskMitigation from "../components/evaluasi/DetailRiskMitigation";
 import Pnrisiko from "../components/pnrisiko/pnrisiko";
 import Risikokepalapuskesmas from "../components/managementrisiko/RisikokepalaPuskesmas";
 import DownloadLaporan from "../components/Laporan/DownloadLaporan";
+import WelcomeDashboard from "../components/dashboard/WelcomeDashboard"; 
+
 
 export default function Dashboard() {
   const router = useRouter();
@@ -151,11 +153,7 @@ export default function Dashboard() {
       ) : page === "download-laporan" ? (
         <DownloadLaporan />
       ) : (
-        <div className="flex items-center justify-center h-full">
-          <h1 className="text-2xl font-bold text-black">
-            Selamat datang di Dashboard
-          </h1>
-        </div>
+        <WelcomeDashboard /> 
       )}
     </Layout>
   );

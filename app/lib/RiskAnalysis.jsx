@@ -32,6 +32,17 @@ export async function getAllRiskAnalysis() {
   }
 }
 
+// Ambil semua data analisis risiko tanpa batasan role
+export async function getAllRiskAnalysisWithoutLimit() {
+  try {
+    const response = await api.get("/risk-analysis/all");
+    return response.data;
+  } catch (error) {
+    throw new Error("Gagal mengambil semua data analisis risiko (tanpa batasan)");
+  }
+}
+
+
 // Ambil data analisis risiko berdasarkan ID analisis
 export async function fetchRiskAnalysisById(id) {
   try {
