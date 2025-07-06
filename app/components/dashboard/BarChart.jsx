@@ -57,7 +57,7 @@ export default function VerticalBarChartByCluster() {
   const colors = ["#1E3A8A", "#60A5FA"]; 
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-3 w-full h-[320px] transition-all">
+    <div className="bg-white rounded-xl shadow-md p-4 w-full h-[320px] transition-all">
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
         <ChartBarIcon className="w-5 h-5 text-blue-600" />
@@ -71,6 +71,9 @@ export default function VerticalBarChartByCluster() {
         <BarChart
           data={data}
           margin={{ top: 5, right: 10, left: 0, bottom: 40 }}
+          barCategoryGap="2%" // jarak antar kategori
+          barGap={2}
+          // barCategoryGap={2}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
           <XAxis
@@ -79,6 +82,8 @@ export default function VerticalBarChartByCluster() {
             textAnchor="middle"
             interval={0}
             tick={{ fontSize: 11 }}
+            axisLine={false} // hilangkan garis sumbu
+            tickLine={false}
           />
           <YAxis tick={{ fontSize: 11 }} />
           <Tooltip
@@ -98,7 +103,8 @@ export default function VerticalBarChartByCluster() {
           <Bar
             dataKey="total"
             name="Total Risiko"
-            radius={[10, 10, 10, 10]} 
+            radius={[10, 10, 10, 10]}
+            barSize={14}
           >
             {data.map((_, index) => (
               <Cell
