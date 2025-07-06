@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BookmarkSlashIcon} from "@heroicons/react/24/outline";
 import { fetchRiskAppetites } from "../../lib/pnrisiko";
 
 export default function RiskControlScoringSummary() {
@@ -58,9 +59,10 @@ export default function RiskControlScoringSummary() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-6 w-full">
-      <h2 className="text-md font-semibold text-gray-800 mb-4">
-        Ringkasan Kontrol & Skoring
+    <div className="bg-white rounded-2xl shadow-sm p-4 w-full">
+      <h2 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <BookmarkSlashIcon className="w-5 h-5 text-green-800" />
+        Ringkasan Kontrol & Skor
       </h2>
 
       {/* Total Risiko di kiri atas */}

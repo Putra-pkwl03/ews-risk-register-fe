@@ -5,6 +5,7 @@ import {
   CalculatorIcon,
   MagnifyingGlassPlusIcon,
   ChevronDoubleRightIcon,
+  BookmarkIcon,
 } from "@heroicons/react/24/outline";
 import { getAllRiskAnalysisWithoutLimit } from "../../lib/RiskAnalysis";
 
@@ -51,8 +52,11 @@ export default function RiskSummaryBox() {
   }
 
   return (
-    <div className="bg-gradient-to-r from-[#5932EA] to-gray-100 rounded-2xl shadow-sm p-6 w-full">
-      <h2 className="text-md font-bold text-white mb-4">Ringkasan Risiko</h2>
+    <div className="bg-gradient-to-r from-[#5932EA] to-gray-100 rounded-2xl shadow-sm p-4 w-full">
+      <h2 className="text-md font-bold text-white mb-4 flex items-center gap-2">
+        <BookmarkIcon className="w-5 h-5 text-pink-500" />
+        Ringkasan Risiko
+      </h2>
       <div className="flex flex-col gap-3">
         <SummaryCard
           title="Total Risiko"

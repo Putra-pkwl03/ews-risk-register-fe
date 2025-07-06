@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  BookmarkSquareIcon,
+} from "@heroicons/react/24/outline";
 import { getAllRiskAnalysisWithoutLimit } from "../../lib/RiskAnalysis";
 
 export default function RiskStatusSummaryBox() {
@@ -51,8 +54,9 @@ export default function RiskStatusSummaryBox() {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-6 w-full">
-      <h2 className="text-md font-semibold text-gray-800 mb-4">
+    <div className="bg-white rounded-2xl shadow-sm p-4 w-full">
+      <h2 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <BookmarkSquareIcon className="w-5 h-5 text-yellow-500" />
         Status Risiko 6 Bulan Terakhir
       </h2>
 
