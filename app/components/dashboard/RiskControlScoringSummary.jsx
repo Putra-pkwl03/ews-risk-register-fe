@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BookmarkSlashIcon} from "@heroicons/react/24/outline";
+import { BookmarkSlashIcon } from "@heroicons/react/24/outline";
 import { fetchRiskAppetites } from "../../lib/pnrisiko";
 
 export default function RiskControlScoringSummary() {
@@ -46,80 +46,82 @@ export default function RiskControlScoringSummary() {
           highestScoring: maxScoring,
           top3Ranking: top3.length,
         });
-
-        setLoading(false);
       })
       .catch((err) => {
         console.error("Gagal ambil data risk appetite:", err);
-      });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return <p className="text-sm text-gray-500">Memuat ringkasan risiko...</p>;
-  }
-
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-4 w-full">
-      <h2 className="text-md font-semibold text-gray-800 mb-4 flex items-center gap-2">
+    <div className={`w-full ${loading ? "animate-pulse" : ""}`}>
+      <h2 className="text-[16px] font-semibold text-gray-700 mb-2 flex items-center gap-2">
         <BookmarkSlashIcon className="w-5 h-5 text-green-800" />
         Ringkasan Kontrol & Skor
       </h2>
 
-      {/* Total Risiko di kiri atas */}
-      <div className="mb-4">
-        <MiniCard
-          title="Total Risiko"
-          value={summary.total}
-          color="bg-blue-100"
-          text="text-black"
-          large
-        />
-      </div>
+      <div className="bg-white rounded-2xl shadow-sm p-4 w-full font-semibold">
+        <div className="mb-4 font-semibold">
+          <MiniCard
+            title="Total Risiko"
+            value={summary.total}
+            color="bg-blue-100"
+            text="text-black"
+            large
+            loading={loading}
+          />
+        </div>
 
-      {/* Data lainnya dalam 2 kolom */}
-      <div className="grid grid-cols-2 gap-2">
-        <MiniCard
-          title={`C Tertinggi (C=${summary.highestControl})`}
-          value={summary.highestControlCount}
-          color="bg-green-100"
-          text="text-green-600"
-          horizontal
-        />
-        <MiniCard
-          title={`C Terendah (C=${summary.lowestControl})`}
-          value={summary.lowestControlCount}
-          color="bg-red-100"
-          text="text-red-600"
-          horizontal
-        />
-        <MiniCard
-          title="Mitigated"
-          value={summary.mitigated}
-          color="bg-teal-100"
-          text="text-teal-600"
-          horizontal
-        />
-        <MiniCard
-          title="Accepted"
-          value={summary.accepted}
-          color="bg-indigo-100"
-          text="text-indigo-600"
-          horizontal
-        />
-        <MiniCard
-          title="Skoring Tertinggi"
-          value={summary.highestScoring}
-          color="bg-orange-100"
-          text="text-orange-600"
-          horizontal
-        />
-        <MiniCard
-          title="Top 3 Ranking"
-          value={summary.top3Ranking}
-          color="bg-yellow-100"
-          text="text-yellow-600"
-          horizontal
-        />
+        <div className="grid grid-cols-2 gap-2 py-2">
+          <MiniCard
+            title={`C Tertinggi (C=${summary.highestControl})`}
+            value={summary.highestControlCount}
+            color="bg-green-100"
+            text="text-green-600"
+            horizontal
+            loading={loading}
+          />
+          <MiniCard
+            title={`C Terendah (C=${summary.lowestControl})`}
+            value={summary.lowestControlCount}
+            color="bg-red-100"
+            text="text-red-600"
+            horizontal
+            loading={loading}
+          />
+          <MiniCard
+            title="Mitigated"
+            value={summary.mitigated}
+            color="bg-teal-100"
+            text="text-teal-600"
+            horizontal
+            loading={loading}
+          />
+          <MiniCard
+            title="Accepted"
+            value={summary.accepted}
+            color="bg-indigo-100"
+            text="text-indigo-600"
+            horizontal
+            loading={loading}
+          />
+          <MiniCard
+            title="Skoring Tertinggi"
+            value={summary.highestScoring}
+            color="bg-orange-100"
+            text="text-orange-600"
+            horizontal
+            loading={loading}
+          />
+          <MiniCard
+            title="Top 3 Ranking"
+            value={summary.top3Ranking}
+            color="bg-yellow-100"
+            text="text-yellow-600"
+            horizontal
+            loading={loading}
+          />
+        </div>
       </div>
     </div>
   );
@@ -132,6 +134,7 @@ function MiniCard({
   text,
   large = false,
   horizontal = false,
+  loading = false,
 }) {
   const isHorizontal = large || horizontal;
 
@@ -139,8 +142,8 @@ function MiniCard({
     <div
       className={`rounded-xl ${color} hover:shadow transition-all ${
         isHorizontal
-          ? "p-2 flex items-center justify-between"
-          : "p-1 text-center"
+          ? " px-2 py-1 flex items-center justify-between"
+          : "px-2 py-1 text-center"
       }`}
     >
       <p
@@ -148,14 +151,13 @@ function MiniCard({
           isHorizontal ? "mb-0" : "mb-1"
         }`}
       >
-        {title}
+        {loading ? "..." : title}
       </p>
       <p
         className={`font-bold ${text} ${isHorizontal ? "text-md" : "text-sm"}`}
       >
-        {value}
+        {loading ? "..." : value}
       </p>
     </div>
   );
 }
-        
