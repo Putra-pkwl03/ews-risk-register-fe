@@ -7,7 +7,7 @@ import RiskControlScoringSummary from "../dashboard/RiskControlScoringSummary";
 
 export default function WelcomeDashboard() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 bg-white rounded-sm shadow-gray-200 shadow-xl mb-4">
       {/* Ringkasan Risiko - Grid 3 kolom */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <RiskSummaryBox />
