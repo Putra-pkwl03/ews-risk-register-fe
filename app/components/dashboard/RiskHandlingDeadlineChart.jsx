@@ -90,7 +90,7 @@ export default function RiskHandlingDeadlineChart() {
         </h2>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-5 w-full max-w-2xl mx-auto transition-all">
+      <div className="bg-white rounded-xl  p-5 w-full max-w-2xl mx-auto transition-all">
         <div className="text-sm text-right space-y-1">
           <div className="text-gray-500">
             Deadline -3 hari:{" "}
