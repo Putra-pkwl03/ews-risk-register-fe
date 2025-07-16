@@ -186,7 +186,7 @@ export default function AddMitigation() {
                 <button
                   type="button"
                   onClick={() => removeMitigation(mIdx)}
-                  className="absolute top-0 right-0 text-red-600 hover:text-red-800 text-xl"
+                  className="absolute top-0 right-0 text-red-600 hover:text-red-800 text-xl cursor-pointer"
                   title="Hapus Mitigasi"
                 >
                   <X size={18} />
@@ -232,7 +232,8 @@ export default function AddMitigation() {
                   <option value="">-- Pilih PIC --</option>
                   {users.map((u) => (
                     <option key={u.id} value={u.id}>
-                      {u.name}
+                      {u.name} (
+                      {u.role.charAt(0).toUpperCase() + u.role.slice(1)})
                     </option>
                   ))}
                 </select>

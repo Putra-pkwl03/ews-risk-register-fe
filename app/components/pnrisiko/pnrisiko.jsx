@@ -36,17 +36,38 @@ export default function Pnrisiko() {
   const itemsPerPage = 9;
   const totalItems = data.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const [filterEfektivitas, setFilterEfektivitas] = useState("All");
+  const [sortOrder, setSortOrder] = useState("");
+  const [errorToast, setErrorToast] = useState({ isOpen: false, message: "" });
   const [successToast, setSuccessToast] = useState({
     isOpen: false,
     message: "",
   });
-  const [errorToast, setErrorToast] = useState({ isOpen: false, message: "" });
+  const filteredData = data.filter((item) => {
+    if (filterEfektivitas === "All") return true;
+    return (
+      item.effectiveness &&
+      item.effectiveness.trim().toLowerCase() ===
+        filterEfektivitas.trim().toLowerCase()
+    );
+  });
 
+  
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (sortOrder === "Ascending") {
+      return a.effectiveness.localeCompare(b.effectiveness);
+    } else if (sortOrder === "Descending") {
+      return b.effectiveness.localeCompare(a.effectiveness);
+    }
+    return 0;
+  });
+  
   // Data yang ditampilkan di halaman saat ini:
-  const paginatedData = data.slice(
+  const paginatedData = sortedData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
 
   useEffect(() => {
     fetchRiskHandlings()
@@ -63,6 +84,13 @@ export default function Pnrisiko() {
       />
     );
   }
+  const handleEfektivitasChange = (e) => {
+    setFilterEfektivitas(e.target.value);
+  };
+
+  const handleSortChange = (e) => {
+    setSortOrder(e.target.value);
+  };
 
   return (
     <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
@@ -70,35 +98,78 @@ export default function Pnrisiko() {
         <h5 className="text-[18px] sm:text-[20px] text-black font-semibold">
           Penanganan Risiko
         </h5>
-        <button
-          onClick={() => {
-            const uniqueRisks = data
-              .map((item) => item.risk)
-              .filter(
-                (risk, index, self) =>
-                  index === self.findIndex((r) => r.id === risk.id)
-              );
-            setRisks(uniqueRisks);
-            setModalOpen(true);
-          }}
-          className="flex items-center gap-1 text-xs sm:text-sm border border-green-500 text-green-500 hover:bg-green-100 px-3 py-1.5 rounded-md"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Filter Efektivitas */}
+          <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
+            <span>Filter:</span>
+            <select
+              value={filterEfektivitas}
+              onChange={handleEfektivitasChange}
+              className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center hover:cursor-pointer appearance-none focus:outline-none pr-6"
+            >
+              <option value="All">All</option>
+              <option value="Efektif">Efektif</option>
+              <option value="Tidak Efektif">Tidak Efektif</option>
+              <option value="Kurang Efektif">Kurang Efektif</option>
+            </select>
+            <img
+              src="/icons/chevron-down.svg"
+              alt="Filter Icon"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
             />
-          </svg>
-          Add Efektivitas
-        </button>
+          </div>
+
+          {/* Sorting */}
+          <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
+            <span>Sorting:</span>
+            <select
+              value={sortOrder}
+              onChange={handleSortChange}
+              className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center hover:cursor-pointer appearance-none focus:outline-none pr-6"
+            >
+              <option value="">Default</option>
+              <option value="Ascending">Ascending</option>
+              <option value="Descending">Descending</option>
+            </select>
+            <img
+              src="/icons/chevron-down.svg"
+              alt="Sort Icon"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
+            />
+          </div>
+
+          {/* Tombol Add Efektivitas */}
+          <button
+            onClick={() => {
+              const uniqueRisks = data
+                .map((item) => item.risk)
+                .filter(
+                  (risk, index, self) =>
+                    index === self.findIndex((r) => r.id === risk.id)
+                );
+              setRisks(uniqueRisks);
+              setModalOpen(true);
+            }}
+            className="flex items-center gap-1 text-xs sm:text-sm border border-green-500 text-green-500 hover:bg-green-100 px-3 py-1.5 rounded-md cursor-pointer"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Add Efektivitas
+          </button>
+        </div>
       </div>
 
       {error && <p className="text-red-500">{error}</p>}
@@ -115,6 +186,9 @@ export default function Pnrisiko() {
               <th className="p-2 whitespace-nowrap text-xs sm:text-sm">Unit</th>
               <th className="p-2 whitespace-nowrap text-xs sm:text-sm">
                 Efektivitas
+              </th>
+              <th className="p-2 whitespace-nowrap text-xs sm:text-sm">
+                Hambatan
               </th>
               <th className="p-2 whitespace-nowrap text-xs sm:text-sm">
                 Signature
@@ -170,6 +244,9 @@ export default function Pnrisiko() {
                   </td>
                   <td className="p-2 text-center text-[12px] sm:text-sm">
                     {item.effectiveness}
+                  </td>
+                  <td className="p-2 text-[12px] sm:text-sm">
+                    {item.barrier || "-"}
                   </td>
                   <td className="p-2 text-[12px] sm:text-sm">
                     {item.approval_signature ? (

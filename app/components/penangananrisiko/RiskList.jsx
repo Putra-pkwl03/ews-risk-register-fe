@@ -176,25 +176,6 @@ export default function RiskList({
                       </button>
                     </div>
 
-                    {!risk.risk_appetite?.decision && (
-                      <select
-                        defaultValue=""
-                        className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
-                        onChange={(e) =>
-                          onDecisionChange(
-                            risk.risk_appetite.id,
-                            e.target.value
-                          )
-                        }
-                      >
-                        <option value="" disabled>
-                          Pilih Keputusan
-                        </option>
-                        <option value="accepted">Diterima</option>
-                        <option value="mitigated">Dicegah</option>
-                      </select>
-                    )}
-
                     {risk.risk_appetite?.decision && (
                       <span className="text-xs italic text-gray-500">
                         {risk.risk_appetite.decision === "accepted"

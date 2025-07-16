@@ -406,29 +406,31 @@ export default function Sidebar({
                     </span>
                   )}
                 </motion.li>
-                <motion.li
-                  variants={itemVariants}
-                  onClick={() => handleNavigate("download-laporan")}
-                  className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
-                    ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
-                    ${
-                      page === "download-laporan"
-                        ? "bg-[#5932EA] text-white"
-                        : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
-                    }
-                    w-full
-                  `}
-                >
-                  <FileDown
-                    className={`h-6 w-6 flex-shrink-0 ${
-                      page === "download-laporan"
-                        ? "text-white"
-                        : "text-[#9197B3]"
-                    }`}
-                  />
-                  {isOpen && <span className="text-sm">Download Laporan</span>}
-                </motion.li>
               </>
+            )}
+            {["kepala_puskesmas", "dinas_kesehatan"].includes(role) && (
+              <motion.li
+                variants={itemVariants}
+                onClick={() => handleNavigate("download-laporan")}
+                className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
+                  ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                  ${
+                    page === "download-laporan"
+                      ? "bg-[#5932EA] text-white"
+                      : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                  }
+                  w-full
+                `}
+              >
+                <FileDown
+                  className={`h-6 w-6 flex-shrink-0 ${
+                    page === "download-laporan"
+                      ? "text-white"
+                      : "text-[#9197B3]"
+                  }`}
+                />
+                {isOpen && <span className="text-sm">Download Laporan</span>}
+              </motion.li>
             )}
 
             {/* Manage Users */}

@@ -1,13 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import RiskService from "../../lib/RiskService"; 
+import RiskService from "../../lib/RiskService";
 
-export default function AddEffectivenessModal({ isOpen, onClose, onSubmit, editingItem }) {
+export default function AddEffectivenessModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  editingItem,
+}) {
   const [riskId, setRiskId] = useState("");
   const [effectiveness, setEffectiveness] = useState("TE");
   const [loading, setLoading] = useState(false);
   const [risks, setRisks] = useState([]);
+  const [barrier, setBarrier] = useState("");
 
   useEffect(() => {
     if (!isOpen) return;
@@ -17,7 +23,7 @@ export default function AddEffectivenessModal({ isOpen, onClose, onSubmit, editi
         const allRisks = await RiskService.getAll();
 
         const filteredRisks = editingItem
-          ? allRisks 
+          ? allRisks
           : allRisks.filter(
               (risk) => !risk.handlings || risk.handlings.length === 0
             );
@@ -30,15 +36,16 @@ export default function AddEffectivenessModal({ isOpen, onClose, onSubmit, editi
 
     fetchRisks();
   }, [isOpen, editingItem]);
-  
 
   useEffect(() => {
     if (editingItem) {
       setRiskId(editingItem.risk_id);
       setEffectiveness(editingItem.effectiveness);
+      setBarrier(editingItem.barrier || ""); // Tambahan ini
     } else {
       setRiskId("");
       setEffectiveness("TE");
+      setBarrier(""); // Reset saat tambah baru
     }
   }, [editingItem]);
 
@@ -47,7 +54,7 @@ export default function AddEffectivenessModal({ isOpen, onClose, onSubmit, editi
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await onSubmit({ risk_id: riskId, effectiveness });
+    await onSubmit({ risk_id: riskId, effectiveness, barrier });
     setLoading(false);
     setRiskId("");
     setEffectiveness("TE");
@@ -97,7 +104,16 @@ export default function AddEffectivenessModal({ isOpen, onClose, onSubmit, editi
               <option value="E">Efektif</option>
             </select>
           </div>
-
+          <div className="mb-4">
+            <label className="block mb-1 text-sm font-medium">Hambatan</label>
+            <textarea
+              value={barrier}
+              onChange={(e) => setBarrier(e.target.value)}
+              className="w-full border rounded px-3 py-2 resize-none"
+              rows={3}
+              placeholder="Masukkan hambatan jika ada"
+            />
+          </div>
           <div className="flex justify-end space-x-2">
             <button
               type="button"
