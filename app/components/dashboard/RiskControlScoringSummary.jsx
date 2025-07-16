@@ -60,7 +60,7 @@ export default function RiskControlScoringSummary() {
         Ringkasan Kontrol & Skor
       </h2>
 
-      <div className="bg-white rounded-2xl shadow-sm p-4 w-full font-semibold">
+      <div className="bg-white rounded-2xl  p-4 w-full font-semibold min-h-[220px]">
         <div className="mb-4 font-semibold">
           <MiniCard
             title="Total Risiko"

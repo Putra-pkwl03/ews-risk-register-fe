@@ -50,7 +50,7 @@ export default function RiskSummaryBox() {
         Ringkasan Risiko
       </h2>
 
-      <div className="bg-gradient-to-r from-[#5932EA] to-gray-300 rounded-2xl shadow-sm p-4 w-full">
+      <div className="bg-gradient-to-r from-[#5932EA] to-gray-300 rounded-2xl  p-4 w-full min-h-[220px]">
         <div className="flex flex-col gap-3">
           <SummaryCard
             title="Total Risiko"

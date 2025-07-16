@@ -17,6 +17,14 @@ import Pagination from "../manage-users/Pagenations";
 import SuccessToast from "../modalconfirmasi/SuccessToast";
 import ErrorToast from "../modalconfirmasi/ErrorToast";
 
+import {
+  EyeIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  PaperAirplaneIcon,
+  ExclamationTriangleIcon,
+} from "@heroicons/react/24/outline";
+
 export default function Pnrisiko() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +60,6 @@ export default function Pnrisiko() {
     );
   });
 
-  
   const sortedData = [...filteredData].sort((a, b) => {
     if (sortOrder === "Ascending") {
       return a.effectiveness.localeCompare(b.effectiveness);
@@ -61,17 +68,30 @@ export default function Pnrisiko() {
     }
     return 0;
   });
-  
+
   // Data yang ditampilkan di halaman saat ini:
   const paginatedData = sortedData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  const [showModal, setShowModal] = useState(false);
+  const [detailMitigasi, setDetailMitigasi] = useState([]);
+
+  // useEffect(() => {
+  //   console.log(data)
+  //   fetchRiskHandlings()
+  //     .then((res) => setData(res.data))
+  //     .catch((err) => setError(err.message))
+  //     .finally(() => setLoading(false));
+  // }, []);
 
   useEffect(() => {
     fetchRiskHandlings()
-      .then((res) => setData(res.data))
+      .then((res) => {
+        setData(res.data);
+        console.log("? Data hasil fetchRiskHandlings:", res.data);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
@@ -90,6 +110,56 @@ export default function Pnrisiko() {
 
   const handleSortChange = (e) => {
     setSortOrder(e.target.value);
+  };
+
+  // INFO START LOGIC
+  const risikoBelumDitangani = data.filter((item) => {
+    if (!item || !item.effectiveness || item.is_sent === 0) {
+      return true;
+    }
+    return false;
+  });
+
+  const totalRisiko = data.length;
+  const totalBelumDitangani = risikoBelumDitangani.length;
+  const persen = Math.round((totalBelumDitangani / totalRisiko) * 100);
+
+  const today = new Date();
+
+  const mitigasiLewatDeadline = data.filter((item) => {
+    const risk = item.risk;
+    if (!risk || !Array.isArray(risk.mitigations)) return false;
+
+    return risk.mitigations.some((mitigasi) => {
+      const deadline = new Date(mitigasi.deadline);
+      return deadline < today;
+    });
+  });
+  const totalMitigasiTerlambat = mitigasiLewatDeadline.length;
+  // INFO END
+
+  const handleShowDetail = () => {
+    const detail = [];
+
+    mitigasiLewatDeadline.forEach((item) => {
+      const risk = item.risk;
+      if (!risk || !Array.isArray(risk.mitigations)) return;
+
+      risk.mitigations.forEach((mitigasi) => {
+        const deadline = new Date(mitigasi.deadline);
+        if (deadline < today) {
+          detail.push({
+            name: risk.name,
+            unit: risk.unit,
+            cluster: risk.cluster,
+            deadline: mitigasi.deadline,
+          });
+        }
+      });
+    });
+
+    setDetailMitigasi(detail);
+    setShowModal(true);
   };
 
   return (
@@ -174,9 +244,50 @@ export default function Pnrisiko() {
 
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* Scrollable table on small screens */}
-      <div className="overflow-x-auto">
-        <table className="min-w-max w-full text-sm sm:text-base">
+      {/* INFO START*/}
+      {totalBelumDitangani > 0 && (
+        <div className="animate-pulse  bg-red-50 text-red-700 px-2 py-1 rounded-lg shadow mb-4 flex items-center justify-between w-full max-w-sm">
+          <div>
+            <strong className="block text-sm font-semibold">
+              {totalBelumDitangani} Risiko Belum Ditangani
+            </strong>
+            <span className="text-xs">
+              Segera isi penanganan ({persen}% dari total)
+            </span>
+          </div>
+          <span className="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded-full">
+            {persen}%
+          </span>
+        </div>
+      )}
+      {totalMitigasiTerlambat > 0 && (
+        <button
+          onClick={handleShowDetail}
+          className="text-left  bg-yellow-50 text-yellow-800 px-2 py-1 rounded-lg shadow mb-4 flex items-center justify-between w-full max-w-sm hover:bg-yellow-200 transition cursor-pointer"
+        >
+          <div>
+            <strong className="block text-sm font-semibold">
+              {totalMitigasiTerlambat} Risiko yang Mitigasinya Lewat dari
+              Deadline
+            </strong>
+            <div className="ml-3">
+              <span className="text-xs">
+                {/* Melebihi tanggal: {today.toISOString().slice(0, 10)} */}
+              </span>
+              <p className="text-[11px] text-gray-400 italic">
+                Klik untuk Detailnya
+              </p>
+            </div>
+          </div>
+          <span className="bg-yellow-100 text-yellow-700 font-bold p-1 rounded-full">
+            <ExclamationTriangleIcon className="w-5 h-5" />
+          </span>
+        </button>
+      )}
+      {/* END INFO HERE */}
+
+      {data.length > 0 && (
+        <table className="w-full text-sm sm:text-base">
           <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
             <tr>
               <th className="p-2 whitespace-nowrap text-xs sm:text-sm">No</th>
@@ -397,106 +508,145 @@ export default function Pnrisiko() {
             )}
           </tbody>
         </table>
+      )}
+      {/* MODAL INFO START */}
+      {showModal && (
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center"
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 w-full max-w-md shadow-lg transition-transform transform scale-100 hover:scale-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
+              <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500" />
+              Mitigasi Lewat Deadline
+            </h3>
 
-        {/* Modal */}
-        <AddEffectivenessModal
-          isOpen={modalOpen}
-          onClose={() => {
+            <ul className="space-y-3 max-h-60 overflow-y-auto pr-1">
+              {detailMitigasi.map((item, index) => (
+                <li
+                  key={index}
+                  className="text-sm text-gray-700 border-b pb-2 flex flex-col gap-1"
+                >
+                  <span className="font-semibold text-gray-800">
+                    {item.name}
+                  </span>
+                  <span className="text-xs text-gray-500 italic">
+                    {item.unit} / {item.cluster}
+                  </span>
+                  <span className="text-xs text-red-600 font-medium">
+                    Deadline: {item.deadline}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="text-[11px] text-center text-gray-400 mt-4 italic">
+              Klik di luar area untuk menutup
+            </p>
+          </div>
+        </div>
+      )}
+      {/* MODAL END */}
+
+      {/* Modal */}
+      <AddEffectivenessModal
+        isOpen={modalOpen}
+        onClose={() => {}}
+        editingItem={editingItem}
+        onSubmit={async (formData) => {
+          try {
+            if (editingItem) {
+              await updateRiskHandling(editingItem.id, formData);
+              setSuccessToast({
+                isOpen: true,
+                message: "Data berhasil diperbarui",
+              });
+            } else {
+              await createRiskHandling(formData);
+              setSuccessToast({
+                isOpen: true,
+                message: "Data berhasil ditambahkan",
+              });
+            }
+            const updated = await fetchRiskHandlings();
+            setData(updated.data);
+          } catch (err) {
+            setErrorToast({ isOpen: true, message: err.message });
+          } finally {
             setModalOpen(false);
             setEditingItem(null);
-          }}
-          editingItem={editingItem}
-          onSubmit={async (formData) => {
-            try {
-              if (editingItem) {
-                await updateRiskHandling(editingItem.id, formData);
-                setSuccessToast({
-                  isOpen: true,
-                  message: "Data berhasil diperbarui",
-                });
-              } else {
-                await createRiskHandling(formData);
-                setSuccessToast({
-                  isOpen: true,
-                  message: "Data berhasil ditambahkan",
-                });
-              }
-              const updated = await fetchRiskHandlings();
-              setData(updated.data);
-            } catch (err) {
-              setErrorToast({ isOpen: true, message: err.message });
-            } finally {
-              setModalOpen(false);
-              setEditingItem(null);
-            }
-          }}
-        />
+          }
+        }}
+      />
 
-        <ConfirmSendModal
-          isOpen={confirmSendOpen}
-          onClose={() => {
+      <ConfirmSendModal
+        isOpen={confirmSendOpen}
+        onClose={() => {
+          setConfirmSendOpen(false);
+          setSendItemId(null);
+        }}
+        onConfirm={async () => {
+          try {
+            setLoadingId(sendItemId);
+            await sendToKepala(sendItemId);
+            setSuccessToast({
+              isOpen: true,
+              message: "Notifikasi berhasil dikirim ke kepala puskesmas.",
+            });
+            const updated = await fetchRiskHandlings();
+            setData(updated.data);
+          } catch (err) {
+            setErrorToast({ isOpen: true, message: err.message });
+          } finally {
+            setLoadingId(null);
             setConfirmSendOpen(false);
             setSendItemId(null);
-          }}
-          onConfirm={async () => {
-            try {
-              setLoadingId(sendItemId);
-              await sendToKepala(sendItemId);
-              setSuccessToast({
-                isOpen: true,
-                message: "Notifikasi berhasil dikirim ke kepala puskesmas.",
-              });
-              const updated = await fetchRiskHandlings();
-              setData(updated.data);
-            } catch (err) {
-              setErrorToast({ isOpen: true, message: err.message });
-            } finally {
-              setLoadingId(null);
-              setConfirmSendOpen(false);
-              setSendItemId(null);
-            }
-          }}
-        />
+          }
+        }}
+      />
 
-        <ConfirmDeleteModal
-          isOpen={confirmDeleteOpen}
-          onClose={() => {
+      <ConfirmDeleteModal
+        isOpen={confirmDeleteOpen}
+        onClose={() => {
+          setConfirmDeleteOpen(false);
+          setDeleteItemId(null);
+        }}
+        onConfirm={async () => {
+          try {
+            await deleteRiskHandling(deleteItemId);
+            setSuccessToast({
+              isOpen: true,
+              message: "Data berhasil dihapus.",
+            });
+            const updated = await fetchRiskHandlings();
+            setData(updated.data);
+          } catch (err) {
+            setErrorToast({ isOpen: true, message: err.message });
+          } finally {
             setConfirmDeleteOpen(false);
             setDeleteItemId(null);
-          }}
-          onConfirm={async () => {
-            try {
-              await deleteRiskHandling(deleteItemId);
-              setSuccessToast({
-                isOpen: true,
-                message: "Data berhasil dihapus.",
-              });
-              const updated = await fetchRiskHandlings();
-              setData(updated.data);
-            } catch (err) {
-              setErrorToast({ isOpen: true, message: err.message });
-            } finally {
-              setConfirmDeleteOpen(false);
-              setDeleteItemId(null);
-            }
-          }}
-        />
-        <SuccessToast
-          message={successToast.message}
-          isOpen={successToast.isOpen}
-          onClose={() => setSuccessToast({ isOpen: false, message: "" })}
-        />
-        <ErrorToast
-          message={errorToast.message}
-          isOpen={errorToast.isOpen}
-          onClose={() => setErrorToast({ isOpen: false, message: "" })}
-        />
-        <ReviewNoteModal
-          isOpen={noteModalOpen}
-          onClose={() => setNoteModalOpen(false)}
-          note={selectedNote}
-        />
-      </div>
+          }
+        }}
+      />
+      <SuccessToast
+        message={successToast.message}
+        isOpen={successToast.isOpen}
+        onClose={() => setSuccessToast({ isOpen: false, message: "" })}
+      />
+      <ErrorToast
+        message={errorToast.message}
+        isOpen={errorToast.isOpen}
+        onClose={() => setErrorToast({ isOpen: false, message: "" })}
+      />
+      <ReviewNoteModal
+        isOpen={noteModalOpen}
+        onClose={() => setNoteModalOpen(false)}
+        note={selectedNote}
+      />
+
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

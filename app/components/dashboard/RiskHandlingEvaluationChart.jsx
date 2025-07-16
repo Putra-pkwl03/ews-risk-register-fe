@@ -67,7 +67,7 @@ export default function RiskHandlingEvaluationChart() {
         </h2>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-5 w-full max-w-2xl mx-auto transition-all">
+      <div className="bg-white rounded-xl p-5 w-full max-w-2xl mx-auto transition-all">
         <span className="text-sm text-gray-500">
           Total Ditangani:{" "}
           <strong className="text-gray-700">

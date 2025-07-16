@@ -68,7 +68,7 @@ export default function RiskStatusSummaryBox() {
         Status Risiko 6 Bulan Terakhir
       </h2>
 
-      <div className="bg-white rounded-2xl shadow-sm p-4 w-full font-semibold">
+      <div className="bg-white rounded-2xl p-4 w-full font-semibold min-h-[222px]">
         <div className="mb-4 font-semibold">
           {/* Total Risiko */}
           <StatusCard
@@ -78,6 +78,7 @@ export default function RiskStatusSummaryBox() {
             textColor="text-black"
             horizontal={true}
             large
+            loading={loading}
           />
         </div>
 
@@ -135,34 +136,35 @@ function StatusCard({
   horizontal = false,
   large = false,
 }) {
+  const isHorizontal = horizontal || large;
+
   return (
     <div
-      className={`
-        rounded-xl shadow transition-all duration-200 hover:shadow-md
+      className={`rounded-xl shadow transition-all duration-200 hover:shadow-md
         ${color} ${
-        horizontal
+        isHorizontal
           ? "flex items-center justify-between px-2 py-1"
-          : "text-center"
-      } 
-      `}
+          : "px-2 py-1 text-center"
+      }`}
     >
       <p
-        className={`
-          text-sm ${horizontal ? "mb-0" : "mb-1"} text-gray-600 font-medium
-        `}
+        className={`text-sm font-medium text-gray-600 ${
+          isHorizontal ? "mb-0" : ""
+        }`}
       >
         {title}
       </p>
       <p
-        className={`
-          font-bold ${textColor}
-        `}
+        className={`font-bold ${textColor} ${
+          isHorizontal ? "text-md" : "text-sm"
+        }`}
       >
         {value}
       </p>
     </div>
   );
 }
+
 
 
 function RiskListModal({ show, onClose, pending, rejected, draft }) {
