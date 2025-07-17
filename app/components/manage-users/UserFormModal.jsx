@@ -224,19 +224,22 @@ export default function UserFormModal({
             >
               <option value="">-- Select Role --</option>
               {[
-                "koordinator_unit",
-                "koordinator_menris",
-                "koordinator_mutu",
-                "kepala_puskesmas",
-                "dinas_kesehatan",
-                "admin",
-              ].map((role) => (
-                <option key={role} value={role}>
-                  {role
-                    .replace(/_/g, " ")
-                    .replace(/\b\w/g, (c) => c.toUpperCase())}
-                </option>
-              ))}
+              "koordinator_unit",
+              "koordinator_menris",
+              "koordinator_mutu",
+              "kepala_puskesmas",
+              "dinas_kesehatan",
+              "admin",
+            ].map((role) => (
+              <option key={role} value={role}>
+                {role === "koordinator_menris"
+                  ? "Koordinator Manrisk"
+                  : role
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (c) => c.toUpperCase())}
+              </option>
+            ))}
+
             </select>
             {errors.role && (
               <p className="text-red-600 text-xs mt-1">{errors.role}</p>

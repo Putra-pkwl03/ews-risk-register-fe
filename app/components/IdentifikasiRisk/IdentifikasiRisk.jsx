@@ -10,6 +10,10 @@ import ErrorToast from "../../components/modalconfirmasi/ErrorToast";
 import SuccessToast from "../../components/modalconfirmasi/SuccessToast";
 import DetailRisikoCard from "../../components/IdentifikasiRisk/DetailRisikoCard";
 import Pagination from "../manage-users/Pagenations"; 
+import DownloadExportButton from "./DownloadExportButton";
+import { exportToExcel, exportToPDF } from "../../lib/IdenExcelUtils";
+
+
 
 export default function IdentifikasiRisikoTable() {
   const [data, setData] = useState([]);
@@ -39,22 +43,40 @@ export default function IdentifikasiRisikoTable() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const risks = await RiskService.getAll();
-        setData(risks);
-      } catch (error) {
-        console.error("ERROR MENGAMBIL RISIKO:", error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const risks = await RiskService.getAll();
+      setData(risks);
+    } catch (error) {
+      console.error("ERROR MENGAMBIL RISIKO:", error);
+    }
+  };
 
-    fetchData();
-  }, []);
+  fetchData();
+}, []);
 
   const openDeleteModal = (id) => {
     setSelectedId(id);
     setIsModalOpen(true);
   };
+
+  // STARTDOWNLOAD FUNCTION
+  const handleExport = (type, range) => {
+    let filtered = [...data];
+
+    if (range === "last6") {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      filtered = filtered.filter(item => new Date(item.created_at) >= sixMonthsAgo);
+    }
+
+    if (type === "pdf") {
+      exportToPDF(filtered);
+    } else if (type === "excel") {
+      exportToExcel(filtered);
+    }
+  };
+  // ENDDOWNLOAD FUNCTION
 
   const generateRandomString = (length = 10) => {
     const chars =
@@ -218,6 +240,7 @@ export default function IdentifikasiRisikoTable() {
               Identifikasi Risiko
             </h5>
             <div className="flex flex-col sm:flex-row items-center gap-4">
+               <DownloadExportButton onExport={handleExport} />
               <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white">
                 <img
                   src="/icons/search.svg"

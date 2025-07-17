@@ -10,6 +10,7 @@ import {
   ShieldCheckIcon,
   DocumentCheckIcon,
   ClipboardDocumentListIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import { LayoutDashboardIcon, LogOutIcon, ChartBarIcon } from "lucide-react";
 
@@ -359,50 +360,138 @@ export default function Sidebar({
               </motion.li>
             )}
 
-            {role === "kepala_puskesmas" && (
-              <>
-                {console.log(
-                  "[DEBUG Sidebar] notifCountHandling:",
-                  notifCountHandling
-                )}
-                {console.log("[DEBUG Sidebar] role:", role)}
-                {console.log("[DEBUG Sidebar] page:", page)}
+          <>
+  {/* Manajemen Risiko khusus untuk kepala_puskesmas */}
+  {role === "kepala_puskesmas" && (
+    <>
+      {console.log("[DEBUG Sidebar] notifCountHandling:", notifCountHandling)}
+      {console.log("[DEBUG Sidebar] role:", role)}
+      {console.log("[DEBUG Sidebar] page:", page)}
 
-                <motion.li
-                  variants={itemVariants}
-                  onClick={() => {
-                    handleNavigate("manajemen-risiko");
-                    if (notifCountHandling > 0 && onResetNotifHandling) {
-                      onResetNotifHandling();
-                    }
-                  }}
-                  className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
-                  ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
-                  ${
-                    page === "manajemen-risiko"
-                      ? "bg-[#5932EA] text-white"
-                      : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
-                  }
-                  w-full
-                `}
-                >
-                  <ClipboardDocumentListIcon
-                    className={`h-6 w-6 flex-shrink-0 ${
-                      page === "manajemen-risiko"
-                        ? "text-white"
-                        : "text-[#9197B3]"
-                    }`}
-                  />
-                  {isOpen && <span className="text-sm">Manajemen Risiko</span>}
+      <motion.li
+        variants={itemVariants}
+        onClick={() => {
+          handleNavigate("manajemen-risiko");
+          if (notifCountHandling > 0 && onResetNotifHandling) {
+            onResetNotifHandling();
+          }
+        }}
+        className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
+        ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+        ${
+          page === "manajemen-risiko"
+            ? "bg-[#5932EA] text-white"
+            : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+        }
+        w-full
+      `}
+      >
+        <ClipboardDocumentListIcon
+          className={`h-6 w-6 flex-shrink-0 ${
+            page === "manajemen-risiko" ? "text-white" : "text-[#9197B3]"
+          }`}
+        />
+        {isOpen && <span className="text-sm">Manajemen Risiko</span>}
+        {notifCountHandling > 0 && (
+          <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
+            {notifCountHandling}
+          </span>
+        )}
+      </motion.li>
+    </>
+  )}
 
-                  {notifCountHandling > 0 && (
-                    <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
-                      {notifCountHandling}
-                    </span>
-                  )}
-                </motion.li>
-              </>
-            )}
+  {/* Menu Laporan bisa diakses semua role */}
+  <motion.li
+    variants={itemVariants}
+    onClick={() => handleNavigate("laporan")}
+    className={`flex items-center transition-all duration-200 cursor-pointer rounded
+    ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+    ${
+      page === "laporan"
+        ? "bg-[#5932EA] text-white"
+        : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+    }
+    w-full
+  `}
+  >
+    <DocumentTextIcon
+      className={`h-6 w-6 flex-shrink-0 ${
+        page === "laporan" ? "text-white" : "text-[#9197B3]"
+      }`}
+    />
+    {isOpen && <span className="text-sm">Laporan</span>}
+  </motion.li>
+</>
+
+
+
+ {/* {role === "kepala_puskesmas" && (
+  <>
+   
+    {console.log(
+      "[DEBUG Sidebar] notifCountHandling:",
+      notifCountHandling
+    )}
+    {console.log("[DEBUG Sidebar] role:", role)}
+    {console.log("[DEBUG Sidebar] page:", page)}
+
+    <motion.li
+      variants={itemVariants}
+      onClick={() => {
+        handleNavigate("manajemen-risiko");
+        if (notifCountHandling > 0 && onResetNotifHandling) {
+          onResetNotifHandling();
+        }
+      }}
+      className={`relative flex items-center transition-all duration-200 cursor-pointer rounded
+      ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+      ${
+        page === "manajemen-risiko"
+          ? "bg-[#5932EA] text-white"
+          : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+      }
+      w-full
+    `}
+    >
+      <ClipboardDocumentListIcon
+        className={`h-6 w-6 flex-shrink-0 ${
+          page === "manajemen-risiko" ? "text-white" : "text-[#9197B3]"
+        }`}
+      />
+      {isOpen && <span className="text-sm">Manajemen Risiko</span>}
+      {notifCountHandling > 0 && (
+        <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
+          {notifCountHandling}
+        </span>
+      )}
+    </motion.li>
+
+
+    <motion.li
+      variants={itemVariants}
+      onClick={() => handleNavigate("laporan")}
+      className={`flex items-center transition-all duration-200 cursor-pointer rounded
+      ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+      ${
+        page === "laporan"
+          ? "bg-[#5932EA] text-white"
+          : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+      }
+      w-full
+    `}
+    >
+      <DocumentTextIcon
+        className={`h-6 w-6 flex-shrink-0 ${
+          page === "laporan" ? "text-white" : "text-[#9197B3]"
+        }`}
+      />
+      {isOpen && <span className="text-sm">Laporan</span>}
+    </motion.li>
+  </>
+)} */}
+
+
 
             {/* Manage Users */}
             {role === "admin" && (
