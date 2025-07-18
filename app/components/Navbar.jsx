@@ -48,8 +48,13 @@ export default function Navbar({ toggleSidebar, isSidebarOpen }) {
             {user?.name || "Memuat..."}
           </div>
           <div className="text-gray-600 text-xs truncate max-w-[120px]">
-            {user?.role || "-"}
-          </div>
+  {user?.role
+    ? user.role === "koordinator_menris"
+      ? "koordinator manrisk"
+      : user.role.replace(/_/g, " ")
+    : ""}
+</div>
+
         </div>
         <svg
           xmlns="http://www.w3.org/2000/svg"

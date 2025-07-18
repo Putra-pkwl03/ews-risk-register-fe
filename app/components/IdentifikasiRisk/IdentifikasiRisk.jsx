@@ -10,7 +10,9 @@ import ConfirmDeleteModal from "../../components/modalconfirmasi/DeleteModal";
 import ErrorToast from "../../components/modalconfirmasi/ErrorToast";
 import SuccessToast from "../../components/modalconfirmasi/SuccessToast";
 import DetailRisikoCard from "../../components/IdentifikasiRisk/DetailRisikoCard";
-import Pagination from "../manage-users/Pagenations";
+import Pagination from "../manage-users/Pagenations"; 
+import DownloadExportButton from "./DownloadExportButton";
+import { exportToExcel, exportToPDF } from "../../lib/IdenExcelUtils";
 
 export default function IdentifikasiRisikoTable() {
   const [data, setData] = useState([]);
@@ -41,17 +43,17 @@ export default function IdentifikasiRisikoTable() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const risks = await RiskService.getAll();
-        setData(risks);
-      } catch (error) {
-        console.error("ERROR MENGAMBIL RISIKO:", error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const risks = await RiskService.getAll();
+      setData(risks);
+    } catch (error) {
+      console.error("ERROR MENGAMBIL RISIKO:", error);
+    }
+  };
 
-    fetchData();
-  }, []);
+  fetchData();
+}, []);
 
   const openDeleteModal = (id) => {
     setSelectedId(id);
@@ -67,6 +69,34 @@ export default function IdentifikasiRisikoTable() {
   //   }
   //   return result;
   // };
+
+  // STARTDOWNLOAD FUNCTION
+  const handleExport = (type, range) => {
+    let filtered = [...data];
+
+    if (range === "last6") {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      filtered = filtered.filter(item => new Date(item.created_at) >= sixMonthsAgo);
+    }
+
+    if (type === "pdf") {
+      exportToPDF(filtered);
+    } else if (type === "excel") {
+      exportToExcel(filtered);
+    }
+  };
+  // ENDDOWNLOAD FUNCTION
+
+  const generateRandomString = (length = 10) => {
+    const chars =
+      "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -219,87 +249,94 @@ export default function IdentifikasiRisikoTable() {
             <h5 className="text-[20px] text-black font-semibold">
               Identifikasi Risiko
             </h5>
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white">
-                  <img
-                    src="/icons/search.svg"
-                    alt="Search Icon"
-                    className="h-4 w-4 mr-2 opacity-60"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search Risiko..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="outline-none text-[12px] text-black w-full"
-                  />
-                </div>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              {/* Tombol Export */}
+              <DownloadExportButton onExport={handleExport} />
 
-                {/* Filter Kategori */}
-                <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-                  <span>Filter by:</span>
-                  <select
-                    value={kategoriFilter}
-                    onChange={handleKategoriChange}
-                    className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
-                  >
-                    <option value="All">All</option>
-                    <option value="Draft">Draft</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
-                    <option value="Dampak">UC/C</option>
-                  </select>
-                  <img
-                    src="/icons/chevron-down.svg"
-                    alt="Filter Icon"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
-                  />
-                </div>
-
-                {/* Sorting */}
-                <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-                  <span>Sorting by:</span>
-                  <select
-                    value={sortOrder}
-                    onChange={handleSortChange}
-                    disabled={!isSortingEnabled}
-                    className={`border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0 ${
-                      !isSortingEnabled ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    <option value="">All</option>
-                    <option value="Ascending">Ascending</option>
-                    <option value="Descending">Descending</option>
-                  </select>
-                  <img
-                    src="/icons/chevron-down.svg"
-                    alt="Filter Icon"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
-                  />
-                </div>
-                <button
-                  onClick={handleAdd}
-                  className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 hover:cursor-pointer px-3 py-1.5 rounded-md"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  Add Risk
-                </button>
+              {/* Search */}
+              <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white">
+                <img
+                  src="/icons/search.svg"
+                  alt="Search Icon"
+                  className="h-4 w-4 mr-2 opacity-60"
+                />
+                <input
+                  type="text"
+                  placeholder="Search Risiko..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="outline-none text-[12px] text-black w-full"
+                />
               </div>
+
+              {/* Filter Kategori */}
+              <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
+                <span>Filter by:</span>
+                <select
+                  value={kategoriFilter}
+                  onChange={handleKategoriChange}
+                  className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
+                >
+                  <option value="All">All</option>
+                  <option value="Draft">Draft</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                  <option value="Dampak">UC/C</option>
+                </select>
+                <img
+                  src="/icons/chevron-down.svg"
+                  alt="Filter Icon"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
+                />
+              </div>
+
+              {/* Sorting */}
+              <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
+                <span>Sorting by:</span>
+                <select
+                  value={sortOrder}
+                  onChange={handleSortChange}
+                  disabled={!isSortingEnabled}
+                  className={`border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0 ${
+                    !isSortingEnabled ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  <option value="">All</option>
+                  <option value="Ascending">Ascending</option>
+                  <option value="Descending">Descending</option>
+                </select>
+                <img
+                  src="/icons/chevron-down.svg"
+                  alt="Filter Icon"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
+                />
+              </div>
+
+              {/* Tombol Tambah */}
+              <button
+                onClick={handleAdd}
+                className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 hover:cursor-pointer px-3 py-1.5 rounded-md"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Add Risk
+              </button>
+            </div>
           </div>
+
           {/* Table */}
           <RisikoTable
             isLoading={isLoading}
@@ -312,6 +349,7 @@ export default function IdentifikasiRisikoTable() {
             addedRiskIds={addedRiskIds}
             setAddedRiskIds={setAddedRiskIds}
           />
+
           <div className="text-sm text-gray-600 ml-4">
             <Pagination
               currentPage={currentPage}
