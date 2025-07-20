@@ -71,7 +71,7 @@ export default function Sidebar({
         className="fixed top-0 left-0 h-full bg-white shadow-lg z-50 overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b h-16 relative">
+        <div className="flex items-center justify-between p-4 border-b h-15 relative">
           <AnimatePresence initial={false} mode="wait">
             {isOpen && (
               <motion.div
