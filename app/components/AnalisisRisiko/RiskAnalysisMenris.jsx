@@ -312,24 +312,34 @@ export default function RiskActionMenris() {
                   </span>
                 </td>
                 <td className="p-2 text-center">
-                  <div className="flex justify-center items-center gap-1.5">
-                    <button
-                      onClick={() => {
-                        setSelectedRiskId(item.id);
-                        setShowApproveModal(true);
-                      }}
-                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-xs font-medium"
-                    >
-                      Setuju
-                    </button>
-                    <button
-                      onClick={() => handleRejectClick(item.id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs font-medium"
-                    >
-                      Tolak
-                    </button>
-                  </div>
-                </td>
+                <div className="flex justify-center items-center gap-1.5">
+                  <button
+                    onClick={() => {
+                      setSelectedRiskId(item.id);
+                      setShowApproveModal(true);
+                    }}
+                    disabled={item.status === "validated_approved" || item.status === "validated_rejected"}
+                    className={`px-3 py-1 rounded-md text-xs font-medium 
+                      ${item.status === "validated_approved" || item.status === "validated_rejected"
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700 text-white"
+                      }`}
+                  >
+                    Setuju
+                  </button>
+                  <button
+                    onClick={() => handleRejectClick(item.id)}
+                    disabled={item.status === "validated_approved" || item.status === "validated_rejected"}
+                    className={`px-3 py-1 rounded-md text-xs font-medium 
+                      ${item.status === "validated_approved" || item.status === "validated_rejected"
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-red-600 hover:bg-red-700 text-white"
+                      }`}
+                  >
+                    Tolak
+                  </button>
+                </div>
+              </td>
               </tr>
             ))
           )}
