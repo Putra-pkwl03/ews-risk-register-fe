@@ -20,3 +20,8 @@ export async function deleteUser(id) {
     const res = await api.delete(`/users/${id}`);
     return res.data;
 }
+
+export async function updateProfile(profileData) {
+  const res = await api.put('/profile', profileData);
+  return res.data;
+}
