@@ -433,29 +433,6 @@ export default function Sidebar({
               </motion.li>
             )} */}
             
-            <>
-              {/* Menu Laporan bisa diakses semua role */}
-              <motion.li
-                variants={itemVariants}
-                onClick={() => handleNavigate("laporan")}
-                className={`flex items-center transition-all duration-200 cursor-pointer rounded
-                  ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
-                  ${
-                    page === "laporan"
-                      ? "bg-[#5932EA] text-white"
-                      : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
-                  }
-                  w-full
-                `}
-              >
-                <DocumentTextIcon
-                  className={`h-6 w-6 flex-shrink-0 ${
-                    page === "laporan" ? "text-white" : "text-[#9197B3]"
-                  }`}
-                />
-                {isOpen && <span className="text-sm">Laporan</span>}
-              </motion.li>
-            </>
 
             {/* {role === "kepala_puskesmas" && (
   <>
@@ -543,6 +520,30 @@ export default function Sidebar({
                 {isOpen && <span className="text-sm">Manage Users</span>}
               </motion.li>
             )}
+
+              <>
+              {/* Menu Laporan bisa diakses semua role */}
+              <motion.li
+                variants={itemVariants}
+                onClick={() => handleNavigate("laporan")}
+                className={`flex items-center transition-all duration-200 cursor-pointer rounded
+                  ${isOpen ? "gap-3 px-4 py-2" : "justify-center py-3"}
+                  ${
+                    page === "laporan"
+                      ? "bg-[#5932EA] text-white"
+                      : "text-gray-800 hover:bg-[#eeeeff] hover:text-black"
+                  }
+                  w-full
+                `}
+              >
+                <DocumentTextIcon
+                  className={`h-6 w-6 flex-shrink-0 ${
+                    page === "laporan" ? "text-white" : "text-[#9197B3]"
+                  }`}
+                />
+                {isOpen && <span className="text-sm">Laporan</span>}
+              </motion.li>
+            </>
           </ul>
 
           {/* Logout */}
