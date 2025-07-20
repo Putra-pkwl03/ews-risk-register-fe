@@ -1,33 +1,38 @@
-import PenyebabSection from "../../components/IdentifikasiRisk/PenyebabSection";
 import { useState } from "react";
+import PenyebabSection from "./PenyebabSection";
 import RiskNoteModal from "./RiskNoteModal";
 
-export default function FormFields({
+export default function RiskFormField({
   formData,
   handleChange,
   unitsByKlaster,
   kategoriOptions,
-  onSave,
   onCancel,
   handleAddPenyebab,
   handleRemovePenyebab,
   isFormValid,
   isSaving,
+  isEdit,
 }) {
-  const defaultPenyebab = {
-    kategori: "",
-    deskripsiUtama: "",
-    deskripsiSub: [],
-  };
-  const [penyebabBaru, setPenyebabBaru] = useState(defaultPenyebab);
   const [showNoteModal, setShowNoteModal] = useState(false);
   const handleOpenNoteModal = () => setShowNoteModal(true);
   const handleCloseNoteModal = () => setShowNoteModal(false);
 
+  const handleUpdatePenyebab = (updatedList) => {
+    handleChange({
+      target: {
+        name: "penyebab",
+        value: updatedList,
+      },
+    });
+  };
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-md text-gray-900 max-w-4xl mx-auto mt-8">
-      <h3 className="text-2xl font-semibold mr-2">Tambah Risiko Baru</h3>
-      {/* Modal */}
+      <h3 className="text-2xl font-semibold mb-4">
+        {isEdit ? "Edit Risiko" : "Tambah Risiko Baru"}
+      </h3>
+
       {showNoteModal && <RiskNoteModal onClose={handleCloseNoteModal} />}
       <div className="grid grid-cols-2 gap-6">
         <div>
@@ -36,7 +41,7 @@ export default function FormFields({
             name="klaster"
             value={formData.klaster}
             onChange={handleChange}
-            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:cursor-pointer"
+            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">-- Pilih Klaster --</option>
             {Object.keys(unitsByKlaster).map((klaster) => (
@@ -54,7 +59,7 @@ export default function FormFields({
             value={formData.unit}
             onChange={handleChange}
             disabled={!formData.klaster}
-            className="w-full rounded-md border border-gray-300 px-4 py-2 disabled:bg-gray-100 disabled:cursor-auto focus:outline-none focus:ring-2 focus:ring-blue-500 hover:cursor-pointer"
+            className="w-full rounded-md border border-gray-300 px-4 py-2 disabled:bg-gray-100"
           >
             <option value="">-- Pilih Unit --</option>
             {formData.klaster &&
@@ -72,7 +77,7 @@ export default function FormFields({
             name="namaRisiko"
             value={formData.namaRisiko}
             onChange={handleChange}
-            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-md border border-gray-300 px-4 py-2"
           />
         </div>
 
@@ -83,7 +88,7 @@ export default function FormFields({
               name="kategori"
               value={formData.kategori}
               onChange={handleChange}
-              className="flex-grow rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:cursor-pointer"
+              className="flex-grow rounded-md border border-gray-300 px-4 py-2"
             >
               <option value="">-- Pilih Kategori --</option>
               {kategoriOptions.map((kat) => (
@@ -94,7 +99,7 @@ export default function FormFields({
             </select>
             <img
               src="/icons/question.png"
-              alt="Informasi Risiko"
+              alt="info"
               className="h-5 w-5 opacity-60 cursor-pointer"
               onClick={handleOpenNoteModal}
             />
@@ -108,7 +113,7 @@ export default function FormFields({
             type="text"
             value={formData.dampak}
             onChange={handleChange}
-            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-md border border-gray-300 px-4 py-2"
           />
         </div>
 
@@ -118,7 +123,7 @@ export default function FormFields({
             name="ucc"
             value={formData.ucc}
             onChange={handleChange}
-            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:cursor-pointer"
+            className="w-full rounded-md border border-gray-300 px-4 py-2"
           >
             <option value="">-- Pilih UC/C --</option>
             <option value="UC">UC</option>
@@ -133,21 +138,23 @@ export default function FormFields({
             value={formData.deskripsi}
             onChange={handleChange}
             rows={3}
-            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full rounded-md border border-gray-300 px-4 py-2 resize-none"
           />
         </div>
       </div>
 
+      {/* Penyebab Risiko dan Edit Modal langsung di dalamnya */}
       <PenyebabSection
         penyebabList={formData.penyebab}
         onAdd={handleAddPenyebab}
         onRemove={handleRemovePenyebab}
+        onUpdate={handleUpdatePenyebab} // gunakan fungsi update
       />
 
       <div className="flex justify-end gap-4 mt-6">
         <button
           onClick={onCancel}
-          className="w-[90px] h-[42px] hover:cursor-pointer text-sm text-red-600 border border-red-400 rounded-lg hover:bg-red-100 transition duration-300 ease-in-out"
+          className="w-[90px] h-[42px] text-sm text-red-600 border border-red-400 rounded-lg hover:bg-red-100 hover:cursor-pointer"
           type="button"
         >
           Cancel
@@ -155,12 +162,11 @@ export default function FormFields({
         <button
           type="submit"
           disabled={!isFormValid || isSaving}
-          className={`w-[90px] h-[42px] text-sm border rounded-lg transition duration-300 ease-in-out flex items-center justify-center
-    ${
-      isFormValid && !isSaving
-        ? "text-blue-600 border-blue-500 hover:bg-blue-100 hover:text-blue-700 hover:cursor-pointer"
-        : "text-gray-400 border-gray-300 bg-gray-100 cursor-not-allowed"
-    }`}
+          className={`w-[90px] h-[42px] text-sm border rounded-lg flex items-center justify-center ${
+            isFormValid && !isSaving
+              ? "text-blue-600 border-blue-500 hover:bg-blue-100 hover:cursor-pointer"
+              : "text-gray-400 border-gray-300 bg-gray-100 cursor-not-allowed"
+          }`}
         >
           {isSaving ? (
             <span className="flex items-center gap-2">
@@ -177,12 +183,12 @@ export default function FormFields({
                   r="10"
                   stroke="currentColor"
                   strokeWidth="4"
-                ></circle>
+                />
                 <path
                   className="opacity-75"
                   fill="currentColor"
                   d="M4 12a8 8 0 018-8v8z"
-                ></path>
+                />
               </svg>
               Loading...
             </span>

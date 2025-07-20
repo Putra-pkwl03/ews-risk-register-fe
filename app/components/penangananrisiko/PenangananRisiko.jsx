@@ -13,18 +13,57 @@ export default function PenangananRisiko() {
   const [risks, setRisks] = useState([]);
   const [selectedRisk, setSelectedRisk] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [kategoriFilter, setKategoriFilter] = useState("All");
+  const [sortOrder, setSortOrder] = useState("");
+
+  const filteredData = risks.filter((item) => {
+    const matchSearch = [
+      item?.name,
+      item?.unit,
+      item?.cluster,
+      item?.category,
+    ].some((field) => field?.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchKategori =
+      kategoriFilter === "All" ||
+      item.risk_appetite?.decision === kategoriFilter;
+
+    return matchSearch && matchKategori;
+  });
+
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (sortOrder === "Ascending") return a.risk_appetite?.scoring - b.risk_appetite?.scoring;
+    if (sortOrder === "Descending")
+      return b.risk_appetite?.scoring - a.risk_appetite?.scoring;
+
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const paginatedRisks = sortedData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Fungsi fetch ulang data risiko
   const fetchValidatedRisks = async () => {
+    setIsLoading(true); // ← mulai loading
     try {
       const data = await getValidatedRisks();
-      console.log(data)
+      console.log(data);
       setRisks(data);
     } catch (error) {
       console.error(error.message);
+    } finally {
+      setIsLoading(false); // ← selesai loading
     }
   };
 
@@ -81,13 +120,26 @@ export default function PenangananRisiko() {
 
   return (
     <RiskList
-      risks={risks}
+      risks={paginatedRisks}
       onDetailClick={handleDetailClick}
       onOpenControlibility={handleOpenControlibility}
       selectedRisk={selectedRisk}
       modalOpen={modalOpen}
       onCloseModal={handleCloseModal}
       onDecisionChange={handleDecisionChange}
+      isLoading={isLoading}
+      currentPage={currentPage}
+      totalPages={totalPages}
+      setCurrentPage={setCurrentPage}
+      itemsPerPage={itemsPerPage}
+      totalItems={filteredData.length} // sesuai hasil filter
+      // Tambahan untuk search + filter
+      searchTerm={searchTerm}
+      kategoriFilter={kategoriFilter}
+      sortOrder={sortOrder}
+      setSearchTerm={setSearchTerm}
+      setKategoriFilter={setKategoriFilter}
+      setSortOrder={setSortOrder}
     />
   );
 }

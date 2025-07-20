@@ -4,23 +4,21 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import FormRisiko from "./FormRisk";
 import RiskService from "../../lib/RiskService";
-import LoadingSkeleton from "../loadings/LoadingSkeleton";
+import RisikoTable from "../IdentifikasiRisk/RisikoTable";
 import ConfirmDeleteModal from "../../components/modalconfirmasi/DeleteModal";
 import ErrorToast from "../../components/modalconfirmasi/ErrorToast";
 import SuccessToast from "../../components/modalconfirmasi/SuccessToast";
 import DetailRisikoCard from "../../components/IdentifikasiRisk/DetailRisikoCard";
-import Pagination from "../manage-users/Pagenations"; 
+import Pagination from "../manage-users/Pagenations";
 import DownloadExportButton from "./DownloadExportButton";
 import { exportToExcel, exportToPDF } from "../../lib/IdenExcelUtils";
-
-
 
 export default function IdentifikasiRisikoTable() {
   const [data, setData] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [kategoriFilter, setKategoriFilter] = useState("");
-  const [sortOrder, setSortOrder] = useState("");
+  const [sortOrder, setSortOrder] = useState("Newest");
   const [isSortingEnabled, setIsSortingEnabled] = useState(false);
   const [selectedRisk, setSelectedRisk] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -32,8 +30,11 @@ export default function IdentifikasiRisikoTable() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [addedRiskIds, setAddedRiskIds] = useState([]);
   const router = useRouter();
-  const itemsPerPage = 5; 
+  const itemsPerPage = 5;
+  const [filterByCluster, setFilterByCluster] = useState("");
+  const [filterByUC, setFilterByUC] = useState("");
 
   const handleCancel = () => {
     setShowForm(false);
@@ -43,22 +44,32 @@ export default function IdentifikasiRisikoTable() {
   };
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const risks = await RiskService.getAll();
-      setData(risks);
-    } catch (error) {
-      console.error("ERROR MENGAMBIL RISIKO:", error);
-    }
-  };
+    const fetchData = async () => {
+      try {
+        const risks = await RiskService.getAll();
+        setData(risks);
+      } catch (error) {
+        console.error("ERROR MENGAMBIL RISIKO:", error);
+      }
+    };
 
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
   const openDeleteModal = (id) => {
     setSelectedId(id);
     setIsModalOpen(true);
   };
+
+  // const generateRandomString = (length = 10) => {
+  //   const chars =
+  //     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  //   let result = "";
+  //   for (let i = 0; i < length; i++) {
+  //     result += chars.charAt(Math.floor(Math.random() * chars.length));
+  //   }
+  //   return result;
+  // };
 
   // STARTDOWNLOAD FUNCTION
   const handleExport = (type, range) => {
@@ -67,7 +78,9 @@ export default function IdentifikasiRisikoTable() {
     if (range === "last6") {
       const sixMonthsAgo = new Date();
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-      filtered = filtered.filter(item => new Date(item.created_at) >= sixMonthsAgo);
+      filtered = filtered.filter(
+        (item) => new Date(item.created_at) >= sixMonthsAgo
+      );
     }
 
     if (type === "pdf") {
@@ -92,15 +105,14 @@ export default function IdentifikasiRisikoTable() {
     setCurrentPage(1);
   }, [searchTerm, kategoriFilter, sortOrder]);
 
-  const handleSave = async (newItem) => {
+  const handleSave = async (newItem, id = null) => {
     try {
-      if (isEditMode) {
-        await RiskService.update(newItem.id, newItem);
+      if (isEditMode && id) {
+        await RiskService.update(id, newItem);
       } else {
         await RiskService.create(newItem);
       }
 
-      // Setelah create/update, fetch ulang semua data dari server
       const risks = await RiskService.getAll();
       setData(risks);
 
@@ -120,15 +132,12 @@ export default function IdentifikasiRisikoTable() {
     }
   };
 
-  const handleKategoriChange = (e) => {
-    const value = e.target.value;
-    setKategoriFilter(value);
-    setIsSortingEnabled(value === "Dampak");
-    if (value !== "Dampak") setSortOrder("");
+  const handleClusterChange = (e) => {
+    setFilterByCluster(e.target.value);
   };
 
   const handleSortChange = (e) => {
-    if (isSortingEnabled) setSortOrder(e.target.value);
+    setSortOrder(e.target.value);
   };
 
   const handleAdd = () => {
@@ -160,23 +169,33 @@ export default function IdentifikasiRisikoTable() {
   };
 
   const filteredData = data.filter((item) => {
-    const matchesSearch = item.name
-      ?.toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesFilter =
-      kategoriFilter && kategoriFilter !== "All"
-        ? item.status === kategoriFilter.toLowerCase()
-        : true;
-    return matchesSearch && matchesFilter;
+    const matchesSearch = [
+      item.name,
+      item.cluster,
+      item.unit,
+      item.category,
+    ].some((field) => field?.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCluster = filterByCluster
+      ? item.cluster === filterByCluster
+      : true;
+    const matchesUC = filterByUC ? item.uc_c === filterByUC : true;
+    return matchesSearch && matchesCluster && matchesUC;
   });
 
   let displayedData = [...filteredData];
-  if (isSortingEnabled) {
-    if (sortOrder === "Ascending") {
-      displayedData.sort((a, b) => a.impact - b.impact);
-    } else if (sortOrder === "Descending") {
-      displayedData.sort((a, b) => b.impact - a.impact);
-    }
+
+  if (sortOrder === "Ascending") {
+    displayedData.sort((a, b) => a.impact - b.impact);
+  } else if (sortOrder === "Descending") {
+    displayedData.sort((a, b) => b.impact - a.impact);
+  } else if (sortOrder === "Newest") {
+    displayedData.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+  } else if (sortOrder === "Oldest") {
+    displayedData.sort(
+      (a, b) => new Date(a.created_at) - new Date(b.created_at)
+    );
   }
 
   const [isLoading, setIsLoading] = useState(true);
@@ -240,7 +259,10 @@ export default function IdentifikasiRisikoTable() {
               Identifikasi Risiko
             </h5>
             <div className="flex flex-col sm:flex-row items-center gap-4">
-               <DownloadExportButton onExport={handleExport} />
+              {/* Tombol Export */}
+              <DownloadExportButton onExport={handleExport} />
+
+              {/* Search */}
               <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white">
                 <img
                   src="/icons/search.svg"
@@ -249,57 +271,70 @@ export default function IdentifikasiRisikoTable() {
                 />
                 <input
                   type="text"
-                  placeholder="Search Risiko..."
+                  placeholder="Search"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="outline-none text-[12px] text-black w-full"
+                  className="outline-none text-[12px] text-black w-19"
                 />
               </div>
 
-              {/* Filter Kategori */}
+              {/* Filter Cluster */}
               <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-                <span>Filter by:</span>
+                <span>Klaster:</span>
                 <select
-                  value={kategoriFilter}
-                  onChange={handleKategoriChange}
-                  className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
+                  value={filterByCluster}
+                  onChange={handleClusterChange}
+                  className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center hover:cursor-pointer appearance-none pr-6"
                 >
-                  <option value="All">All</option>
-                  <option value="Draft">Draft</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Rejected">Rejected</option>
-                  <option value="Dampak">UC/C</option>
+                  <option value="">Semua</option>
+                  <option value="Management">Management</option>
+                  <option value="Ibu & Anak">Ibu & Anak</option>
+                  <option value="Usia Dewasa & Lansia">
+                    Usia Dewasa & Lansia
+                  </option>
+                  <option value="Penanggulangan Penyakit Menular">
+                    Penanggulangan Penyakit Menular
+                  </option>
+                  <option value="Lintas Kluster">Lintas Kluster</option>
                 </select>
                 <img
                   src="/icons/chevron-down.svg"
-                  alt="Filter Icon"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
+                  alt="Dropdown Icon"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 w-3 h-3 pointer-events-none"
                 />
               </div>
 
               {/* Sorting */}
-              <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-                <span>Sorting by:</span>
+              <div className="flex justify-center items-center relative gap-1 text-sm text-gray-400">
+                <span>Urutkan:</span>
                 <select
                   value={sortOrder}
                   onChange={handleSortChange}
-                  disabled={!isSortingEnabled}
-                  className={`border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0 ${
-                    !isSortingEnabled ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className="text-center border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
                 >
-                  <option value="">All</option>
-                  <option value="Ascending">Ascending</option>
-                  <option value="Descending">Descending</option>
+                  <option value="Newest">Terbaru</option>
+                  <option value="Oldest">Terlama</option>
                 </select>
                 <img
                   src="/icons/chevron-down.svg"
-                  alt="Filter Icon"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
+                  alt="Dropdown Icon"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 w-3 h-3 pointer-events-none"
                 />
               </div>
-
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setKategoriFilter("");
+                  setSortOrder("Newest");
+                  setCurrentPage(1);
+                  setFilterByCluster("");
+                  setFilterByUC("");
+                }}
+                className="text-sm px-3 py-1 border border-red-500 rounded-md text-red-500 hover:bg-red-100 cursor-pointer"
+              >
+                Reset Filter
+              </button>
+              {/* Tombol Tambah */}
               <button
                 onClick={handleAdd}
                 className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 hover:cursor-pointer px-3 py-1.5 rounded-md"
@@ -323,168 +358,21 @@ export default function IdentifikasiRisikoTable() {
             </div>
           </div>
 
-          <table className="w-full text-sm sm:text-base">
-            <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
-              <tr>
-                <th className="p-2">Klaster</th>
-                <th className="p-2">Unit</th>
-                <th className="p-2">Nama Risiko</th>
-                <th className="p-2">Kategori</th>
-                <th className="p-2">Deskripsi</th>
-                <th className="p-2">Penyebab</th>
-                <th className="p-2">Dampak</th>
-                <th className="p-2">UC/C</th>
-                <th className="p-2 text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                <tr>
-                  <td colSpan={9} className="py-4 text-center">
-                    <LoadingSkeleton />
-                  </td>
-                </tr>
-              ) : displayedData.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="text-center py-4 text-gray-400">
-                    Tidak ada data ditemukan.
-                  </td>
-                </tr>
-              ) : (
-                paginatedData.map((item, idx) => (
-                  <tr
-                    key={item.id}
-                    className={`text-[12px] text-[#292D32] transition-colors border-b border-gray-200 ${
-                      idx % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
-                    } hover:bg-gray-100`}
-                  >
-                    <td className="p-2">{item.cluster}</td>
-                    <td className="p-2">{item.unit}</td>
-                    <td className="p-2">{item.name}</td>
-                    <td className="p-2">{item.category}</td>
-                    <td className="p-2 max-w-[100px]">
-                      <div className="truncate max-w-[200px]">
-                        {item.description}
-                      </div>
-                    </td>
-                    <td className="p-2 text-xs max-w-[250px]">
-                      {item.causes?.map((cause) => (
-                        <div key={cause.id} className="mb-2">
-                          {/* Kategori tetap tampil */}
-                          <p>
-                            <strong>Kategori :</strong>{" "}
-                            {cause.category || "Man"}
-                          </p>
+          {/* Table */}
+          <RisikoTable
+            isLoading={isLoading}
+            displayedData={displayedData}
+            paginatedData={paginatedData}
+            setSelectedRisk={setSelectedRisk}
+            setIsDetailMode={setIsDetailMode}
+            handleEdit={handleEdit}
+            openDeleteModal={openDeleteModal}
+            addedRiskIds={addedRiskIds}
+            setAddedRiskIds={setAddedRiskIds}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+          />
 
-                          {/* Utama satu baris dengan ... jika panjang */}
-                          <p
-                            className="truncate whitespace-nowrap overflow-hidden text-ellipsis"
-                            title={cause.main_cause}
-                          >
-                            <strong>Utama :</strong> {cause.main_cause}
-                          </p>
-
-                          {/* Sub selalu tampil penuh */}
-                          <p
-                            className="truncate whitespace-nowrap overflow-hidden text-ellipsis"
-                            title={cause.sub_causes
-                              ?.map((sub) => sub.sub_cause)
-                              .join(", ")}
-                          >
-                            <strong>Sub :</strong>{" "}
-                            {cause.sub_causes
-                              ?.map((sub) => sub.sub_cause)
-                              .join(", ")}
-                          </p>
-                        </div>
-                      ))}
-                    </td>
-                    <td className="p-2">{item.impact}</td>
-                    <td className="p-2 text-center">
-                      {item.uc_c === 1
-                        ? "C"
-                        : item.uc_c === 0
-                        ? "UC"
-                        : item.uc_c}
-                    </td>
-                    <td className="p-2 text-sm m:p-3">
-                      <div className="flex flex-row justify-center items-center gap-2">
-                        <button
-                          onClick={() => {
-                            setSelectedRisk(item);
-                            setIsDetailMode(true);
-
-                            const randomRef = generateRandomString();
-
-                            // Update URL tanpa reload
-                            const params = new URLSearchParams(
-                              window.location.search
-                            );
-                            params.set("ref", randomRef);
-                            const newUrl = `${
-                              window.location.pathname
-                            }?${params.toString()}`;
-                            window.history.pushState({}, "", newUrl);
-                          }}
-                          title="Detail"
-                        >
-                          <img
-                            src="/icons/detail.svg"
-                            alt="Detail Icon"
-                            className="h-5 w-5 min-w-[20px] min-h-[20px] hover:opacity-80 hover:cursor-pointer"
-                          />
-                        </button>
-
-                        <button onClick={() => handleEdit(item)} title="Edit">
-                          <img
-                            src="/icons/edit.svg"
-                            alt="Edit Icon"
-                            className="h-5 w-5 min-w-[20px] min-h-[20px] hover:opacity-80 hover:cursor-pointer"
-                          />
-                        </button>
-                        <button
-                          onClick={() => openDeleteModal(item.id)}
-                          title="Delete"
-                        >
-                          <img
-                            src="/icons/hapus.svg"
-                            alt="Delete Icon"
-                            className="h-5 w-5 min-w-[20px] min-h-[20px] hover:opacity-80 hover:cursor-pointer"
-                          />
-                        </button>
-                        <button
-                          onClick={() => {
-                            const params = new URLSearchParams();
-                            params.set("page", "form-analisis");
-                            params.set("mode", "add");
-                            params.set("riskId", item.id); // <- hanya kirim riskId
-                            router.push(`/dashboard?${params.toString()}`);
-                          }}
-                          title="Add"
-                          className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 hover:cursor-pointer px-3 py-1.5 rounded-md"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={2}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
           <div className="text-sm text-gray-600 ml-4">
             <Pagination
               currentPage={currentPage}

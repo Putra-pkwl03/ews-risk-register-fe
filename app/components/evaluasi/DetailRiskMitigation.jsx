@@ -87,7 +87,7 @@ export default function DetailRiskMitigation() {
     gradingColors[grading?.toLowerCase()] || "bg-gray-400 text-white";
 
   return (
-    <div className="relative bg-white rounded-xl shadow-md max-w-5xl p-6 mx-auto">
+    <div className="relative bg-white rounded-xl shadow-md max-w-5xl p-6 mx-auto mt-3">
       <button
         onClick={() => router.push("/dashboard?page=evaluasi-risiko")}
         className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 mb-6 cursor-pointer"
@@ -203,7 +203,7 @@ export default function DetailRiskMitigation() {
               {mitigations.slice(0, 2).map((m) => (
                 <div
                   key={m.id}
-                  className="w-full max-w-xl p-4 border border-gray-200 rounded-lg bg-gray-50"
+                  className="w-full max-w-xl p-4 border border-gray-200 rounded-lg bg-gray-50 text-black"
                 >
                   <p>
                     <strong>Type:</strong> {m.mitigation_type}

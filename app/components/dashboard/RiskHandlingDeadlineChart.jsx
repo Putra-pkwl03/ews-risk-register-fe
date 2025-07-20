@@ -133,20 +133,22 @@ export default function RiskHandlingDeadlineChart() {
                   dataKey="value"
                   stroke="#3B82F6"
                   strokeWidth={2}
-                  dot={({ cx, cy, payload }) => {
+                  dot={({ cx, cy, payload, index }) => {
                     let color = "#3B82F6";
                     if (payload.status === "warning") color = "#DC2626";
                     if (payload.status === "expired") color = "#9CA3AF";
 
                     return (
-                      <circle
-                        cx={cx}
-                        cy={cy}
-                        r={5}
-                        fill={color}
-                        stroke="#fff"
-                        strokeWidth={1}
-                      />
+                      <g key={`dot-${index}`}>
+                        <circle
+                          cx={cx}
+                          cy={cy}
+                          r={5}
+                          fill={color}
+                          stroke="#fff"
+                          strokeWidth={1}
+                        />
+                      </g>
                     );
                   }}
                 />

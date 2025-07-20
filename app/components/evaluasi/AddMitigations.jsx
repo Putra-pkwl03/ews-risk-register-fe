@@ -6,19 +6,23 @@ import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { X, Plus } from "lucide-react";
 import { saveRiskMitigation } from "../../lib/RiskMitigations";
 import { getUsers } from "../../lib/userApi";
+import SuccessToast from "../modalconfirmasi/SuccessToast";
+import ErrorToast from "../modalconfirmasi/ErrorToast";
 
 export default function AddMitigation() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const page = searchParams.get("page") || "";
   const riskId = page.split("/")[1];
-
   const [users, setUsers] = useState([]);
   const [mitigations, setMitigations] = useState([
     { mitigation_type: "", pic_id: "", deadline: "", descriptions: [""] },
   ]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   useEffect(() => {
     getUsers()
@@ -36,10 +40,9 @@ export default function AddMitigation() {
       last.descriptions.every((desc) => desc.trim() !== "")
     );
   };
-        
+
   const allTypes = ["regulasi", "sdm", "sarana_prasarana"];
 
-          
   const addMitigation = () => {
     if (mitigations.length >= 3) return;
 
@@ -49,15 +52,13 @@ export default function AddMitigation() {
     setMitigations([
       ...mitigations,
       {
-        mitigation_type: unusedTypes[0] || "", 
+        mitigation_type: unusedTypes[0] || "",
         pic_id: "",
         deadline: "",
         descriptions: [""],
       },
     ]);
   };
-        
-        
 
   const removeMitigation = (index) => {
     if (mitigations.length <= 1) return;
@@ -107,9 +108,6 @@ export default function AddMitigation() {
       }
     }
 
-
-        
-
     setLoading(true);
     try {
       for (const m of mitigations) {
@@ -121,10 +119,15 @@ export default function AddMitigation() {
           descriptions: m.descriptions,
         });
       }
-      alert("Mitigasi risiko berhasil disimpan.");
-      router.push("/dashboard?page=evaluasi-risiko");
+
+      setToastMessage("Mitigasi risiko berhasil disimpan.");
+      setShowSuccess(true);
+      setTimeout(() => {
+        router.push("/dashboard?page=evaluasi-risiko");
+      }, 1500);
     } catch (err) {
-      setError(err.message || "Terjadi kesalahan saat menyimpan data.");
+      setToastMessage(err.message || "Terjadi kesalahan saat menyimpan data.");
+      setShowError(true);
     } finally {
       setLoading(false);
     }
@@ -142,33 +145,48 @@ export default function AddMitigation() {
     });
   };
 
-          
   return (
     <>
-      <button
-        onClick={() => router.push("/dashboard?page=evaluasi-risiko")}
-        className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 mb-6 cursor-pointer"
-        aria-label="Kembali"
-      >
-        <ArrowLeftIcon className="h-5 w-5" />
-      </button>
+      <SuccessToast
+        message={toastMessage}
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+      />
+      <ErrorToast
+        message={toastMessage}
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+      />
+      <div className="relative mb-5">
+        {/* Tombol back di kiri atas */}
+        <button
+          onClick={() => router.push("/dashboard?page=evaluasi-risiko")}
+          className="absolute top-0 left-0 flex items-center space-x-2 text-gray-700 hover:text-gray-900 hover:cursor-pointer p-4"
+          aria-label="Kembali"
+        >
+          <ArrowLeftIcon className="h-5 w-5 hover:text-blue-500" />
+        </button>
 
-      <h3 className="text-xl font-semibold mb-2">Mitigasi Risiko</h3>
+        {/* Judul di tengah, agak ke bawah */}
+        <div className="flex justify-center pt-8">
+          <h3 className="text-xl font-semibold text-black">Mitigasi Risiko</h3>
+        </div>
+      </div>
 
-      {error && <div className="mb-4 text-red-600">{error}</div>}
+      {error && <div className="mb-2 text-red-600">{error}</div>}
 
       <form onSubmit={handleSubmit}>
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 p-4">
           {mitigations.map((m, mIdx) => (
             <div
               key={mIdx}
-              className="relative flex-1 min-w-[300px] p-4 rounded shadow-md"
+              className="relative flex-1 min-w-[300px] p-4 rounded shadow text-black -mt-6"
             >
               {mIdx > 0 && (
                 <button
                   type="button"
                   onClick={() => removeMitigation(mIdx)}
-                  className="absolute top-0 right-0 text-red-600 hover:text-red-800 text-xl"
+                  className="absolute top-0 right-0 text-red-600 hover:text-red-800 text-xl cursor-pointer"
                   title="Hapus Mitigasi"
                 >
                   <X size={18} />
@@ -214,7 +232,8 @@ export default function AddMitigation() {
                   <option value="">-- Pilih PIC --</option>
                   {users.map((u) => (
                     <option key={u.id} value={u.id}>
-                      {u.name}
+                      {u.name} (
+                      {u.role.charAt(0).toUpperCase() + u.role.slice(1)})
                     </option>
                   ))}
                 </select>
@@ -227,7 +246,7 @@ export default function AddMitigation() {
                   onChange={(e) =>
                     updateMitigation(mIdx, "deadline", e.target.value)
                   }
-                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:cursor-pointer"
                 />
               </div>
               <div>
@@ -289,7 +308,7 @@ export default function AddMitigation() {
           </div>
         )}
 
-        <div className="mt-6 w-full">
+        <div className="mt-6 w-full p-4">
           <button
             type="submit"
             disabled={!isAllMitigationsFilled() || loading}

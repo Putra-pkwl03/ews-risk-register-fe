@@ -3,12 +3,19 @@ import {
   saveRiskAppetite,
   editRiskAppetiteControllability,
 } from "../../lib/RiskAnalysis";
+import SuccessToast from "../modalconfirmasi/SuccessToast";
+import ErrorToast from "../modalconfirmasi/ErrorToast";
 
 export default function ControlabilityModal({ isOpen, onClose, risk }) {
   const [controllability, setControllability] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [decision, setDecision] = useState(""); // bisa kosong
+  const [decision, setDecision] = useState("");
+  // ✅ Tambahkan validasi sederhana
+  const isFormValid = [1, 2, 3, 4].includes(controllability) && decision !== "";
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   useEffect(() => {
     if (isOpen && risk) {
@@ -25,13 +32,8 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
-    if (
-      !controllability ||
-      isNaN(controllability) ||
-      controllability < 1 ||
-      controllability > 4
-    ) {
-      setError("Kontrolabilitas harus antara 1 sampai 4.");
+    if (!isFormValid) {
+      setError("Isi semua field dengan benar.");
       return;
     }
 
@@ -40,13 +42,11 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
 
     try {
       if (risk.risk_appetite?.id) {
-        // Mode edit
         await editRiskAppetiteControllability(
           risk.risk_appetite.id,
           controllability
         );
       } else {
-        // Mode simpan baru
         const payload = {
           risk_id: String(risk.id),
           controllability: Number(controllability),
@@ -55,23 +55,26 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
         await saveRiskAppetite(payload);
       }
 
-      // Kirim data baru ke parent untuk update UI
-      onClose(true, {
-        ...risk,
-        risk_appetite: {
-          ...(risk.risk_appetite || {}),
-          controllability,
-          decision,
-        },
-      });
+      setToastMessage("Kontrolabilitas berhasil disimpan.");
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        onClose(true, {
+          ...risk,
+          risk_appetite: {
+            ...(risk.risk_appetite || {}),
+            controllability,
+            decision,
+          },
+        });
+      }, 1000);
     } catch (err) {
-      setError(err.response?.data?.message || "Gagal menyimpan");
-      console.error(err.response?.data);
-    } finally {
-      setLoading(false);
+      const message = err.response?.data?.message || "Gagal menyimpan";
+      setToastMessage(message);
+      setShowError(true);
+      console.error(err);
     }
   };
-  
 
   return (
     <div
@@ -79,7 +82,7 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
       onClick={() => onClose(false)}
     >
       <div
-        className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative"
+        className="bg-white text-[#292D32] rounded-lg shadow-lg max-w-md w-full p-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-semibold mb-4">Kontrolabilitas Risiko</h2>
@@ -104,7 +107,7 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
               setControllability("");
             }
           }}
-          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300 mb-4"
+          className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
         />
 
         <label
@@ -117,32 +120,46 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
           id="decision"
           value={decision}
           onChange={(e) => setDecision(e.target.value)}
-          className="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-300 mb-4"
+          className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 hover:cursor-pointer"
         >
           <option value="">-- Pilih Keputusan --</option>
           <option value="accepted">Accepted</option>
           <option value="mitigated">Mitigated</option>
         </select>
 
-        {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
+        {error && <p className="text-red-600 text-sm mb-3 ">{error}</p>}
 
         <div className="flex justify-end gap-2">
           <button
             onClick={() => onClose(false)}
-            className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
+            className="w-[90px] h-[42px] text-sm text-red-600 border border-red-400 rounded-lg hover:bg-red-100 transition hover: cursor-pointer"
             disabled={loading}
           >
-            Batal
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            disabled={loading}
+            className={`w-[90px] h-[42px] text-sm border rounded-lg transition flex items-center justify-center ${
+              isFormValid && !loading
+                ? "text-blue-600 border-blue-500 hover:bg-blue-100 hover:cursor-pointer"
+                : "text-gray-400 border-gray-300 bg-gray-100 cursor-not-allowed"
+            }`}
+            disabled={loading || !isFormValid}
           >
             {loading ? "Menyimpan..." : "Simpan"}
           </button>
         </div>
       </div>
+      <SuccessToast
+        message={toastMessage}
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+      />
+      <ErrorToast
+        message={toastMessage}
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+      />
     </div>
   );
 }

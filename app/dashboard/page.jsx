@@ -17,9 +17,9 @@ import EditMitigation from "../components/evaluasi/EditMitigations";
 import DetailRiskMitigation from "../components/evaluasi/DetailRiskMitigation";
 import Pnrisiko from "../components/pnrisiko/pnrisiko";
 import Risikokepalapuskesmas from "../components/managementrisiko/RisikokepalaPuskesmas";
+import DownloadLaporan from "../components/Laporan/DownloadLaporan";
 import WelcomeDashboard from "../components/dashboard/WelcomeDashboard"; 
-import LaporanKepalaPuskesmas from "../components/laporan/LaporanKepalaPuskesmas";
-
+import LaporanKepalaPuskesmas from "../components/Laporan/LaporanKepalaPuskesmas";
 
 
 export default function Dashboard() {
@@ -151,6 +151,8 @@ export default function Dashboard() {
         <Pnrisiko />
       ) : page === "manajemen-risiko" ? (
         <Risikokepalapuskesmas />
+      ) : page === "download-laporan" ? (
+        <DownloadLaporan />
         ) : page === "laporan" ? (
         <LaporanKepalaPuskesmas />
       ) : (

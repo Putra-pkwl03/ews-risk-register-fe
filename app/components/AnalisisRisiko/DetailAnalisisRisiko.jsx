@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { fetchRiskAnalysisById } from "../../lib/RiskAnalysis";
 import SpinnerLoader from "../loadings/SpinnerLoader";
+import FishboneModal from "../diagram/FishboneModal";
+import FishboneChart from "../diagram/FishboneChart";
 
 const statusColors = {
   draft: "bg-gray-400",
@@ -33,6 +35,7 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
     }
   }, [data]);
 
+  const [showFishbone, setShowFishbone] = useState(false);
   const isLoading = !data || !riskAnalysisData;
 
   const riskAnalysis = Array.isArray(riskAnalysisData)
@@ -67,7 +70,7 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
       <SpinnerLoader />
     </div>
   ) : (
-    <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 mx-auto">
+    <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 mx-auto mt-3">
       <button
         onClick={() => {
           const params = new URLSearchParams(window.location.search);
@@ -79,7 +82,6 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
         className="flex items-center text-sm text-gray-600 hover:text-blue-600 mb-6 hover:cursor-pointer"
       >
         <ArrowLeftIcon className="w-5 h-5 mr-1" />
-        Kembali
       </button>
 
       <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
@@ -96,35 +98,44 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
           value={risk.description || "-"}
           spanFull
         />
-        <div>
-          <h3 className="mb-2 font-semibold text-gray-800">Penyebab</h3>
+        <div className="md:col-span-2">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-bold text-gray-800">Penyebab</h3>
+            <button
+              onClick={() => setShowFishbone(true)}
+              className="text-sm px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 hover:cursor-pointer"
+            >
+              Lihat Pohon Keputusan
+            </button>
+          </div>
+
           {risk.causes && risk.causes.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {risk.causes.map((cause) => (
                 <div
                   key={cause.id}
-                  className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-gray-800"
+                  className="p-6 bg-gray-50 rounded-xl border border-gray-200 text-gray-800"
                 >
-                  <div className="mb-2">
+                  <div className="mb-3">
                     <strong className="text-[16px] font-semibold">
                       Kategori:
                     </strong>{" "}
-                    <span className="capitalize text-[14px]">
+                    <span className="capitalize text-[15px]">
                       {cause.category}
                     </span>
                   </div>
-                  <div className="mb-2">
+                  <div className="mb-3">
                     <strong className="text-[16px] font-semibold">
                       Penyebab Utama:
                     </strong>{" "}
-                    <span className="capitalize text-[14px]">
+                    <span className="capitalize text-[15px]">
                       {cause.main_cause}
                     </span>
                   </div>
                   {cause.sub_causes && cause.sub_causes.length > 0 && (
-                    <div className="ml-4 mt-3 text-[14px] text-gray-600 font-semibold">
-                      <strong>Sub Penyebab:</strong>
-                      <ul className="list-disc list-inside mt-1 space-y-1 text-[14px]">
+                    <div className="ml-4 mt-4 text-[15px] text-gray-700 font-medium">
+                      <strong className="block mb-1">Sub Penyebab:</strong>
+                      <ul className="list-disc list-inside space-y-1">
                         {cause.sub_causes.map((sub) => (
                           <li key={sub.id}>{sub.sub_cause}</li>
                         ))}
@@ -138,6 +149,7 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
             <p className="text-gray-500">Tidak ada penyebab yang tercatat.</p>
           )}
         </div>
+
         <DetailItem label="Dampak" value={risk.impact || "-"} spanFull />
         <DetailItem label="UC/C" value={uc_c_display} />
         <DetailItem label="Severity" value={riskAnalysis.severity ?? "-"} />
@@ -183,6 +195,13 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
       >
         Tutup Detail
       </button>
+
+      <FishboneModal
+        isOpen={showFishbone}
+        onClose={() => setShowFishbone(false)}
+      >
+        <FishboneChart causes={risk.causes || []} riskName={risk.name} />
+      </FishboneModal>
     </div>
   );
   

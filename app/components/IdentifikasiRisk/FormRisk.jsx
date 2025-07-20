@@ -271,7 +271,7 @@ export default function FormRisiko({
 
     try {
       const payload = preparePayload(formData);
-      const saved = await onSave(payload);
+      const saved = await onSave(payload, isEditMode ? selectedRisk?.id : null);
       if (saved) {
         setToastMessage("Data risiko berhasil disimpan.");
         setSuccessOpen(true);
@@ -320,10 +320,10 @@ export default function FormRisiko({
         kategoriOptions={kategoriOptions}
         onCancel={onCancel}
         handleAddPenyebab={handleAddPenyebab}
-        // hapus handleEditPenyebab dari props
         handleRemovePenyebab={handleRemovePenyebab}
         isFormValid={isFormValid}
         isSaving={isSaving}
+        isEdit={!!selectedRisk}
       />
 
       {showModal && (

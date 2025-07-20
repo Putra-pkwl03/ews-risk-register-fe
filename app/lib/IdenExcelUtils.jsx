@@ -1,4 +1,3 @@
-
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import ExcelJS from "exceljs";
@@ -6,10 +5,17 @@ import { saveAs } from "file-saver";
 
 // Helper untuk format penyebab
 function formatCauses(causes = []) {
-  return causes.map((cause, idx) => {
-    const sub = cause.sub_causes?.map(sc => `     • Sub: ${sc.sub_cause}`).join("\n") || "     • Sub: -";
-    return `Kategori: ${idx + 1}. ${cause.category}\n   - Penyebab Utama: ${cause.main_cause}\n${sub}`;
-  }).join("\n\n");
+  return causes
+    .map((cause, idx) => {
+      const sub =
+        cause.sub_causes
+          ?.map((sc) => `     • Sub: ${sc.sub_cause}`)
+          .join("\n") || "     • Sub: -";
+      return `Kategori: ${idx + 1}. ${cause.category}\n   - Penyebab Utama: ${
+        cause.main_cause
+      }\n${sub}`;
+    })
+    .join("\n\n");
 }
 
 // Fungsi Export to Excel dengan gaya
@@ -27,6 +33,7 @@ export async function exportToExcel(data, filename = "laporan-risk") {
     { header: "Dampak", key: "impact", width: 15 },
     { header: "Deskripsi", key: "description", width: 25 },
     { header: "Penyebab", key: "causes", width: 45 },
+    { header: "UC/C", key: "uc_c", width: 15 },
     { header: "Tanggal", key: "tanggal", width: 12 },
   ];
 
@@ -41,6 +48,12 @@ export async function exportToExcel(data, filename = "laporan-risk") {
       impact: item.impact || "-",
       description: item.description || "-",
       causes: formatCauses(item.causes),
+      uc_c:
+        item.uc_c === 1
+          ? "Controlled"
+          : item.uc_c === 0
+          ? "Uncontrolled"
+          : item.uc_c,
       tanggal: new Date(item.created_at).toLocaleDateString("id-ID"),
     });
   });
@@ -51,10 +64,14 @@ export async function exportToExcel(data, filename = "laporan-risk") {
     cell.fill = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "FFCCE5FF" }, 
+      fgColor: { argb: "FFCCE5FF" },
     };
     cell.font = { bold: true };
-    cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+    cell.alignment = {
+      vertical: "middle",
+      horizontal: "center",
+      wrapText: true,
+    };
     cell.border = {
       top: { style: "thin" },
       left: { style: "thin" },
@@ -62,12 +79,12 @@ export async function exportToExcel(data, filename = "laporan-risk") {
       right: { style: "thin" },
     };
   });
-  headerRow.height = 22; 
+  headerRow.height = 22;
 
   // Gaya semua baris data
   worksheet.eachRow((row, rowNumber) => {
     if (rowNumber !== 1) {
-      row.height = 50; 
+      row.height = 50;
       row.alignment = { vertical: "top", wrapText: true };
       row.eachCell((cell) => {
         cell.border = {
@@ -122,10 +139,16 @@ export function exportToPDF(data, filename = "laporan-risk") {
       ["Dampak", item.impact || ""],
       ["Deskripsi", item.description || ""],
       ["Penyebab", formattedCauses.join("\n\n")],
+      [
+        "UC/C",
+        item.uc_c === 1 ? "Controlled" : item.uc_c === 0 ? "Uncontrolled" : "-",
+      ],
       ["Tanggal", new Date(item.created_at).toLocaleDateString("id-ID")],
     ];
 
-    const tableStartY = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 10 : 15;
+    const tableStartY = doc.lastAutoTable?.finalY
+      ? doc.lastAutoTable.finalY + 10
+      : 15;
 
     doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
@@ -145,7 +168,7 @@ export function exportToPDF(data, filename = "laporan-risk") {
       },
       columnStyles: {
         0: { fontStyle: "bold", cellWidth: 40 },
-        1: { cellWidth: 140 }, 
+        1: { cellWidth: 140 },
       },
       theme: "grid",
       margin: { left: 15, right: 15 },

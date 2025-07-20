@@ -4,7 +4,7 @@ import { Bars3Icon } from "@heroicons/react/24/outline";
 import { useState, useRef, useEffect } from "react";
 import useCurrentUser from "../lib/useCurrentUser";
 
-export default function Navbar({ toggleSidebar }) {
+export default function Navbar({ toggleSidebar, isSidebarOpen }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const user = useCurrentUser();
@@ -21,17 +21,20 @@ export default function Navbar({ toggleSidebar }) {
 
   return (
     <nav
-      className="bg-[#f8f8f8] px-4 py-2 flex items-center justify-between sticky top-0 z-40"
-      style={{ minHeight: "40px" }}
+      className="bg-[#f8f8f8] py-4 flex items-center justify-between fixed top-0 z-40 shadow-sm transition-all duration-300 -ml-4 w-full"
+      style={{
+        minHeight: "40px",
+        paddingLeft: isSidebarOpen ? "256px" : "75px",
+        paddingRight: "4px", 
+      }}
     >
-      {/* Kiri: Sambutan */}
-      <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+      <h2 className="text-base sm:text-lg font-semibold text-gray-800 -ml-11">
         Selamat Datang {user?.name} 👋
       </h2>
 
       {/* Kanan: Avatar + Nama + Role + Dropdown */}
       <div
-        className="flex items-center gap-2 relative hover:cursor-pointer"
+        className="flex items-center gap-2 fixed right-4 hover:cursor-pointer"
         ref={dropdownRef}
         onClick={() => setDropdownOpen(!dropdownOpen)}
       >
