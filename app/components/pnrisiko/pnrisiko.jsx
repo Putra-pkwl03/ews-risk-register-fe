@@ -42,35 +42,47 @@ export default function Pnrisiko() {
   const [loadingId, setLoadingId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
-  const totalItems = data.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const [filterEfektivitas, setFilterEfektivitas] = useState("All");
   const [sortOrder, setSortOrder] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [errorToast, setErrorToast] = useState({ isOpen: false, message: "" });
   const [successToast, setSuccessToast] = useState({
     isOpen: false,
     message: "",
   });
-  const filteredData = data.filter((item) => {
-    if (filterEfektivitas === "All") return true;
-    return (
-      item.effectiveness &&
-      item.effectiveness.trim().toLowerCase() ===
-        filterEfektivitas.trim().toLowerCase()
-    );
-  });
 
-  const sortedData = [...filteredData].sort((a, b) => {
-    if (sortOrder === "Ascending") {
-      return a.effectiveness.localeCompare(b.effectiveness);
-    } else if (sortOrder === "Descending") {
-      return b.effectiveness.localeCompare(a.effectiveness);
-    }
-    return 0;
-  });
+  const displayedData = [...data]
+    .filter((item) => {
+      const searchFields = [
+        item.risk?.name ?? "",
+        item.risk?.unit ?? "",
+        item.handler?.name ?? "",
+        item.reviewer?.name ?? "",
+      ];
 
-  // Data yang ditampilkan di halaman saat ini:
-  const paginatedData = sortedData.slice(
+      const matchSearch = searchFields.some((field) =>
+        field.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      const matchEfektivitas =
+        filterEfektivitas === "All" ||
+        item.effectiveness?.toLowerCase() === filterEfektivitas.toLowerCase();
+
+      return matchSearch && matchEfektivitas;
+    })
+    .sort((a, b) => {
+      if (sortOrder === "Ascending") {
+        return new Date(a.created_at) - new Date(b.created_at);
+      } else if (sortOrder === "Descending") {
+        return new Date(b.created_at) - new Date(a.created_at);
+      }
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+
+  const totalItems = displayedData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const paginatedData = displayedData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -170,43 +182,72 @@ export default function Pnrisiko() {
         </h5>
 
         <div className="flex flex-wrap items-center gap-3">
-          {/* Filter Efektivitas */}
-          <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-            <span>Filter:</span>
-            <select
-              value={filterEfektivitas}
-              onChange={handleEfektivitasChange}
-              className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center hover:cursor-pointer appearance-none focus:outline-none pr-6"
-            >
-              <option value="All">All</option>
-              <option value="Efektif">Efektif</option>
-              <option value="Tidak Efektif">Tidak Efektif</option>
-              <option value="Kurang Efektif">Kurang Efektif</option>
-            </select>
-            <img
-              src="/icons/chevron-down.svg"
-              alt="Filter Icon"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
-            />
-          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* SEARCH */}
+            <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white min-w-[200px]">
+              <img
+                src="/icons/search.svg"
+                alt="Search Icon"
+                className="h-4 w-4 mr-2 opacity-60"
+              />
+              <input
+                type="text"
+                placeholder="Cari risiko, unit, handled by, reviewer"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="outline-none text-[12px] text-black w-full"
+              />
+            </div>
 
-          {/* Sorting */}
-          <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-            <span>Sorting:</span>
-            <select
-              value={sortOrder}
-              onChange={handleSortChange}
-              className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center hover:cursor-pointer appearance-none focus:outline-none pr-6"
+            {/* FILTER */}
+            <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
+              <span>Efektivitas:</span>
+              <select
+                value={filterEfektivitas}
+                onChange={(e) => setFilterEfektivitas(e.target.value)}
+                className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center appearance-none focus:outline-none pr-6"
+              >
+                <option value="All">Semua</option>
+                <option value="E">Efektif</option>
+                <option value="KE">Kurang Efektif</option>
+                <option value="TE">Tidak Efektif</option>
+              </select>
+              <img
+                src="/icons/chevron-down.svg"
+                alt="Filter Icon"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
+              />
+            </div>
+
+            {/* SORT */}
+            <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
+              <span>Urutkan:</span>
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center appearance-none focus:outline-none pr-6"
+              >
+                <option value="Descending">Terbaru</option>
+                <option value="Ascending">Terlama</option>
+              </select>
+              <img
+                src="/icons/chevron-down.svg"
+                alt="Sort Icon"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
+              />
+            </div>
+
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setFilterEfektivitas("All");
+                setSortOrder("Descending");
+                setCurrentPage(1); // ini penting
+              }}
+              className="text-sm px-3 py-1 border border-red-500 rounded-md text-red-500 hover:bg-red-100 cursor-pointer"
             >
-              <option value="">Default</option>
-              <option value="Ascending">Ascending</option>
-              <option value="Descending">Descending</option>
-            </select>
-            <img
-              src="/icons/chevron-down.svg"
-              alt="Sort Icon"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
-            />
+              Reset
+            </button>
           </div>
 
           {/* Tombol Add Efektivitas */}
@@ -244,50 +285,50 @@ export default function Pnrisiko() {
 
       {error && <p className="text-red-500">{error}</p>}
 
-      {/* INFO START*/}
-      {totalBelumDitangani > 0 && (
-        <div className="animate-pulse  bg-red-50 text-red-700 px-2 py-1 rounded-lg shadow mb-4 flex items-center justify-between w-full max-w-sm">
-          <div>
-            <strong className="block text-sm font-semibold">
-              {totalBelumDitangani} Risiko Belum Ditangani
-            </strong>
-            <span className="text-xs">
-              Segera isi penanganan ({persen}% dari total)
-            </span>
-          </div>
-          <span className="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded-full">
-            {persen}%
-          </span>
+      {/* INFO START */}
+      {(totalBelumDitangani > 0 || totalMitigasiTerlambat > 0) && (
+        <div className="w-full flex flex-wrap gap-4 mb-4">
+          {totalBelumDitangani > 0 && (
+            <div className="animate-pulse bg-red-50 text-red-700 px-3 py-2 rounded-lg shadow flex items-center justify-between w-full max-w-sm sm:max-w-xs">
+              <div>
+                <strong className="block text-sm font-semibold">
+                  {totalBelumDitangani} Risiko Belum Ditangani
+                </strong>
+                <span className="text-xs">
+                  Segera isi penanganan ({persen}% dari total)
+                </span>
+              </div>
+              <span className="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded-full">
+                {persen}%
+              </span>
+            </div>
+          )}
+
+          {totalMitigasiTerlambat > 0 && (
+            <button
+              onClick={handleShowDetail}
+              className="bg-yellow-50 text-yellow-800 px-3 py-2 rounded-lg shadow flex items-center justify-between w-full max-w-sm sm:max-w-xs hover:bg-yellow-200 transition cursor-pointer text-left"
+            >
+              <div>
+                <strong className="block text-sm font-semibold">
+                  {totalMitigasiTerlambat} Risiko yang Mitigasinya Lewat dari
+                  Deadline
+                </strong>
+                <p className="text-[11px] text-gray-400 italic">
+                  Klik untuk Detailnya
+                </p>
+              </div>
+              <span className="bg-yellow-100 text-yellow-700 font-bold p-1 rounded-full">
+                <ExclamationTriangleIcon className="w-5 h-5" />
+              </span>
+            </button>
+          )}
         </div>
       )}
-      {totalMitigasiTerlambat > 0 && (
-        <button
-          onClick={handleShowDetail}
-          className="text-left  bg-yellow-50 text-yellow-800 px-2 py-1 rounded-lg shadow mb-4 flex items-center justify-between w-full max-w-sm hover:bg-yellow-200 transition cursor-pointer"
-        >
-          <div>
-            <strong className="block text-sm font-semibold">
-              {totalMitigasiTerlambat} Risiko yang Mitigasinya Lewat dari
-              Deadline
-            </strong>
-            <div className="ml-3">
-              <span className="text-xs">
-                {/* Melebihi tanggal: {today.toISOString().slice(0, 10)} */}
-              </span>
-              <p className="text-[11px] text-gray-400 italic">
-                Klik untuk Detailnya
-              </p>
-            </div>
-          </div>
-          <span className="bg-yellow-100 text-yellow-700 font-bold p-1 rounded-full">
-            <ExclamationTriangleIcon className="w-5 h-5" />
-          </span>
-        </button>
-      )}
-      {/* END INFO HERE */}
+      {/* END INFO */}
 
       {data.length > 0 && (
-        <table className="w-full text-sm sm:text-base">
+        <table className="w-full text-sm sm:text-base shadow-gray-200 shadow-md ">
           <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
             <tr>
               <th className="p-2 whitespace-nowrap text-xs sm:text-sm">No</th>
@@ -322,12 +363,18 @@ export default function Pnrisiko() {
             </tr>
           </thead>
           <tbody>
-            {loading ? (
+            {loadingId ? (
               Array.from({ length: 5 }).map((_, rowIndex) => (
                 <tr key={rowIndex} className="animate-pulse">
-                  {Array.from({ length: 10 }).map((_, colIndex) => (
+                  {Array.from({ length: 11 }).map((_, colIndex) => (
                     <td key={colIndex} className="p-2">
-                      <div className="h-4 bg-gray-200 rounded w-full"></div>
+                      <div
+                        className={`h-${
+                          Math.floor(Math.random() * 2) + 3
+                        } bg-gray-300 rounded w-full max-w-[${
+                          100 + colIndex * 5
+                        }px] mx-auto`}
+                      ></div>
                     </td>
                   ))}
                 </tr>
@@ -370,13 +417,13 @@ export default function Pnrisiko() {
                       "-"
                     )}
                   </td>
-                  <td className="py-2 text-center text-[12px] sm:text-sm">
+                  <td className="p-2 text-[12px] sm:text-sm">
                     {item.handler?.name || "-"}
                   </td>
-                  <td className="py-2 text-center text-[12px] sm:text-sm">
+                  <td className="py-2 text-[12px] sm:text-sm">
                     {item.reviewer?.name || "-"}
                   </td>
-                  <td className="py-2">
+                  <td className="p-2">
                     {item.review_notes ? (
                       <button
                         className="text-red-600 hover:underline cursor-pointer text-[12px] sm:text-sm"
@@ -392,11 +439,11 @@ export default function Pnrisiko() {
                       "-"
                     )}
                   </td>
-                  <td className="py-2 text-center text-[12px] sm:text-sm">
+                  <td className="w-[100px] py-2 text-center text-[12px] sm:text-sm">
                     {new Date(item.created_at).toLocaleString()}
                   </td>
-                  <td className="p-2 text-sm m:p-3 text-center">
-                    <div className="flex flex-row justify-center items-center text-center gap-2">
+                  <td className="p-2 text-sm text-center">
+                    <div className="w-[100px] flex flex-wrap justify-center sm:justify-start items-center gap-1.5">
                       <button
                         onClick={() => {
                           setSelectedItem(item);
@@ -554,7 +601,7 @@ export default function Pnrisiko() {
       {/* Modal */}
       <AddEffectivenessModal
         isOpen={modalOpen}
-        onClose={() => {}}
+        onClose={() => setModalOpen(false)}
         editingItem={editingItem}
         onSubmit={async (formData) => {
           try {

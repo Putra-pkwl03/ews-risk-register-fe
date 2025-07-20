@@ -46,14 +46,13 @@ export default function AnalisisRisiko() {
   const [errorToastOpen, setErrorToastOpen] = useState(false);
   const [errorToastMessage, setErrorToastMessage] = useState("");
 
-
   const itemsPerPage = 7;
 
-//   useEffect(() => {
-//     if (typeof setNotifCount === "function") {
-//       // setNotifCount(0);
-//     }
-//   }, [setNotifCount]);
+  //   useEffect(() => {
+  //     if (typeof setNotifCount === "function") {
+  //       // setNotifCount(0);
+  //     }
+  //   }, [setNotifCount]);
 
   useEffect(() => {
     setLoading(true);
@@ -171,21 +170,30 @@ export default function AnalisisRisiko() {
   };
 
   const filteredData = analisisRisiko.filter((item) => {
-    const matchSearch = item.risk?.name
-      ?.toLowerCase()
-      .includes(searchTerm.toLowerCase());
+    const matchSearch = [
+      item.risk?.name,
+      item.risk?.cluster,
+      item.risk?.unit,
+      item.risk?.category,
+    ].some((field) => field?.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchKategori =
-      kategoriFilter === "All" || item.risk?.status === kategoriFilter;
+      kategoriFilter === "All" ||
+      (kategoriFilter === "validated" &&
+        ["validated_approved", "validated_rejected"].includes(
+          item.risk?.status
+        )) ||
+      item.risk?.status === kategoriFilter;
 
     return matchSearch && matchKategori;
   });
-  
 
   const sortedData = [...filteredData].sort((a, b) => {
     if (sortOrder === "Ascending") return a.score - b.score;
     if (sortOrder === "Descending") return b.score - a.score;
-    return 0;
+
+    // Default: urutkan berdasarkan ID terbaru di atas
+    return new Date(b.created_at) - new Date(a.created_at);
   });
 
   const openFormAnalisis = (risk) => {
@@ -239,7 +247,7 @@ export default function AnalisisRisiko() {
   );
 
   const handleSend = async (id) => {
-    setLoadingId(id); 
+    setLoadingId(id);
 
     try {
       const response = await sendToMenris(id);
@@ -254,7 +262,6 @@ export default function AnalisisRisiko() {
 
       setShowModal(false);
     } catch (error) {
-
       setErrorToastMessage(
         error.message || "Terjadi kesalahan saat mengirim risiko"
       );
@@ -263,7 +270,6 @@ export default function AnalisisRisiko() {
       setLoadingId(null);
     }
   };
-  
 
   return (
     <>
@@ -295,7 +301,7 @@ export default function AnalisisRisiko() {
                 />
                 <input
                   type="text"
-                  placeholder="Search Risiko..."
+                  placeholder="Search"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="outline-none text-[12px] text-black w-full"
@@ -303,13 +309,13 @@ export default function AnalisisRisiko() {
               </div>
 
               <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-                <span>Filter by:</span>
+                <span>Status :</span>
                 <select
                   value={kategoriFilter}
                   onChange={handleKategoriChange}
                   className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
                 >
-                  <option value="All">All</option>
+                  <option value="All">Semua</option>
                   <option value="draft">Draft</option>
                   <option value="pending">Pending</option>
                   <option value="validated_approved">Approved</option>
@@ -324,7 +330,7 @@ export default function AnalisisRisiko() {
               </div>
 
               <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-                <span>Sorting by:</span>
+                <span>Urutkan Skor :</span>
                 <select
                   value={sortOrder}
                   onChange={handleSortChange}
@@ -333,9 +339,9 @@ export default function AnalisisRisiko() {
                     !isSortingEnabled ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
-                  <option value="">All</option>
-                  <option value="Ascending">Ascending</option>
-                  <option value="Descending">Descending</option>
+                  <option value="">Semua</option>
+                  <option value="Ascending">Rendah</option>
+                  <option value="Descending">Tinggi</option>
                 </select>
                 <img
                   src="/icons/chevron-down.svg"
@@ -343,12 +349,23 @@ export default function AnalisisRisiko() {
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
                 />
               </div>
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setKategoriFilter("All");
+                  setSortOrder("");
+                }}
+                className="text-sm px-3 py-1 border border-red-500 rounded-md text-red-500 hover:bg-red-100 cursor-pointer"
+              >
+                Reset Filter
+              </button>
             </div>
           </div>
 
-          <table className="w-full text-sm sm:text-base table-auto border border-gray-200">
+          <table className="w-full text-sm sm:text-base table-auto border shadow-gray-200 shadow-md border-gray-200">
             <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
               <tr>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">No</th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base">Klaster</th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base">Unit</th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base">
@@ -377,13 +394,13 @@ export default function AnalisisRisiko() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={9} className="py-4 text-center">
+                  <td colSpan={10} className="py-4 text-center">
                     <LoadingSkeleton />
                   </td>
                 </tr>
               ) : paginatedData.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-4 text-gray-400">
+                  <td colSpan={10} className="text-center py-4 text-gray-400">
                     Tidak ada data ditemukan.
                   </td>
                 </tr>
@@ -400,6 +417,9 @@ export default function AnalisisRisiko() {
                         index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
                       } hover:bg-gray-100`}
                     >
+                      <td className="p-2">
+                        {(currentPage - 1) * itemsPerPage + index + 1}
+                      </td>
                       <td className="p-2 text-[12px] ">
                         {item.risk?.cluster || "-"}
                       </td>

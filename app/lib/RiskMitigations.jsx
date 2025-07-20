@@ -16,7 +16,6 @@ export async function saveRiskMitigation(data) {
   }
 }
 
-
 export async function getAllRiskMitigations() {
   try {
     const response = await api.get("/risk-mitigations");
@@ -75,4 +74,15 @@ export async function getCompleteRiskAnalysisById(riskId) {
   }
 }
 
+// Hapus mitigasi risiko by id
+export async function deleteRiskMitigation(id) {
+  try {
+    const response = await api.delete(`/risk-mitigations/${id}`);
+    return response.data;
+  } catch (error) {
+    const message =
+      error.response?.data?.message || error.message || "Gagal menghapus mitigasi";
+    throw new Error(message);
+  }
+}
 

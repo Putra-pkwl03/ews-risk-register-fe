@@ -13,6 +13,11 @@ export default function ModalPenyebab({
   const isValid =
     penyebabBaru.kategori.trim() !== "" &&
     penyebabBaru.deskripsiUtama.trim() !== "";
+  const handleUpdatePenyebab = (index, updatedItem) => {
+    const updatedList = [...penyebabList];
+    updatedList[index] = updatedItem;
+    setPenyebabList(updatedList);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center text-gray-900 justify-center z-50">
@@ -58,15 +63,14 @@ export default function ModalPenyebab({
                   placeholder={`Deskripsi ${idx + 1}`}
                   className="w-full rounded-md border border-gray-300 px-6 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 />
-                {penyebabBaru.deskripsiSub.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => onRemoveSub(idx)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded self-stretch cursor-pointer"
-                  >
-                    &times;
-                  </button>
-                )}
+
+                <button
+                  type="button"
+                  onClick={() => onRemoveSub(idx)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded self-stretch cursor-pointer"
+                >
+                  &times;
+                </button>
               </div>
             ))}
           </>

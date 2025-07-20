@@ -25,6 +25,10 @@ export default function RiskActionMenris() {
   const [rejectId, setRejectId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [kategoriFilter, setKategoriFilter] = useState("All");
+  const [sortOrder, setSortOrder] = useState("");
+  const [isSortingEnabled, setIsSortingEnabled] = useState(true);
 
   const fetchData = async () => {
     try {
@@ -96,21 +100,116 @@ export default function RiskActionMenris() {
     }
   };
 
+  const filteredData = dataRisiko.filter((item) => {
+    const matchSearch = [
+      item.name,
+      item.unit,
+      item.cluster,
+      item.category,
+    ].some((field) => field?.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchKategori =
+      kategoriFilter === "All" || item.status === kategoriFilter;
+
+    return matchSearch && matchKategori;
+  });
+
+  const sortedData = [...filteredData].sort((a, b) => {
+    const aScore = a.analysis?.score || 0;
+    const bScore = b.analysis?.score || 0;
+
+    if (sortOrder === "Ascending") return aScore - bScore;
+    if (sortOrder === "Descending") return bScore - aScore;
+
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+
   const totalPages = Math.ceil(dataRisiko.length / itemsPerPage);
-  const paginatedRisiko = dataRisiko.slice(
+  const paginatedRisiko = sortedData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   return (
     <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
-      <h5 className="text-[20px] text-black font-semibold mb-6">
-        Daftar Risiko Analisis
-      </h5>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
+        <h5 className="text-[20px] text-black font-semibold">
+          Daftar Risiko Analisis
+        </h5>
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-center gap-4">
+          <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white min-w-[200px]">
+            <img
+              src="/icons/search.svg"
+              alt="Search Icon"
+              className="h-4 w-4 mr-2 opacity-60"
+            />
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="outline-none text-[12px] text-black w-full"
+            />
+          </div>
 
+          <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
+            <span>Status :</span>
+            <select
+              value={kategoriFilter}
+              onChange={(e) => setKategoriFilter(e.target.value)}
+              className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
+            >
+              <option value="All">Semua</option>
+              <option value="draft">Draft</option>
+              <option value="pending">Pending</option>
+              <option value="validated_approved">Approved</option>
+              <option value="validated_rejected">Rejected</option>
+            </select>
+
+            <img
+              src="/icons/chevron-down.svg"
+              alt="Filter Icon"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
+            />
+          </div>
+
+          <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
+            <span>Urutkan Skor :</span>
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              disabled={!isSortingEnabled}
+              className={`border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0 ${
+                !isSortingEnabled ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              <option value="">Semua</option>
+              <option value="Ascending">Rendah</option>
+              <option value="Descending">Tinggi</option>
+            </select>
+            <img
+              src="/icons/chevron-down.svg"
+              alt="Filter Icon"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
+            />
+          </div>
+
+          <button
+            onClick={() => {
+              setSearchTerm("");
+              setKategoriFilter("All");
+              setSortOrder("");
+            }}
+            className="text-sm px-3 py-1 border border-red-500 rounded-md text-red-500 hover:bg-red-100 cursor-pointer"
+          >
+            Reset Filter
+          </button>
+        </div>
+      </div>
       <table className="w-full text-sm sm:text-base table-auto border border-gray-200">
         <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
           <tr>
+            <th className="p-2 text-center">No</th>
             <th className="p-2">Nama Risiko</th>
             <th className="p-2">Unit</th>
             <th className="p-2">Cluster</th>
@@ -125,9 +224,9 @@ export default function RiskActionMenris() {
         </thead>
         <tbody>
           {isLoading ? (
-            Array.from({ length: 5 }).map((_, rowIndex) => (
+            Array.from({ length: 6 }).map((_, rowIndex) => (
               <tr key={rowIndex} className="animate-pulse">
-                {Array.from({ length: 10 }).map((_, colIndex) => (
+                {Array.from({ length: 11 }).map((_, colIndex) => (
                   <td key={colIndex} className="p-2">
                     <div className="h-4 bg-gray-200 rounded w-full"></div>
                   </td>
@@ -148,7 +247,10 @@ export default function RiskActionMenris() {
                   index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
                 } hover:bg-gray-100`}
               >
-                <td className="p-2 font-semibold">{item.name || "-"}</td>
+                <td className="p-2 text-center">
+                  {(currentPage - 1) * itemsPerPage + index + 1}
+                </td>
+                <td className="p-2">{item.name || "-"}</td>
                 <td className="p-2">{item.unit || "-"}</td>
                 <td className="p-2">{item.cluster || "-"}</td>
                 <td className="p-2">{item.category || "-"}</td>

@@ -25,7 +25,10 @@ export default function Risikokepalapuskesmas() {
   const [noteModalOpen, setNoteModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const itemsPerPage = 10;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterEfektivitas, setFilterEfektivitas] = useState("All");
+  const [sortByDateDesc, setSortByDateDesc] = useState(true);
 
   // Toast states
   const [successToast, setSuccessToast] = useState({
@@ -48,10 +51,43 @@ export default function Risikokepalapuskesmas() {
   }, []);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
+
+  const filteredData = data.filter((item) => {
+    const name = item.risk?.name?.toLowerCase() || "";
+    const unit = item.risk?.unit?.toLowerCase() || "";
+    const cluster = item.risk?.cluster?.toLowerCase() || "";
+    const handler = item.handler?.name?.toLowerCase() || "";
+    const reviewer = item.reviewer?.name?.toLowerCase() || "";
+    const effectiveness = item.effectiveness?.toLowerCase() || "";
+
+    const keyword = searchTerm.toLowerCase();
+
+    const searchMatch =
+      name.includes(keyword) ||
+      unit.includes(keyword) ||
+      cluster.includes(keyword) ||
+      handler.includes(keyword) ||
+      reviewer.includes(keyword);
+
+    const matchEfektivitas =
+      filterEfektivitas === "All" ||
+      item.effectiveness?.toLowerCase() === filterEfektivitas.toLowerCase();
+
+    return searchMatch && matchEfektivitas;
+  });
+
+  const sortedData = [...filteredData].sort((a, b) => {
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+    return sortByDateDesc ? dateB - dateA : dateA - dateB;
+  });
+
+  const totalItems = filteredData.length;
   const paginatedData = loading
     ? []
-    : data.slice(startIndex, startIndex + itemsPerPage);
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+    : sortedData.slice(startIndex, startIndex + itemsPerPage);
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   if (selectedItem) {
     return (
@@ -146,7 +182,6 @@ export default function Risikokepalapuskesmas() {
     saveAs(blob, `penanganan_risiko_${risk?.name || "export"}.xlsx`);
   };
 
-
   return (
     <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
       <SuccessToast
@@ -159,20 +194,79 @@ export default function Risikokepalapuskesmas() {
         isOpen={errorToast.isOpen}
         onClose={() => setErrorToast({ ...errorToast, isOpen: false })}
       />
-
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-[20px] text-black font-semibold">
           Manajemen Risiko
         </h1>
-      </div>.....
-
+        <div className="flex flex-wrap gap-4">
+          <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white min-w-[80px]">
+            <img
+              src="/icons/search.svg"
+              alt="Search Icon"
+              className="h-4 w-4 mr-2 opacity-60"
+            />
+            <input
+              type="text"
+              placeholder="Search"
+              className="outline-none text-[12px] text-black w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="relative inline-flex items-center gap-1 text-sm text-black">
+            <span>Efektivitas:</span>
+            <select
+              value={filterEfektivitas}
+              onChange={(e) => setFilterEfektivitas(e.target.value)}
+              className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center appearance-none focus:outline-none pr-6"
+            >
+              <option value="All">Semua</option>
+              <option value="E">Efektif</option>
+              <option value="KE">Kurang Efektif</option>
+              <option value="TE">Tidak Efektif</option>
+            </select>
+            <img
+              src="/icons/chevron-down.svg"
+              alt="Filter Icon"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Sort Tanggal:</span>
+            <select
+              value={sortByDateDesc ? "Desc" : "Asc"}
+              onChange={(e) => setSortByDateDesc(e.target.value === "Desc")}
+              className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black"
+            >
+              <option value="Desc">Terbaru</option>
+              <option value="Asc">Terlama</option>
+            </select>
+          </div>
+          <div>
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setFilterEfektivitas("All");
+                setSortByDateDesc(true);
+              }}
+              className="text-sm px-3 py-2 border border-red-500 rounded-md text-red-500 hover:bg-red-100 cursor-pointer"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+      .....
       {error && <p className="text-red-500">{error}</p>}
-
       {data.length === 0 && !loading && (
         <p className="text-gray-500">Belum ada data penanganan risiko.</p>
       )}
-
-      <table className="w-full text-sm sm:text-base">
+      {!loading && filteredData.length === 0 && (
+        <p className="flex justify-center items-center text-gray-500 italic">
+          Tidak ada data sesuai pencarian/filter.
+        </p>
+      )}
+      <table className="w-full text-sm sm:text-base shadow-gray-200 shadow-md ">
         <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
           <tr>
             <th className="px-2 py-2">No</th>
@@ -222,9 +316,7 @@ export default function Risikokepalapuskesmas() {
                   <td className="px-2 py-2 text-center">
                     {item.handler?.name || "-"}
                   </td>
-                  <td className="px-2 py-2">
-                    {item.reviewer?.name || "-"}
-                  </td>
+                  <td className="px-2 py-2">{item.reviewer?.name || "-"}</td>
                   <td className="px-2 py-2">
                     {item.review_notes ? (
                       <button
@@ -292,7 +384,6 @@ export default function Risikokepalapuskesmas() {
               ))}
         </tbody>
       </table>
-
       {!loading && totalPages > 1 && (
         <div className="mt-4">
           <Pagination
@@ -302,7 +393,6 @@ export default function Risikokepalapuskesmas() {
           />
         </div>
       )}
-
       <ReviewModal
         isOpen={reviewModalOpen}
         onClose={(type, message) => {
@@ -324,11 +414,17 @@ export default function Risikokepalapuskesmas() {
         }}
         item={selectedReviewItem}
       />
-
       <ReviewNoteModal
         isOpen={noteModalOpen}
         onClose={() => setNoteModalOpen(false)}
         note={selectedNote}
+      />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        itemsPerPage={itemsPerPage}
+        totalItems={totalItems}
       />
     </div>
   );

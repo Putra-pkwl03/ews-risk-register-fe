@@ -22,6 +22,7 @@ export default function ManageUsers() {
   const [errorMessage, setErrorMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [sortByDateDesc, setSortByDateDesc] = useState(true);
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
@@ -35,7 +36,13 @@ export default function ManageUsers() {
 
   const startIdx = (currentPage - 1) * itemsPerPage;
   const endIdx = startIdx + itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIdx, endIdx);
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+    return sortByDateDesc ? dateB - dateA : dateA - dateB;
+  });
+
+  const paginatedUsers = sortedUsers.slice(startIdx, endIdx);
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
@@ -198,6 +205,35 @@ export default function ManageUsers() {
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-6 w-5 pointer-events-none text-[#3D3C42]"
               />
             </div>
+            {/* Sort by Tanggal */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Sort Tanggal:</span>
+              <select
+                value={sortByDateDesc ? "Desc" : "Asc"}
+                className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black"
+                onChange={(e) => {
+                  setSortByDateDesc(e.target.value === "Desc");
+                  setCurrentPage(1);
+                }}
+              >
+                <option value="Desc">Terbaru</option>
+                <option value="Asc">Terlama</option>
+              </select>
+            </div>
+
+            {/* Reset Button */}
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setRoleFilter(""); // perbaikan di sini
+                setSortByDateDesc(true); // kembali ke default: terbaru
+                setCurrentPage(1);
+              }}
+              className="text-sm px-3 py-2 border border-red-500 rounded-md text-red-500 hover:bg-red-100"
+            >
+              Reset
+            </button>
+
             <button
               onClick={handleAdd}
               className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 px-3 py-1.5 rounded-md"
@@ -220,10 +256,10 @@ export default function ManageUsers() {
             </button>
           </div>
         </div>
-        <table className="w-full text-sm sm:text-base">
+        <table className="w-full text-sm sm:text-base shadow-gray-200 shadow-md ">
           <thead className="bg-gray-100 text-[#5932EA] text-left border-b-[1px] border-gray-200">
             <tr>
-              <th className="p-2 text-[14px] sm:p-3 sm:text-base">No</th>
+              <th className="p-2 text-[14px] text-center sm:p-3 sm:text-base">No</th>
               <th className="p-2 text-[14px] sm:p-3 sm:text-base">Name</th>
               <th className="p-2 text-[14px] sm:p-3 sm:text-base">Email</th>
               <th className="p-2 text-[14px] sm:p-3 sm:text-base">Role</th>
@@ -253,7 +289,7 @@ export default function ManageUsers() {
                       idx % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
                     } hover:bg-gray-200`}
                   >
-                    <td className="p-2 text-[12px] sm:p-3">
+                    <td className="p-2 text-[12px] sm:p-3 text-center">
                       {startIdx + idx + 1}
                     </td>
                     <td className="p-2 text-[12px] sm:p-3">{user.name}</td>

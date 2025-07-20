@@ -13,6 +13,8 @@ export default function RisikoTable({
   openDeleteModal,
   addedRiskIds,
   setAddedRiskIds,
+  currentPage,
+  itemsPerPage,
 }) {
   const router = useRouter();
 
@@ -38,9 +40,10 @@ export default function RisikoTable({
   }
 
   return (
-    <table className="w-full text-sm sm:text-base">
+    <table className="w-full text-sm sm:text-base shadow-gray-200 shadow-md ">
       <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
         <tr>
+          <th className="p-2">No</th>
           <th className="p-2">Klaster</th>
           <th className="p-2">Unit</th>
           <th className="p-2">Nama Risiko</th>
@@ -55,13 +58,13 @@ export default function RisikoTable({
       <tbody>
         {isLoading ? (
           <tr>
-            <td colSpan={9} className="py-4 text-center">
+            <td colSpan={10} className="py-4 text-center">
               <LoadingSkeleton />
             </td>
           </tr>
         ) : displayedData.length === 0 ? (
           <tr>
-            <td colSpan={9} className="text-center py-4 text-gray-400">
+            <td colSpan={10} className="text-center py-4 text-gray-400">
               Tidak ada data ditemukan.
             </td>
           </tr>
@@ -80,6 +83,9 @@ export default function RisikoTable({
                   idx % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
                 } hover:bg-gray-100`}
               >
+                <td className="p-2">
+                  {(currentPage - 1) * itemsPerPage + idx + 1}
+                </td>
                 <td className="p-2">{item.cluster}</td>
                 <td className="p-2">{item.unit}</td>
                 <td className="p-2">{item.name}</td>

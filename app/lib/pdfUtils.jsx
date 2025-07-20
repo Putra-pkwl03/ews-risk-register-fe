@@ -1,6 +1,13 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+function formatEfektivitas(code) {
+  if (code === "E") return "Efektif";
+  if (code === "KE") return "Kurang Efektif";
+  if (code === "TE") return "Tidak Efektif";
+  return "-";
+}
+
 export function generateLaporanPDF(data, judul = "Laporan Risiko") {
   const doc = new jsPDF("portrait");
   const tanggalCetak = new Date().toLocaleDateString("id-ID", {
@@ -9,7 +16,6 @@ export function generateLaporanPDF(data, judul = "Laporan Risiko") {
     year: "numeric",
   });
 
-  // Header hanya di halaman pertama
   doc.setFontSize(14);
   doc.text(judul, 14, 14);
 
@@ -22,35 +28,56 @@ export function generateLaporanPDF(data, judul = "Laporan Risiko") {
     const creator = risk.creator?.name || "-";
     const validator = risk.validations?.[0]?.validator?.name || "-";
     const handler = item.handler?.name || "-";
+    const reviewer = item.reviewed_by?.name || "-";
     const appetite = risk.risk_appetite || {};
     const causes = risk.causes || [];
-    const mitigations = Array.isArray(risk.mitigations) && risk.mitigations.length > 0
-      ? risk.mitigations
-      : Array.isArray(item.mitigations) ? item.mitigations : [];
+    const mitigations =
+      Array.isArray(risk.mitigations) && risk.mitigations.length > 0
+        ? risk.mitigations
+        : Array.isArray(item.mitigations)
+        ? item.mitigations
+        : [];
+
+    const mainCauses =
+      causes.map((c) => `• ${c.main_cause} (${c.category})`).join("\n") || "-";
+    const subCauses =
+      causes
+        .map((c) =>
+          c.sub_causes?.map((s, idx) => `${idx + 1}. ${s.sub_cause}`).join("\n")
+        )
+        .filter(Boolean)
+        .join("\n") || "-";
+
+    const uc_c =
+      risk.uc_c === 1 ? "Controlled" : risk.uc_c === 0 ? "Uncontrolled" : "-";
+    const efektivitas = formatEfektivitas(item.effectiveness);
+    const tanggal = item.created_at?.split("T")[0] || "-";
+    const catatan = item.review_notes || "-";
+    const hambatan = item.barrier || "-";
 
     if (index > 0) {
       doc.addPage();
       doc.setFontSize(10);
-      doc.text(`Halaman ${index + 1} dari ${data.length}`, 200, 20, { align: "right" });
+      doc.text(`Halaman ${index + 1} dari ${data.length}`, 200, 20, {
+        align: "right",
+      });
     }
 
-    // RISK
+    // Identifikasi Risiko
     autoTable(doc, {
       startY: index === 0 ? 30 : 25,
-      head: [["Field", "Isi"]],
+      head: [["Identifikasi Risiko", "Isi"]],
       body: [
         ["Nama Risiko", risk.name || "-"],
         ["Cluster", risk.cluster || "-"],
         ["Unit", risk.unit || "-"],
         ["Kategori", risk.category || "-"],
         ["Deskripsi", risk.description || "-"],
+        ["Penyebab Utama", mainCauses],
+        ["Sub Penyebab", subCauses],
         ["Dampak", risk.impact || "-"],
+        ["UC/C", uc_c],
         ["Status", risk.status || "-"],
-        ["Efektivitas Penanganan", item.effectiveness || "-"],
-        ["Tanggal Penanganan", item.created_at?.split("T")[0] || "-"],
-        ["Pembuat", creator],
-        ["Validator", validator],
-        ["Handler", handler],
       ],
       styles: { fontSize: 9, cellPadding: 3, valign: "top" },
       theme: "grid",
@@ -60,15 +87,15 @@ export function generateLaporanPDF(data, judul = "Laporan Risiko") {
       },
     });
 
-    // APPETITE
+    // Analisis Risiko
     autoTable(doc, {
       margin: { top: 10 },
-      head: [["Risk Appetite", "Nilai"]],
+      head: [["Analisis Risiko", "Nilai"]],
       body: [
-        ["Skor", appetite.scoring ?? "-"],
-        ["Keputusan", appetite.decision || "-"],
-        ["Ranking", appetite.ranking ?? "-"],
-        ["Kontrolabilitas", appetite.controllability ?? "-"],
+        ["Severity", item.severity ?? "-"],
+        ["Probability", item.probability ?? "-"],
+        ["Skor", item.score ?? "-"],
+        ["Bands Risiko", item.grading ?? "-"],
       ],
       styles: { fontSize: 9, cellPadding: 3 },
       theme: "grid",
@@ -78,43 +105,37 @@ export function generateLaporanPDF(data, judul = "Laporan Risiko") {
       },
     });
 
-    // CAUSES
-    const causeRows = [];
-    causes.forEach((cause) => {
-      causeRows.push([
-        `• ${cause.main_cause} (${cause.category})`,
-        cause.sub_causes?.map((s) => `- ${s.sub_cause}`).join("\n") || "-",
-      ]);
-    });
-
+    // Evaluasi Risiko
     autoTable(doc, {
       margin: { top: 10 },
-      head: [["Penyebab Utama (4M1E)", "Sub Penyebab"]],
-      body: causeRows.length ? causeRows : [["-", "-"]],
-      styles: { fontSize: 9, cellPadding: 3, valign: "top" },
+      head: [["Evaluasi Risiko", "Nilai"]],
+      body: [
+        ["Kontrolabilitas", appetite.controllability ?? "-"],
+        ["Scoring", appetite.scoring ?? "-"],
+        ["Ranking", appetite.ranking ?? "-"],
+        ["Keputusan", appetite.decision ?? "-"],
+      ],
+      styles: { fontSize: 9, cellPadding: 3 },
       theme: "grid",
       columnStyles: {
-        0: { cellWidth: 80 },
+        0: { fontStyle: "bold", cellWidth: 65 },
         1: { cellWidth: "auto" },
       },
     });
 
-    // MITIGATIONS
-    const mitigationRows = [];
-    mitigations.forEach((m) => {
-      mitigationRows.push([
-        m.mitigation_type || "-",
-        m.pic?.name || "-",
-        m.deadline || "-",
-        Array.isArray(m.descriptions) && m.descriptions.length > 0
-          ? m.descriptions.map((d) => `- ${d.description}`).join("\n")
-          : "-"
-      ]);
-    });
+    // Penanganan Risiko
+    const mitigationRows = mitigations.map((m) => [
+      m.mitigation_type || "-",
+      m.pic?.name || "-",
+      m.deadline || "-",
+      Array.isArray(m.descriptions)
+        ? m.descriptions.map((d) => `- ${d.description}`).join("\n")
+        : "-",
+    ]);
 
     autoTable(doc, {
       margin: { top: 10 },
-      head: [["Jenis", "PIC", "Deadline", "Deskripsi Mitigasi"]],
+      head: [["Jenis Mitigasi", "PIC", "Deadline", "Deskripsi Mitigasi"]],
       body: mitigationRows.length ? mitigationRows : [["-", "-", "-", "-"]],
       styles: { fontSize: 9, cellPadding: 3, valign: "top" },
       theme: "grid",
@@ -125,25 +146,51 @@ export function generateLaporanPDF(data, judul = "Laporan Risiko") {
         3: { cellWidth: "auto" },
       },
     });
-    
-  if (item.approval_signature) {
-  const yPos = doc.lastAutoTable.finalY + 10;
-  const imgWidth = 30;
-  const imgHeight = 15;
 
-  const centerX = 175;
+    // Informasi Tambahan & Signature
+    autoTable(doc, {
+      margin: { top: 10 },
+      head: [["Field", "Isi"]],
+      body: [
+        ["Efektivitas", efektivitas],
+        ["Hambatan", hambatan],
+        ["Catatan", catatan],
+        ["Tanggal", tanggal],
+        ["Pembuat", creator],
+        ["Handled By", handler],
+        ["Validator", validator],
+        ["Reviewer", reviewer],
+      ],
+      styles: { fontSize: 9, cellPadding: 3, valign: "top" },
+      theme: "grid",
+      columnStyles: {
+        0: { fontStyle: "bold", cellWidth: 65 },
+        1: { cellWidth: "auto" },
+      },
+    });
 
-  const text = "TTD:";
-  const textWidth = doc.getTextWidth(text);
-  const textX = centerX - (textWidth / 6);      
-  const imgX = centerX - (imgWidth / 2);        
+    if (item.approval_signature) {
+      const yPos = doc.lastAutoTable.finalY + 10;
+      const imgWidth = 30;
+      const imgHeight = 15;
+      const centerX = 175;
 
-  doc.setFontSize(10);
-  doc.text(text, textX, yPos);
-  doc.addImage(item.approval_signature, 'PNG', imgX, yPos + 5, imgWidth, imgHeight);
-}
+      const text = "TTD:";
+      const textWidth = doc.getTextWidth(text);
+      const textX = centerX - textWidth / 6;
+      const imgX = centerX - imgWidth / 2;
 
-
+      doc.setFontSize(10);
+      doc.text(text, textX, yPos);
+      doc.addImage(
+        item.approval_signature,
+        "PNG",
+        imgX,
+        yPos + 5,
+        imgWidth,
+        imgHeight
+      );
+    }
   });
 
   doc.save("laporan-risiko.pdf");

@@ -18,8 +18,40 @@ export default function PenangananRisiko() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const totalItems = risks.length;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [kategoriFilter, setKategoriFilter] = useState("All");
+  const [sortOrder, setSortOrder] = useState("");
+
+  const filteredData = risks.filter((item) => {
+    const matchSearch = [
+      item?.name,
+      item?.unit,
+      item?.cluster,
+      item?.category,
+    ].some((field) => field?.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchKategori =
+      kategoriFilter === "All" ||
+      item.risk_appetite?.decision === kategoriFilter;
+
+    return matchSearch && matchKategori;
+  });
+
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (sortOrder === "Ascending") return a.risk_appetite?.scoring - b.risk_appetite?.scoring;
+    if (sortOrder === "Descending")
+      return b.risk_appetite?.scoring - a.risk_appetite?.scoring;
+
+    return new Date(b.created_at) - new Date(a.created_at);
+  });
+
+  const totalItems = filteredData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const paginatedRisks = sortedData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   // Fungsi fetch ulang data risiko
   const fetchValidatedRisks = async () => {
@@ -34,7 +66,6 @@ export default function PenangananRisiko() {
       setIsLoading(false); // ← selesai loading
     }
   };
-  
 
   useEffect(() => {
     fetchValidatedRisks();
@@ -89,7 +120,7 @@ export default function PenangananRisiko() {
 
   return (
     <RiskList
-      risks={risks}
+      risks={paginatedRisks}
       onDetailClick={handleDetailClick}
       onOpenControlibility={handleOpenControlibility}
       selectedRisk={selectedRisk}
@@ -101,7 +132,14 @@ export default function PenangananRisiko() {
       totalPages={totalPages}
       setCurrentPage={setCurrentPage}
       itemsPerPage={itemsPerPage}
-      totalItems={totalItems}
+      totalItems={filteredData.length} // sesuai hasil filter
+      // Tambahan untuk search + filter
+      searchTerm={searchTerm}
+      kategoriFilter={kategoriFilter}
+      sortOrder={sortOrder}
+      setSearchTerm={setSearchTerm}
+      setKategoriFilter={setKategoriFilter}
+      setSortOrder={setSortOrder}
     />
   );
 }
