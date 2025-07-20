@@ -20,6 +20,8 @@ import Risikokepalapuskesmas from "../components/managementrisiko/RisikokepalaPu
 import DownloadLaporan from "../components/Laporan/DownloadLaporan";
 import WelcomeDashboard from "../components/dashboard/WelcomeDashboard"; 
 import LaporanKepalaPuskesmas from "../components/Laporan/LaporanKepalaPuskesmas";
+import ProfilePage from "../components/profile/ProfilePage";
+
 
 
 export default function Dashboard() {
@@ -155,6 +157,8 @@ export default function Dashboard() {
         <DownloadLaporan />
         ) : page === "laporan" ? (
         <LaporanKepalaPuskesmas />
+        ) : page === "profile" ? (
+        <ProfilePage />
       ) : (
         <WelcomeDashboard /> 
       )}
