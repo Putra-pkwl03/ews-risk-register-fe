@@ -20,7 +20,7 @@ export default function Navbar({ toggleSidebar, isSidebarOpen }) {
 
   return (
     <nav
-      className="bg-[#f8f8f8] py-4 flex items-center justify-between fixed top-0 z-40 shadow-sm transition-all duration-300 -ml-4 w-full"
+      className="bg-white py-4 flex items-center justify-between fixed top-0 z-40 shadow-sm transition-all duration-300 -ml-4 w-full"
       style={{
         minHeight: "40px",
         paddingLeft: isSidebarOpen ? "256px" : "75px",

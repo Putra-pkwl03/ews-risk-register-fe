@@ -68,7 +68,7 @@ export default function RiskStatusSummaryBox() {
         Status Risiko 6 Bulan Terakhir
       </h2>
 
-      <div className="bg-white rounded-2xl p-4 w-full font-semibold min-h-[222px]">
+      <div className="bg-white shadow rounded-xl transition-all duration-300 ease-in-out hover:shadow-md hover:scale-[1.02] hover:-translate-y-1 p-4 w-full font-semibold min-h-[222px]">
         <div className="mb-4 font-semibold">
           {/* Total Risiko */}
           <StatusCard

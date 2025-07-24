@@ -8,7 +8,7 @@ import RiskHandlingDeadlineChart from "../dashboard/RiskHandlingDeadlineChart";
 
 export default function WelcomeDashboard() {
   return (
-    <div className="p-6 space-y-6 -mt-2 bg-white rounded-sm shadow-gray-200 shadow-xl mb-4">
+    <div className="p-6 space-y-6 -mt-2 mb-4">
       {/* Ringkasan Risiko - Grid 3 kolom */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-2">
         <RiskSummaryBox />
@@ -29,7 +29,7 @@ export default function WelcomeDashboard() {
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Grafik Evaluasi Penanganan Risiko */}
-        <div className="w-full lg:w-1/2">
+        <div className="w-full lg:w-1/3">
           <RiskHandlingEvaluationChart />
         </div>
 

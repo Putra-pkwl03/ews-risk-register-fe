@@ -54,7 +54,7 @@ export default function PieChartGrading() {
         </h2>
       </div>
 
-      <div className="bg-white rounded-xl p-4 w-full h-[320px] transition-all flex flex-col">
+      <div className="bg-white shadow rounded-xl transition-all duration-300 ease-in-out hover:shadow-md hover:scale-[1.02] hover:-translate-y-1 p-4 w-full h-[320px] flex flex-col">
         {/* Chart Container */}
         <div className="flex-1">
           {loading ? (

@@ -25,7 +25,7 @@ export default function Layout({ children, role }) {
   const [resetAtMenris, setResetAtMenris] = useState(null);
 
   return (
-    <div className="bg-[#f8f8f8] min-h-screen flex">
+    <div className="bg-white min-h-screen flex">
       {role === "koordinator_menris" && (
         <NotificationListener
           onCountUpdate={setNotifCountMenris}
