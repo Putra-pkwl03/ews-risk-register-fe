@@ -6,12 +6,20 @@ import { getAllRiskAnalysisWithoutLimit } from "../../lib/RiskAnalysis";
 import { ChartPieIcon } from "@heroicons/react/24/outline";
 
 const gradingColors = {
-  "sangat tinggi": "#991B1B",
-  tinggi: "#EF4444",
-  sedang: "#FACC15",
-  rendah: "#15803D",
-  "sangat rendah": "#4ADE80",
+  // Indonesian labels
+  "sangat tinggi": "#991B1B", // red
+  tinggi: "#F97316", // orange
+  sedang: "#FACC15", // yellow
+  rendah: "#3B82F6", // blue
+  "sangat rendah": "#22C55E", // green
   "tidak diketahui": "#9CA3AF",
+  // English labels (compat)
+  "very high": "#991B1B",
+  high: "#F97316",
+  medium: "#FACC15",
+  low: "#3B82F6",
+  "very low": "#22C55E",
+  unknown: "#9CA3AF",
 };
 
 export default function PieChartGrading() {
@@ -23,7 +31,7 @@ export default function PieChartGrading() {
     getAllRiskAnalysisWithoutLimit()
       .then((res) => {
         const counts = res.reduce((acc, curr) => {
-          const grade = curr.grading?.toLowerCase() || "tidak diketahui";
+          const grade = curr.grading?.toLowerCase() || "unknown";
           acc[grade] = (acc[grade] || 0) + 1;
           return acc;
         }, {});
@@ -39,7 +47,7 @@ export default function PieChartGrading() {
         setActiveIndexes(randomIndexes);
       })
       .catch((err) => {
-        console.error("Gagal ambil data grading:", err.message);
+        console.error("Failed to fetch grading data:", err.message);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -50,7 +58,7 @@ export default function PieChartGrading() {
       <div className="flex items-center gap-2 mb-2">
         <ChartPieIcon className="w-5 h-5 text-red-600" />
         <h2 className="text-[16px] font-semibold text-gray-700">
-          Distribusi Grading Risiko
+          Risk Grading Distribution
         </h2>
       </div>
 
@@ -59,7 +67,7 @@ export default function PieChartGrading() {
         <div className="flex-1">
           {loading ? (
             <div className="w-full h-full flex items-center justify-center">
-              <p className="text-sm text-gray-500">Memuat chart grading...</p>
+              <p className="text-sm text-gray-500">Loading grading chart...</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">

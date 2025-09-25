@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import useCurrentUser from "../lib/useCurrentUser";
+import { User2, LogOut } from "lucide-react";
 
 export default function Navbar({ toggleSidebar, isSidebarOpen }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -28,28 +29,30 @@ export default function Navbar({ toggleSidebar, isSidebarOpen }) {
       }}
     >
       <h2 className="text-base sm:text-lg font-semibold text-gray-800 -ml-11">
-        Selamat Datang {user?.name} 👋
+        Welcome {user?.name} 👋
       </h2>
 
-      {/* Kanan: Avatar + Dropdown */}
+  {/* Right: Avatar + Dropdown */}
       <div className="flex items-center gap-2 fixed right-4" ref={dropdownRef}>
         <div
           className="flex items-center gap-2 hover:cursor-pointer"
           onClick={() => setDropdownOpen(!dropdownOpen)}
         >
           <img
-            src={user?.avatar || "https://randomuser.me/api/portraits/men/1.jpg"}
+            src={
+              user?.avatar || "https://randomuser.me/api/portraits/men/1.jpg"
+            }
             alt="User"
             className="w-8 h-8 rounded-full object-cover"
           />
           <div className="text-sm">
             <div className="font-semibold text-black truncate max-w-[120px]">
-              {user?.name || "Memuat..."}
+              {user?.name || "Loading..."}
             </div>
-            <div className="text-gray-600 text-xs truncate max-w-[120px]">
+              <div className="text-gray-600 text-xs truncate max-w-[120px]">
               {user?.role
-                ? user.role === "koordinator_menris"
-                  ? "koordinator manrisk"
+                ? user.role === "risk_management_coordinator"
+                  ? "Risk Management Coordinator"
                   : user.role.replace(/_/g, " ")
                 : ""}
             </div>
@@ -73,15 +76,16 @@ export default function Navbar({ toggleSidebar, isSidebarOpen }) {
           <div className="absolute right-0 top-13 w-40 bg-white rounded-lg shadow-lg border-gray-200 border-2 text-sm z-50">
             <Link
               href="/dashboard?page=profile"
-              className="block px-4 py-2 hover:bg-[#eeeeff] text-gray-800 font-semibold"
+              className="flex justify-between items-center px-4 py-2 hover:bg-[#eeeeff] text-gray-800 font-semibold"
               onClick={() => setDropdownOpen(false)}
             >
-              Profile
+              <span>Profile</span>
+              <User2 size={18} className="text-gray-600" />
             </Link>
 
-              <button
+            <button
               type="button"
-              className="flex items-center px-4 py-2 text-gray-800 font-semibold w-full cursor-pointer hover:bg-[#eeeeff]"
+              className="flex justify-between items-center px-4 py-2 text-red-600 font-semibold w-full cursor-pointer hover:bg-[#eeeeff]"
               onClick={() => {
                 localStorage.removeItem("token");
                 localStorage.removeItem("userId");
@@ -89,6 +93,7 @@ export default function Navbar({ toggleSidebar, isSidebarOpen }) {
               }}
             >
               <span>Logout</span>
+              <LogOut size={18} className="text-red-600" />
             </button>
           </div>
         )}

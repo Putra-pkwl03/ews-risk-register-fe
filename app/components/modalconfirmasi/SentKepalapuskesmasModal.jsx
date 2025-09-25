@@ -14,7 +14,7 @@ export default function ConfirmSendModal({ isOpen, onClose, onConfirm }) {
       await onConfirm();
       onClose();
     } catch (error) {
-      console.error("Gagal mengirim:", error);
+      console.error("Failed to send:", error);
     } finally {
       setLoading(false);
     }
@@ -31,12 +31,12 @@ export default function ConfirmSendModal({ isOpen, onClose, onConfirm }) {
           <XMarkIcon className="w-5 h-5" />
         </button>
 
-        {/* Konten */}
+        {/* Content */}
         <h2 className="text-md font-semibold mb-2 text-center text-gray-800">
-          Kirim ke Kepala Puskesmas?
+          Send to Head of Puskesmas?
         </h2>
         <p className="text-sm text-center text-gray-600 mb-6">
-          Apakah Anda yakin ingin mengirim data ini ke Kepala Puskesmas?
+          Are you sure you want to send this data to the Head of Puskesmas?
         </p>
 
         {/* Tombol Aksi */}
@@ -46,7 +46,7 @@ export default function ConfirmSendModal({ isOpen, onClose, onConfirm }) {
             disabled={loading}
             className="px-4 py-2 text-sm rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition hover:cursor-pointer disabled:opacity-50"
           >
-            Batal
+            Cancel
           </button>
           <button
             onClick={handleConfirm}
@@ -54,7 +54,7 @@ export default function ConfirmSendModal({ isOpen, onClose, onConfirm }) {
             className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition flex items-center justify-center gap-2 disabled:opacity-50 hover:cursor-pointer"
           >
             {loading && <MiniSpinner />}
-            {loading ? "Mengirim..." : "Kirim"}
+            {loading ? "Sending..." : "Send"}
           </button>
         </div>
       </div>

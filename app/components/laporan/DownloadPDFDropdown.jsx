@@ -5,9 +5,9 @@ import { Download } from "lucide-react";
 export default function DownloadPDFDropdown({ onDownload }) {
   const wrapperRef = useRef(null);
   const [exportType, setExportType] = useState(null); // "open" | "pdf" | "excel"
-  const [rangeType, setRangeType] = useState(null); // "select" | "semua" | "6bulan"
+  const [rangeType, setRangeType] = useState(null); // "select" | "all" | "6months"
 
-  // Menutup dropdown saat klik di luar
+  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -21,9 +21,9 @@ export default function DownloadPDFDropdown({ onDownload }) {
 
   const handleExport = () => {
     if (exportType && rangeType) {
-      const key = `${exportType}-${rangeType === "6bulan" ? "6months" : "all"}`;
+      const key = `${exportType}-${rangeType === "6months" ? "6months" : "all"}`;
       onDownload(key);
-      // Reset setelah export
+      // Reset after export
       setExportType(null);
       setRangeType(null);
     }
@@ -31,7 +31,7 @@ export default function DownloadPDFDropdown({ onDownload }) {
 
   return (
     <div ref={wrapperRef} className="relative inline-block text-left">
-      {/* Tombol utama */}
+      {/* Main button */}
       <button
         onClick={() => setExportType(exportType === "open" ? null : "open")}
         className="flex items-center justify-center w-30 gap-2 px-3 py-1.5 border border-blue-500 text-blue-500 hover:bg-blue-100 cursor-pointer rounded-md text-sm"
@@ -40,7 +40,7 @@ export default function DownloadPDFDropdown({ onDownload }) {
         <Download className="h-4 w-4" />
       </button>
 
-      {/* Dropdown: Pilih jenis file */}
+      {/* Dropdown: choose file type */}
       {exportType === "open" && (
         <div className="absolute right-0 mt-2 w-30 bg-white border border-gray-300 rounded-md shadow-lg z-10 space-y-1 p-2">
           <button
@@ -66,26 +66,26 @@ export default function DownloadPDFDropdown({ onDownload }) {
         </div>
       )}
 
-      {/* Dropdown: Pilih rentang waktu */}
+      {/* Dropdown: choose date range */}
       {rangeType === "select" && (
         <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
           <button
             onClick={() => {
-              setRangeType("semua");
+              setRangeType("all");
               setTimeout(handleExport, 300);
             }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition hover:cursor-pointer"
           >
-            📅 <span className="font-medium">Semua Data</span>
+            📅 <span className="font-medium">All Data</span>
           </button>
           <button
             onClick={() => {
-              setRangeType("6bulan");
+              setRangeType("6months");
               setTimeout(handleExport, 300);
             }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 transition hover:cursor-pointer"
           >
-            ⏱️ <span className="font-medium">6 Bulan Terakhir</span>
+            ⏱️ <span className="font-medium">Last 6 Months</span>
           </button>
         </div>
       )}

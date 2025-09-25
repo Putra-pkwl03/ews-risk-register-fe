@@ -11,7 +11,7 @@ export default function FishboneModal({ isOpen, onClose, children }) {
         {/* Header */}
         <div className="flex justify-between items-center mb-6 border-b pb-3">
           <h2 className="text-xl font-semibold text-gray-800">
-            Pohon Keputusan
+            Tree Diagram
           </h2>
           <button
             onClick={onClose}

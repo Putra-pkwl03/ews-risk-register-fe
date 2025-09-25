@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Plus } from "lucide-react";
 import PenyebabSection from "./PenyebabSection";
 import RiskNoteModal from "./RiskNoteModal";
 
@@ -34,76 +35,69 @@ export default function RiskFormField({
       </h3>
 
       {showNoteModal && <RiskNoteModal onClose={handleCloseNoteModal} />}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block mb-2 font-semibold">Klaster</label>
+          <label className="block text-sm font-medium mb-1">Cluster</label>
           <select
-            name="klaster"
             value={formData.klaster}
-            onChange={handleChange}
-            className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) =>
+              handleChange({ target: { name: "klaster", value: e.target.value } })
+            }
+            className="w-full rounded-md border border-gray-300 px-3 py-2"
           >
-            <option value="">-- Pilih Klaster --</option>
-            {Object.keys(unitsByKlaster).map((klaster) => (
-              <option key={klaster} value={klaster}>
-                {klaster}
+            <option value="">-- Select Cluster --</option>
+            {Object.keys(unitsByKlaster).map((k) => (
+              <option key={k} value={k}>
+                {k}
               </option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block mb-2 font-semibold">Unit</label>
+          <label className="block text-sm font-medium mb-1">Unit</label>
           <select
-            name="unit"
             value={formData.unit}
-            onChange={handleChange}
-            disabled={!formData.klaster}
-            className="w-full rounded-md border border-gray-300 px-4 py-2 disabled:bg-gray-100"
+            onChange={(e) =>
+              handleChange({ target: { name: "unit", value: e.target.value } })
+            }
+            className="w-full rounded-md border border-gray-300 px-3 py-2"
           >
-            <option value="">-- Pilih Unit --</option>
-            {formData.klaster &&
-              unitsByKlaster[formData.klaster].map((unit) => (
-                <option key={unit} value={unit}>
-                  {unit}
-                </option>
-              ))}
+            <option value="">-- Select Unit --</option>
+            {(unitsByKlaster[formData.klaster] || []).map((u) => (
+              <option key={u} value={u}>
+                {u}
+              </option>
+            ))}
           </select>
         </div>
 
         <div>
-          <label className="block mb-2 font-semibold">Nama Risiko</label>
+          <label className="block text-sm font-medium mb-1">Risk Name</label>
           <input
+            type="text"
             name="namaRisiko"
             value={formData.namaRisiko}
             onChange={handleChange}
-            className="w-full rounded-md border border-gray-300 px-4 py-2"
+            className="w-full rounded-md border border-gray-300 px-3 py-2"
           />
         </div>
 
         <div>
-          <label className="block mb-2 font-semibold">Kategori</label>
-          <div className="flex items-center gap-2">
-            <select
-              name="kategori"
-              value={formData.kategori}
-              onChange={handleChange}
-              className="flex-grow rounded-md border border-gray-300 px-4 py-2"
-            >
-              <option value="">-- Pilih Kategori --</option>
-              {kategoriOptions.map((kat) => (
-                <option key={kat} value={kat}>
-                  {kat}
-                </option>
-              ))}
-            </select>
-            <img
-              src="/icons/question.png"
-              alt="info"
-              className="h-5 w-5 opacity-60 cursor-pointer"
-              onClick={handleOpenNoteModal}
-            />
-          </div>
+          <label className="block text-sm font-medium mb-1">Category</label>
+          <select
+            name="kategori"
+            value={formData.kategori}
+            onChange={handleChange}
+            className="w-full rounded-md border border-gray-300 px-3 py-2"
+          >
+            <option value="">-- Select Category --</option>
+            {kategoriOptions.map((k) => (
+              <option key={k} value={k}>
+                {k}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
@@ -141,15 +135,32 @@ export default function RiskFormField({
             className="w-full rounded-md border border-gray-300 px-4 py-2 resize-none"
           />
         </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Causes</label>
+          <div className="mt-2">
+            <button
+              type="button"
+              onClick={handleAddPenyebab}
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold"
+            >
+              <Plus size={18} />
+              Add Cause
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Penyebab Risiko dan Edit Modal langsung di dalamnya */}
-      <PenyebabSection
-        penyebabList={formData.penyebab}
-        onAdd={handleAddPenyebab}
-        onRemove={handleRemovePenyebab}
-        onUpdate={handleUpdatePenyebab} // gunakan fungsi update
-      />
+      {/* Note modal trigger */}
+      <div className="mt-4">
+        <button
+          type="button"
+          onClick={handleOpenNoteModal}
+          className="text-sm text-gray-600 underline"
+        >
+          View Risk Categories
+        </button>
+      </div>
 
       <div className="flex justify-end gap-4 mt-6">
         <button

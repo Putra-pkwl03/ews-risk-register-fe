@@ -65,14 +65,14 @@ export default function RiskStatusSummaryBox() {
     <div className={`w-full ${loading ? "animate-pulse opacity-70" : ""}`}>
       <h2 className="text-[16px] font-semibold text-gray-700 mb-2 flex items-center gap-2">
         <BookmarkSquareIcon className="w-5 h-5 text-yellow-500" />
-        Status Risiko 6 Bulan Terakhir
+        Risk Status in the Last 6 Months
       </h2>
 
       <div className="bg-white rounded-2xl p-4 w-full font-semibold min-h-[222px]">
         <div className="mb-4 font-semibold">
           {/* Total Risiko */}
           <StatusCard
-            title="Total Risiko"
+            title="Total Risks"
             value={totalLast6Months}
             color="bg-blue-100"
             textColor="text-black"
@@ -91,13 +91,13 @@ export default function RiskStatusSummaryBox() {
             textColor="text-yellow-600"
           />
           <StatusCard
-            title="Disetujui"
+            title="Approved"
             value={approvedCount}
             color="bg-green-100"
             textColor="text-green-600"
           />
           <StatusCard
-            title="Ditolak"
+            title="Rejected"
             value={rejectedCount}
             color="bg-red-100"
             textColor="text-red-600"
@@ -180,14 +180,14 @@ function RiskListModal({ show, onClose, pending, rejected, draft }) {
           X
         </button>
         <h2 className="text-lg font-bold mb-4 text-gray-800">
-          Detail Risiko 6 Bulan Terakhir
+          Risk Details for the Last 6 Months
         </h2>
 
         {/* Pending */}
         {pending.length > 0 && (
           <div className="mb-4">
             <h3 className="text-sm font-semibold text-yellow-600 mb-1">
-              Risiko Pending
+              Pending Risks
             </h3>
             <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
               {pending.map((risk) => (
@@ -203,7 +203,7 @@ function RiskListModal({ show, onClose, pending, rejected, draft }) {
         {rejected.length > 0 && (
           <div className="mb-4">
             <h3 className="text-sm font-semibold text-red-600 mb-1">
-              Risiko Ditolak
+              Rejected Risks
             </h3>
             <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
               {rejected.map((risk) => (
@@ -219,7 +219,7 @@ function RiskListModal({ show, onClose, pending, rejected, draft }) {
         {draft.length > 0 && (
           <div className="mb-2">
             <h3 className="text-sm font-semibold text-gray-600 mb-1">
-              Risiko Draft
+              Draft Risks
             </h3>
             <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
               {draft.map((risk) => (
@@ -236,7 +236,7 @@ function RiskListModal({ show, onClose, pending, rejected, draft }) {
           rejected.length === 0 &&
           draft.length === 0 && (
             <p className="text-sm text-gray-600">
-              Tidak ada data risiko tersedia.
+              No risk data available for the last 6 months.
             </p>
           )}
       </div>

@@ -9,11 +9,17 @@ import FishboneModal from "../diagram/FishboneModal";
 import FishboneChart from "../diagram/FishboneChart";
 
 const gradingColors = {
-  "sangat tinggi": "bg-red-800 text-white",
-  tinggi: "bg-red-500 text-white",
-  sedang: "bg-yellow-400 text-white",
-  rendah: "bg-green-700 text-white",
-  "sangat rendah": "bg-green-400 text-white",
+  "sangat tinggi": "bg-red-600 text-white",
+  tinggi: "bg-orange-500 text-white",
+  sedang: "bg-yellow-400 text-black",
+  rendah: "bg-blue-500 text-white",
+  "sangat rendah": "bg-green-500 text-white",
+  // English equivalents for backward compatibility
+  "very high": "bg-red-600 text-white",
+  high: "bg-orange-500 text-white",
+  medium: "bg-yellow-400 text-black",
+  low: "bg-blue-500 text-white",
+  "very low": "bg-green-500 text-white",
 };
 
 export default function DetailRiskMitigation() {
@@ -29,7 +35,7 @@ export default function DetailRiskMitigation() {
 
   useEffect(() => {
     if (!riskId) {
-      console.warn("riskId tidak ditemukan di URL");
+      console.warn("riskId not found in URL");
       return;
     }
 
@@ -39,14 +45,14 @@ export default function DetailRiskMitigation() {
     getCompleteRiskAnalysisById(riskId)
       .then((response) => {
         if (!response || !response.risk) {
-          setError("Data tidak ditemukan.");
+          setError("Data not found.");
           setData(null);
         } else {
           setData(response);
         }
       })
       .catch(() => {
-        setError("Terjadi kesalahan saat mengambil data.");
+        setError("An error occurred while fetching data.");
         setData(null);
       })
       .finally(() => setLoading(false));
@@ -62,7 +68,7 @@ export default function DetailRiskMitigation() {
     return (
       <div className="text-red-600 p-4 text-center font-semibold">{error}</div>
     );
-  if (!data) return <div className="p-4 text-center">Data tidak tersedia.</div>;
+  if (!data) return <div className="p-4 text-center">Data not available.</div>;
 
   const {
     severity,
@@ -91,27 +97,24 @@ export default function DetailRiskMitigation() {
       <button
         onClick={() => router.push("/dashboard?page=evaluasi-risiko")}
         className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 mb-6 cursor-pointer"
-        aria-label="Kembali"
+        aria-label="Back"
       >
         <ArrowLeftIcon className="h-5 w-5" />
       </button>
 
       <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
-        Detail Risiko & Mitigasi
+        Risk & Mitigation Details
       </h2>
 
       <div className="grid grid-cols-3 gap-4 text-sm text-gray-700 mb-8">
-        {/* Baris 1 */}
-        <DetailItem label="Nama Risiko" value={name} />
-        <DetailItem label="Klaster" value={cluster} />
+        <DetailItem label="Risk Name" value={name} />
+        <DetailItem label="Cluster" value={cluster} />
         <DetailItem label="Unit" value={unit} />
 
-        {/* Baris 2 */}
-        <DetailItem label="Kategori" value={category} />
-        <DetailItem label="Dampak" value={impact || "-"} />
+        <DetailItem label="Category" value={category} />
+        <DetailItem label="Impact" value={impact || "-"} />
         <DetailItem label="Severity" value={severity ?? "-"} />
 
-        {/* Baris 3 */}
         <DetailItem label="Probability" value={probability ?? "-"} />
         <DetailItem label="Score" value={score ?? "-"} />
         <DetailItem
@@ -125,34 +128,34 @@ export default function DetailRiskMitigation() {
           }
         />
 
-        {/* Baris 4 - Deskripsi full */}
-        <DetailItem label="Deskripsi" value={description || "-"} spanFull />
+        <DetailItem label="Description" value={description || "-"} spanFull />
       </div>
 
       {/* Risk Appetite section */}
       {risk_appetite && (
         <div className="mb-8">
-          <h3 className="font-semibold text-gray-800 mb-2">Selera Risiko</h3>
+          <h3 className="font-semibold text-gray-800 mb-2">Risk Appetite</h3>
           <div className="grid grid-cols-3 gap-4 text-sm text-gray-700">
             <DetailItem label="Scoring" value={risk_appetite.scoring} />
             <DetailItem label="Ranking" value={risk_appetite.ranking} />
-            <DetailItem label="Keputusan" value={risk_appetite.decision} />
+            <DetailItem label="Decision" value={risk_appetite.decision} />
           </div>
         </div>
       )}
 
+      {/* Causes Section */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-gray-800">Penyebab</h3>
+          <h3 className="font-semibold text-gray-800">Causes</h3>
           <button
             onClick={() => setShowFishbone(true)}
             className="text-md px-3 py-1  text-blue-500 hover:text-blue-700"
           >
-            Lihat Fishbone
+            View Fishbone
           </button>
         </div>
         {causes.length === 0 ? (
-          <p className="text-gray-500">Tidak ada penyebab yang tercatat.</p>
+          <p className="text-gray-500">No recorded causes.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {causes.map((cause) => (
@@ -162,7 +165,7 @@ export default function DetailRiskMitigation() {
               >
                 <div className="mb-2">
                   <strong className="text-[16px] font-semibold">
-                    Kategori:
+                    Category:
                   </strong>{" "}
                   <span className="capitalize text-[14px]">
                     {cause.category}
@@ -170,7 +173,7 @@ export default function DetailRiskMitigation() {
                 </div>
                 <div className="mb-2">
                   <strong className="text-[16px] font-semibold">
-                    Penyebab Utama:
+                    Main Cause:
                   </strong>{" "}
                   <span className="capitalize text-[14px]">
                     {cause.main_cause}
@@ -178,7 +181,7 @@ export default function DetailRiskMitigation() {
                 </div>
                 {cause.sub_causes && cause.sub_causes.length > 0 && (
                   <div className="ml-4 mt-3 text-[14px] text-gray-600 font-semibold">
-                    <strong>Sub Penyebab:</strong>
+                    <strong>Sub Causes:</strong>
                     <ul className="list-disc list-inside mt-1 space-y-1 text-[14px]">
                       {cause.sub_causes.map((sub) => (
                         <li key={sub.id}>{sub.sub_cause}</li>
@@ -192,13 +195,13 @@ export default function DetailRiskMitigation() {
         )}
       </div>
 
+      {/* Mitigations Section */}
       <div className="mb-6">
-        <h3 className="mb-2 font-semibold text-gray-800">Mitigasi</h3>
+        <h3 className="mb-2 font-semibold text-gray-800">Mitigations</h3>
         {mitigations.length === 0 ? (
-          <p className="text-gray-500">Tidak ada mitigasi yang tercatat.</p>
+          <p className="text-gray-500">No recorded mitigations.</p>
         ) : (
           <div className="space-y-4">
-            {/* Baris pertama: 2 card */}
             <div className="flex justify-center gap-4">
               {mitigations.slice(0, 2).map((m) => (
                 <div
@@ -209,7 +212,7 @@ export default function DetailRiskMitigation() {
                     <strong>Type:</strong> {m.mitigation_type}
                   </p>
                   <p>
-                    <strong>Penanggung Jawab:</strong> {m.pic?.name || "-"}
+                    <strong>Person in Charge:</strong> {m.pic?.name || "-"}
                   </p>
                   <p>
                     <strong>Deadline:</strong> {m.deadline || "-"}
@@ -233,7 +236,7 @@ export default function DetailRiskMitigation() {
                     <strong>Type:</strong> {mitigations[2].mitigation_type}
                   </p>
                   <p>
-                    <strong>Penanggung Jawab:</strong>{" "}
+                    <strong>Person in Charge:</strong>{" "}
                     {mitigations[2].pic?.name || "-"}
                   </p>
                   <p>
@@ -255,7 +258,7 @@ export default function DetailRiskMitigation() {
         onClick={() => router.push("/dashboard?page=evaluasi-risiko")}
         className="mt-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl w-full hover:cursor-pointer"
       >
-        Tutup Detail
+        Close Details
       </button>
 
       {/* {validations.length > 0 && (
@@ -273,10 +276,10 @@ export default function DetailRiskMitigation() {
                 <strong>Status:</strong>{" "}
                 {val.is_approved ? (
                   <span className="text-green-600 font-semibold">
-                    Disetujui
+                    Approved
                   </span>
                 ) : (
-                  <span className="text-red-600 font-semibold">Ditolak</span>
+                  <span className="text-red-600 font-semibold">Rejected</span>
                 )}
               </p>
               {val.notes && (

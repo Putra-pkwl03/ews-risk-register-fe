@@ -7,53 +7,37 @@ import PenyebabSection from "../../components/IdentifikasiRisk/PenyebabSection";
 
 const unitsByKlaster = {
   Management: [
-    "Ketatausahaan",
-    "Manajemen Sumber Daya",
-    "Manajemen Puskesmas",
-    "Manajemen Mutu dan Keselamatan",
-    "Manajemen Jejaring Puskesmas",
-    "Sistem Informasi Puskesmas",
-    "Dashboard PWS",
+    "Administration",
+    "Resource Management",
+    "Health Center Management",
+    "Quality & Safety Management",
+    "Networking Management",
+    "Health Information Systems",
+    "PWS Dashboard",
   ],
-  "Ibu & Anak": [
-    "Ibu Hamil Bersalin Nifas",
-    "Balita dan Anak Pra-sekolah",
-    "Anak Usia Sekolah dan remaja",
+  "Maternal & Child": [
+    "Pregnancy, Delivery, Postpartum",
+    "Infants and Preschool Children",
+    "School-age Children and Adolescents",
   ],
-  "Usia Dewasa & Lansia": ["Usia Dewasa", "Lanjut Usia"],
-  "Penanggulangan Penyakit Menular": ["Kesehatan Lingkungan", "Surveilans"],
-  "Lintas Kluster": [
-    "Kegawatdaruratan",
-    "Rawat Inap",
-    "Laboratorium",
-    "Kefarmasian",
-  ],
+  "Adults & Elderly": ["Adults", "Elderly"],
+  "Communicable Disease Control": ["Environmental Health", "Surveillance"],
+  "Cross Cluster": ["Emergency", "Inpatient", "Laboratory", "Pharmacy"],
 };
 
 const kategoriOptions = [
-  "Keuangan",
-  "Kebijakan",
-  "Kepatuhan",
+  "Finance",
+  "Policy",
+  "Compliance",
   "Legal",
   "Fraud",
-  "Reputasi",
-  "Operasional",
+  "Reputation",
+  "Operational",
 ];
 
-const kategoriPenyebab = [
-  "man",
-  "machine",
-  "material",
-  "method",
-  "environment",
-];
+const kategoriPenyebab = ["man", "machine", "material", "method", "environment"];
 
-export default function FormRisiko({
-  selectedRisk,
-  isEditMode,
-  onSave,
-  onCancel,
-}) {
+export default function FormRisk({ selectedRisk, isEditMode, onSave, onCancel }) {
   const [formData, setFormData] = useState({
     klaster: "",
     unit: "",
@@ -66,11 +50,7 @@ export default function FormRisiko({
   });
 
   const [showModal, setShowModal] = useState(false);
-  const [penyebabBaru, setPenyebabBaru] = useState({
-    kategori: "",
-    deskripsiUtama: "",
-    deskripsiSub: [""],
-  });
+  const [penyebabBaru, setPenyebabBaru] = useState({ kategori: "", deskripsiUtama: "", deskripsiSub: [""] });
   const [successOpen, setSuccessOpen] = useState(false);
   const [errorOpen, setErrorOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -128,7 +108,6 @@ export default function FormRisiko({
   };
 
   const handleAddPenyebab = () => {
-    setPenyebabBaru({ kategori: "", deskripsiUtama: "", deskripsiSub: [""] });
     setShowModal(true);
   };
 
@@ -137,84 +116,36 @@ export default function FormRisiko({
   };
 
   const handleSubChange = (index, val) => {
-    const updated = [...penyebabBaru.deskripsiSub];
-    updated[index] = val;
-    setPenyebabBaru((prev) => ({ ...prev, deskripsiSub: updated }));
+    const newSub = [...penyebabBaru.deskripsiSub];
+    newSub[index] = val;
+    setPenyebabBaru((prev) => ({ ...prev, deskripsiSub: newSub }));
   };
 
   const addSubDeskripsi = () => {
-    setPenyebabBaru((prev) => ({
-      ...prev,
-      deskripsiSub: [...prev.deskripsiSub, ""],
-    }));
+    setPenyebabBaru((prev) => ({ ...prev, deskripsiSub: [...prev.deskripsiSub, ""] }));
   };
 
   const hapusSubDeskripsi = (index) => {
-    setPenyebabBaru((prev) => ({
-      ...prev,
-      deskripsiSub: prev.deskripsiSub.filter((_, i) => i !== index),
-    }));
+    setPenyebabBaru((prev) => {
+      const newSub = [...prev.deskripsiSub];
+      newSub.splice(index, 1);
+      return { ...prev, deskripsiSub: newSub };
+    });
   };
 
   const savePenyebab = () => {
-    if (!penyebabBaru.kategori || !penyebabBaru.deskripsiUtama.trim()) {
-      setToastMessage("Kategori dan deskripsi penyebab utama wajib diisi.");
-      setErrorOpen(true);
-      return;
-    }
-
-    // langsung tambah penyebabBaru ke formData.penyebab
-    setFormData((prev) => ({
-      ...prev,
-      penyebab: [...prev.penyebab, penyebabBaru],
-    }));
-
+    if (!penyebabBaru.kategori || !penyebabBaru.deskripsiUtama) return;
+    setFormData((prev) => ({ ...prev, penyebab: [...prev.penyebab, penyebabBaru] }));
+    setPenyebabBaru({ kategori: "", deskripsiUtama: "", deskripsiSub: [""] });
     setShowModal(false);
-    setPenyebabBaru({ kategori: "", deskripsiUtama: "", deskripsiSub: [] });
   };
 
   const handleRemovePenyebab = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      penyebab: prev.penyebab.filter((_, i) => i !== index),
-    }));
+    const copy = [...formData.penyebab];
+    copy.splice(index, 1);
+    setFormData((prev) => ({ ...prev, penyebab: copy }));
   };
 
-  // const preparePayload = (data) => ({
-  //   cluster: data.klaster,
-  //   unit: data.unit,
-  //   name: data.namaRisiko,
-  //   category: data.kategori,
-  //   description: data.deskripsi,
-  //   impact: data.dampak,
-  //   uc_c: data.ucc === "",
-  //   causes: data.penyebab.map((p) => ({
-  //     category: p.kategori,
-  //     main_cause: p.deskripsiUtama,
-  //     sub_causes:
-  //       p.deskripsiSub && p.deskripsiSub.length > 0 ? p.deskripsiSub : null,
-  //   })),
-  // });
-
-  // const preparePayload = (data) => ({
-  //   cluster: data.klaster,
-  //   unit: data.unit,
-  //   name: data.namaRisiko,
-  //   category: data.kategori,
-  //   description: data.deskripsi,
-  //   impact: data.dampak,
-  //   uc_c: data.ucc === "",
-  //   causes: data.penyebab.map((p) => ({
-  //     category: p.kategori,
-  //     main_cause: p.deskripsiUtama,
-  //     sub_causes:
-  //       p.deskripsiSub && p.deskripsiSub.length > 0 ? p.deskripsiSub : null,
-  //   })),
-  // });
-
-  
-
-  // Fungsi untuk transform data formData ke payload backend
   function preparePayload(data) {
     return {
       cluster: data.klaster,
@@ -223,65 +154,33 @@ export default function FormRisiko({
       category: data.kategori,
       description: data.deskripsi,
       impact: data.dampak,
-      uc_c: data.ucc === "C" ? 1 : 0,
+      uc_c: data.ucc === "",
       causes: Array.isArray(data.penyebab)
         ? data.penyebab.map((p) => ({
             category: p.kategori,
             main_cause: p.deskripsiUtama,
-            sub_causes:
-              Array.isArray(p.deskripsiSub) && p.deskripsiSub.length > 0
-                ? p.deskripsiSub
-                : null, 
+            sub_causes: Array.isArray(p.deskripsiSub) && p.deskripsiSub.length > 0 ? p.deskripsiSub : null,
           }))
         : [],
     };
   }
-  
-  // function preparePayload(data) {
-  //   return {
-  //     cluster: data.klaster,
-  //     unit: data.unit,
-  //     name: data.namaRisiko,
-  //     category: data.kategori,
-  //     description: data.deskripsi,
-  //     impact: data.dampak,
-  //     uc_c: data.ucc === "",
-  //     causes: Array.isArray(data.penyebab)
-  //       ? data.penyebab.map((p) => ({
-  //           category: p.kategori,
-  //           main_cause: p.deskripsiUtama,
-  //           sub_causes:
-  //             Array.isArray(p.deskripsiSub) && p.deskripsiSub.length > 0
-  //               ? p.deskripsiSub
-  //               : null, 
-  //         }))
-  //       : [],
-  //   };
-  // }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isFormValid) {
-      setToastMessage("Harap lengkapi semua data risiko terlebih dahulu.");
+      setToastMessage("Please complete all required fields.");
       setErrorOpen(true);
       return;
     }
 
     setIsSaving(true);
-
     try {
       const payload = preparePayload(formData);
-      const saved = await onSave(payload, isEditMode ? selectedRisk?.id : null);
-      if (saved) {
-        setToastMessage("Data risiko berhasil disimpan.");
-        setSuccessOpen(true);
-        onCancel();
-      } else {
-        throw new Error();
-      }
+      await onSave(payload, selectedRisk?.id || null);
+      setToastMessage("Risk saved successfully.");
+      setSuccessOpen(true);
     } catch (err) {
-      console.error(err);
-      setToastMessage("Terjadi kesalahan saat menyimpan.");
+      setToastMessage(err.message || "Failed to save risk.");
       setErrorOpen(true);
     } finally {
       setIsSaving(false);

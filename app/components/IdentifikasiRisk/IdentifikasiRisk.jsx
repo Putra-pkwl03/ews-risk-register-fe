@@ -49,7 +49,7 @@ export default function IdentifikasiRisikoTable() {
         const risks = await RiskService.getAll();
         setData(risks);
       } catch (error) {
-        console.error("ERROR MENGAMBIL RISIKO:", error);
+        console.error("Failed to fetch data:", error);
       }
     };
 
@@ -120,13 +120,13 @@ export default function IdentifikasiRisikoTable() {
       setSelectedRisk(null);
       setIsEditMode(false);
 
-      setSuccessMessage("Data risiko berhasil disimpan.");
+      setSuccessMessage("Risk saved successfully.");
       setShowSuccess(true);
 
       return true;
     } catch (error) {
-      console.error("Gagal menyimpan data:", error);
-      setErrorMessage("Gagal menyimpan data risiko.");
+      console.error("Failed to save risk data:", error);
+      setErrorMessage("Failed to save risk data.");
       setShowError(true);
       return false;
     }
@@ -159,11 +159,11 @@ export default function IdentifikasiRisikoTable() {
       await RiskService.delete(selectedId);
       setData(data.filter((d) => d.id !== selectedId));
       setIsModalOpen(false);
-      setSuccessMessage("Risiko berhasil dihapus.");
+      setSuccessMessage("Risk deleted successfully.");
       setShowSuccess(true);
     } catch (error) {
-      console.error("Gagal menghapus data:", error);
-      setErrorMessage("Gagal menghapus risiko. Silakan coba lagi.");
+      console.error("Failed to delete risk:", error);
+      setErrorMessage("Failed to delete risk. Please try again.");
       setShowError(true);
     }
   };
@@ -256,7 +256,7 @@ export default function IdentifikasiRisikoTable() {
         <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
             <h5 className="text-[20px] text-black font-semibold">
-              Identifikasi Risiko
+              Risk Identification
             </h5>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               {/* Tombol Export */}
@@ -280,22 +280,18 @@ export default function IdentifikasiRisikoTable() {
 
               {/* Filter Cluster */}
               <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-                <span>Klaster:</span>
+                <span>Cluster:</span>
                 <select
                   value={filterByCluster}
                   onChange={handleClusterChange}
                   className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center hover:cursor-pointer appearance-none pr-6"
                 >
-                  <option value="">Semua</option>
+                  <option value="">All</option>
                   <option value="Management">Management</option>
-                  <option value="Ibu & Anak">Ibu & Anak</option>
-                  <option value="Usia Dewasa & Lansia">
-                    Usia Dewasa & Lansia
-                  </option>
-                  <option value="Penanggulangan Penyakit Menular">
-                    Penanggulangan Penyakit Menular
-                  </option>
-                  <option value="Lintas Kluster">Lintas Kluster</option>
+                  <option value="Maternal & Child">Maternal & Child</option>
+                  <option value="Adults & Elderly">Adults & Elderly</option>
+                  <option value="Communicable Disease Control">Communicable Disease Control</option>
+                  <option value="Cross Cluster">Cross Cluster</option>
                 </select>
                 <img
                   src="/icons/chevron-down.svg"
@@ -306,14 +302,14 @@ export default function IdentifikasiRisikoTable() {
 
               {/* Sorting */}
               <div className="flex justify-center items-center relative gap-1 text-sm text-gray-400">
-                <span>Urutkan:</span>
+                <span>Sort:</span>
                 <select
                   value={sortOrder}
                   onChange={handleSortChange}
                   className="text-center border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
                 >
-                  <option value="Newest">Terbaru</option>
-                  <option value="Oldest">Terlama</option>
+                  <option value="Newest">Newest</option>
+                  <option value="Oldest">Oldest</option>
                 </select>
                 <img
                   src="/icons/chevron-down.svg"

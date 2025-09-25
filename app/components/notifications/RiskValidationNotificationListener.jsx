@@ -59,7 +59,7 @@
 //       setNotifications((prev) => {
 //         const exists = prev.some((n) => n.id === notification.id);
 //         if (exists) {
-//           console.log("[NOTIF-VALIDATION] Duplikat, diabaikan:", notification.id);
+//           console.log("[NOTIF-VALIDATION] Duplicate, ignored:", notification.id);
 //           return prev;
 //         }
 //         const updated = [{ ...notification, isRead: false }, ...prev];
@@ -77,7 +77,7 @@
 //     };
 //   }, [userId, localStorageKey]);
 
-//   // Simpan dan hitung badge
+//   // Save and count badge
 //   useEffect(() => {
 //     if (!localStorageKey) return;
 //     localStorage.setItem(localStorageKey, JSON.stringify(notifications));
@@ -174,9 +174,9 @@ export default function RiskValidationNotificationListener({
       console.log("[NOTIF-VALIDATION] Diterima:", notification);
 
       // Filter berdasarkan role
-      if (notification.is_approved === false && role === "koordinator_mutu") {
+      if (notification.is_approved === false && role === "quality_coordinator") {
         console.log(
-          "[NOTIF-VALIDATION] Ditolak ? diabaikan oleh koordinator_mutu"
+          "[NOTIF-VALIDATION] Rejected notification ignored for quality_coordinator"
         );
         return;
       }
@@ -205,7 +205,7 @@ export default function RiskValidationNotificationListener({
     };
   }, [userId, localStorageKey, role]);
 
-  // Simpan notifikasi ke localStorage dan update badge
+  // Save notifications to localStorage and update badge
   useEffect(() => {
     if (!localStorageKey) return;
     localStorage.setItem(localStorageKey, JSON.stringify(notifications));

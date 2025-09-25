@@ -42,7 +42,7 @@ export default function Pnrisiko() {
   const [loadingId, setLoadingId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
-  const [filterEfektivitas, setFilterEfektivitas] = useState("All");
+  const [filterEffectiveness, setFilterEffectiveness] = useState("All");
   const [sortOrder, setSortOrder] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [errorToast, setErrorToast] = useState({ isOpen: false, message: "" });
@@ -64,11 +64,11 @@ export default function Pnrisiko() {
         field.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
-      const matchEfektivitas =
-        filterEfektivitas === "All" ||
-        item.effectiveness?.toLowerCase() === filterEfektivitas.toLowerCase();
+      const matchEffectiveness =
+        filterEffectiveness === "All" ||
+        item.effectiveness?.toLowerCase() === filterEffectiveness.toLowerCase();
 
-      return matchSearch && matchEfektivitas;
+  return matchSearch && matchEffectiveness;
     })
     .sort((a, b) => {
       if (sortOrder === "Ascending") {
@@ -88,7 +88,7 @@ export default function Pnrisiko() {
   );
 
   const [showModal, setShowModal] = useState(false);
-  const [detailMitigasi, setDetailMitigasi] = useState([]);
+  const [mitigationDetails, setMitigationDetails] = useState([]);
 
   // useEffect(() => {
   //   console.log(data)
@@ -100,9 +100,9 @@ export default function Pnrisiko() {
 
   useEffect(() => {
     fetchRiskHandlings()
-      .then((res) => {
-        setData(res.data);
-        console.log("? Data hasil fetchRiskHandlings:", res.data);
+        .then((res) => {
+          setData(res.data);
+          console.log("Fetched risk handlings:", res.data);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -116,8 +116,8 @@ export default function Pnrisiko() {
       />
     );
   }
-  const handleEfektivitasChange = (e) => {
-    setFilterEfektivitas(e.target.value);
+  const handleEffectivenessChange = (e) => {
+    setFilterEffectiveness(e.target.value);
   };
 
   const handleSortChange = (e) => {
@@ -125,52 +125,52 @@ export default function Pnrisiko() {
   };
 
   // INFO START LOGIC
-  const risikoBelumDitangani = data.filter((item) => {
+  const unaddressedRisks = data.filter((item) => {
     if (!item || !item.effectiveness || item.is_sent === 0) {
       return true;
     }
     return false;
   });
 
-  const totalRisiko = data.length;
-  const totalBelumDitangani = risikoBelumDitangani.length;
-  const persen = Math.round((totalBelumDitangani / totalRisiko) * 100);
+  const totalRisks = data.length;
+  const totalUnaddressed = unaddressedRisks.length;
+  const percent = Math.round((totalUnaddressed / Math.max(totalRisks, 1)) * 100);
 
   const today = new Date();
 
-  const mitigasiLewatDeadline = data.filter((item) => {
+  const mitigationsPastDeadline = data.filter((item) => {
     const risk = item.risk;
     if (!risk || !Array.isArray(risk.mitigations)) return false;
 
-    return risk.mitigations.some((mitigasi) => {
-      const deadline = new Date(mitigasi.deadline);
+    return risk.mitigations.some((mitigation) => {
+      const deadline = new Date(mitigation.deadline);
       return deadline < today;
     });
   });
-  const totalMitigasiTerlambat = mitigasiLewatDeadline.length;
+  const totalMitigationsLate = mitigationsPastDeadline.length;
   // INFO END
 
   const handleShowDetail = () => {
     const detail = [];
 
-    mitigasiLewatDeadline.forEach((item) => {
+    mitigationsPastDeadline.forEach((item) => {
       const risk = item.risk;
       if (!risk || !Array.isArray(risk.mitigations)) return;
 
-      risk.mitigations.forEach((mitigasi) => {
-        const deadline = new Date(mitigasi.deadline);
+      risk.mitigations.forEach((mitigation) => {
+        const deadline = new Date(mitigation.deadline);
         if (deadline < today) {
           detail.push({
             name: risk.name,
             unit: risk.unit,
             cluster: risk.cluster,
-            deadline: mitigasi.deadline,
+            deadline: mitigation.deadline,
           });
         }
       });
     });
 
-    setDetailMitigasi(detail);
+    setMitigationDetails(detail);
     setShowModal(true);
   };
 
@@ -178,7 +178,7 @@ export default function Pnrisiko() {
     <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <h5 className="text-[18px] sm:text-[20px] text-black font-semibold">
-          Penanganan Risiko
+          Risk Handling
         </h5>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -192,7 +192,7 @@ export default function Pnrisiko() {
               />
               <input
                 type="text"
-                placeholder="Cari risiko, unit, handled by, reviewer"
+                placeholder="Search risk, unit, handled by, reviewer"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="outline-none text-[12px] text-black w-full"
@@ -201,16 +201,16 @@ export default function Pnrisiko() {
 
             {/* FILTER */}
             <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-              <span>Efektivitas:</span>
+              <span>Effectiveness:</span>
               <select
-                value={filterEfektivitas}
-                onChange={(e) => setFilterEfektivitas(e.target.value)}
+                value={filterEffectiveness}
+                onChange={(e) => setFilterEffectiveness(e.target.value)}
                 className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center appearance-none focus:outline-none pr-6"
               >
-                <option value="All">Semua</option>
-                <option value="E">Efektif</option>
-                <option value="KE">Kurang Efektif</option>
-                <option value="TE">Tidak Efektif</option>
+                <option value="All">All</option>
+                <option value="E">Effective</option>
+                <option value="KE">Less Effective</option>
+                <option value="TE">Not Effective</option>
               </select>
               <img
                 src="/icons/chevron-down.svg"
@@ -221,14 +221,14 @@ export default function Pnrisiko() {
 
             {/* SORT */}
             <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-              <span>Urutkan:</span>
+              <span>Sort:</span>
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value)}
                 className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black text-center appearance-none focus:outline-none pr-6"
               >
-                <option value="Descending">Terbaru</option>
-                <option value="Ascending">Terlama</option>
+                <option value="Descending">Newest</option>
+                <option value="Ascending">Oldest</option>
               </select>
               <img
                 src="/icons/chevron-down.svg"
@@ -240,9 +240,9 @@ export default function Pnrisiko() {
             <button
               onClick={() => {
                 setSearchTerm("");
-                setFilterEfektivitas("All");
+                setFilterEffectiveness("All");
                 setSortOrder("Descending");
-                setCurrentPage(1); // ini penting
+                setCurrentPage(1); // this is important
               }}
               className="text-sm px-3 py-1 border border-red-500 rounded-md text-red-500 hover:bg-red-100 cursor-pointer"
             >
@@ -250,7 +250,7 @@ export default function Pnrisiko() {
             </button>
           </div>
 
-          {/* Tombol Add Efektivitas */}
+          {/* Add Effectiveness Button */}
           <button
             onClick={() => {
               const uniqueRisks = data
@@ -278,7 +278,7 @@ export default function Pnrisiko() {
                 d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            Add Efektivitas
+            Add Effectiveness
           </button>
         </div>
       </div>
@@ -286,36 +286,35 @@ export default function Pnrisiko() {
       {error && <p className="text-red-500">{error}</p>}
 
       {/* INFO START */}
-      {(totalBelumDitangani > 0 || totalMitigasiTerlambat > 0) && (
+  {(totalUnaddressed > 0 || totalMitigationsLate > 0) && (
         <div className="w-full flex flex-wrap gap-4 mb-4">
-          {totalBelumDitangani > 0 && (
+          {totalUnaddressed > 0 && (
             <div className="animate-pulse bg-red-50 text-red-700 px-3 py-2 rounded-lg shadow flex items-center justify-between w-full max-w-sm sm:max-w-xs">
               <div>
                 <strong className="block text-sm font-semibold">
-                  {totalBelumDitangani} Risiko Belum Ditangani
+                  {totalUnaddressed} Unaddressed Risks
                 </strong>
                 <span className="text-xs">
-                  Segera isi penanganan ({persen}% dari total)
+                  Please fill in handling ({percent}% of total)
                 </span>
               </div>
-              <span className="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded-full">
-                {persen}%
+                <span className="text-xs bg-red-100 text-red-600 font-bold px-2 py-1 rounded-full">
+                {percent}%
               </span>
             </div>
           )}
 
-          {totalMitigasiTerlambat > 0 && (
+          {totalMitigationsLate > 0 && (
             <button
               onClick={handleShowDetail}
               className="bg-yellow-50 text-yellow-800 px-3 py-2 rounded-lg shadow flex items-center justify-between w-full max-w-sm sm:max-w-xs hover:bg-yellow-200 transition cursor-pointer text-left"
             >
               <div>
                 <strong className="block text-sm font-semibold">
-                  {totalMitigasiTerlambat} Risiko yang Mitigasinya Lewat dari
-                  Deadline
+                  {totalMitigationsLate} Risks with Mitigations Past Deadline
                 </strong>
                 <p className="text-[11px] text-gray-400 italic">
-                  Klik untuk Detailnya
+                  Click for details
                 </p>
               </div>
               <span className="bg-yellow-100 text-yellow-700 font-bold p-1 rounded-full">
@@ -331,35 +330,17 @@ export default function Pnrisiko() {
         <table className="w-full text-sm sm:text-base shadow-gray-200 shadow-md ">
           <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
             <tr>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm">No</th>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm">
-                Risiko
-              </th>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm">Unit</th>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm">
-                Efektivitas
-              </th>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm">
-                Hambatan
-              </th>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm">
-                Signature
-              </th>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm">
-                Handled By
-              </th>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm">
-                Reviewer
-              </th>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm">
-                Catatan
-              </th>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm text-center">
-                Tanggal
-              </th>
-              <th className="p-2 whitespace-nowrap text-xs sm:text-sm text-center">
-                Aksi
-              </th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm">No</th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm">Risk</th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm">Unit</th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm">Effectiveness</th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm">Barriers</th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm">Signature</th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm">Handled By</th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm">Reviewer</th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm">Notes</th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm text-center">Date</th>
+                <th className="p-2 whitespace-nowrap text-xs sm:text-sm text-center">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -385,7 +366,7 @@ export default function Pnrisiko() {
                   colSpan={10}
                   className="text-center py-4 text-[12px] text-gray-500"
                 >
-                  Belum ada data penanganan risiko.
+                  No risk handling data available.
                 </td>
               </tr>
             ) : (
@@ -455,7 +436,7 @@ export default function Pnrisiko() {
                           }?${params.toString()}`;
                           window.history.pushState({}, "", newUrl);
                         }}
-                        title="Detail"
+                        title="Details"
                       >
                         <img
                           src="/icons/detail.svg"
@@ -534,7 +515,7 @@ export default function Pnrisiko() {
                           (item.is_sent && !item.review_notes) ||
                           loadingId === item.id
                         }
-                        title="Kirim ke Kepala Puskesmas"
+                        title="Send to Puskesmas Head"
                         className={`${
                           (item.is_sent && !item.review_notes) ||
                           loadingId === item.id
@@ -568,11 +549,11 @@ export default function Pnrisiko() {
           >
             <h3 className="text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
               <ExclamationTriangleIcon className="w-5 h-5 text-yellow-500" />
-              Mitigasi Lewat Deadline
+              Mitigations Past Deadline
             </h3>
 
             <ul className="space-y-3 max-h-60 overflow-y-auto pr-1">
-              {detailMitigasi.map((item, index) => (
+              {mitigationDetails.map((item, index) => (
                 <li
                   key={index}
                   className="text-sm text-gray-700 border-b pb-2 flex flex-col gap-1"
@@ -591,7 +572,7 @@ export default function Pnrisiko() {
             </ul>
 
             <p className="text-[11px] text-center text-gray-400 mt-4 italic">
-              Klik di luar area untuk menutup
+              Click outside to close
             </p>
           </div>
         </div>
@@ -609,13 +590,13 @@ export default function Pnrisiko() {
               await updateRiskHandling(editingItem.id, formData);
               setSuccessToast({
                 isOpen: true,
-                message: "Data berhasil diperbarui",
+                message: "Data successfully updated",
               });
             } else {
               await createRiskHandling(formData);
               setSuccessToast({
                 isOpen: true,
-                message: "Data berhasil ditambahkan",
+                message: "Data successfully added",
               });
             }
             const updated = await fetchRiskHandlings();
@@ -641,7 +622,7 @@ export default function Pnrisiko() {
             await sendToKepala(sendItemId);
             setSuccessToast({
               isOpen: true,
-              message: "Notifikasi berhasil dikirim ke kepala puskesmas.",
+              message: "Notification successfully sent to the Puskesmas head.",
             });
             const updated = await fetchRiskHandlings();
             setData(updated.data);
@@ -666,7 +647,7 @@ export default function Pnrisiko() {
             await deleteRiskHandling(deleteItemId);
             setSuccessToast({
               isOpen: true,
-              message: "Data berhasil dihapus.",
+              message: "Data successfully deleted.",
             });
             const updated = await fetchRiskHandlings();
             setData(updated.data);

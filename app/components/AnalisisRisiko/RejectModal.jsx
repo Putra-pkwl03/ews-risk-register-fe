@@ -15,13 +15,13 @@ export default function RejectModal({ isOpen, onClose, onSubmit }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center text-gray-900 justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-lg relative max-h-[80vh] overflow-y-auto">
-        <h3 className="text-lg font-semibold mb-3">Alasan Menolak Risiko</h3>
+  <h3 className="text-lg font-semibold mb-3">Reason for Rejecting Risk</h3>
         <textarea
           className="w-full border border-gray-300 rounded-md p-2 mb-4 resize-none"
           rows={4}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          placeholder="Masukkan alasan penolakan..."
+          placeholder="Enter the reason for rejection..."
         />
         <div className="flex justify-end space-x-3">
           <button
@@ -38,7 +38,7 @@ export default function RejectModal({ isOpen, onClose, onSubmit }) {
             onClick={handleSubmit}
             disabled={!reason.trim()}
           >
-            Kirim
+            Submit
           </button>
         </div>
       </div>

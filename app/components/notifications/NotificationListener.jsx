@@ -71,7 +71,7 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
     };
   }, [userId, localStorageKey]);
 
-  // Simpan dan update badge count
+  // Save and update badge count
   useEffect(() => {
     if (!localStorageKey) return;
     localStorage.setItem(localStorageKey, JSON.stringify(notifications));
@@ -81,7 +81,7 @@ export default function NotificationListener({ onCountUpdate, resetAt }) {
     }
   }, [notifications, onCountUpdate, localStorageKey]);
 
-  // Reset notifikasi (mark as read)
+  // Reset notifications (mark as read)
   useEffect(() => {
     if (!resetAt || !localStorageKey) return;
     setNotifications((prev) => {

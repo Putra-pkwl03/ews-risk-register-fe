@@ -9,15 +9,19 @@ import {
 import SuccessToast from "../modalconfirmasi/SuccessToast";
 import ErrorToast from "../modalconfirmasi/ErrorToast";
 
-// 🔸 Menentukan warna berdasarkan grading
+// Determine badge colors based on grading label
 const getGradingClass = (grading) => {
   switch (grading) {
-    case "Tinggi":
-      return "bg-red-100 text-red-700 border border-red-300";
-    case "Sedang":
-      return "bg-yellow-100 text-yellow-800 border border-yellow-300";
-    case "Rendah":
-      return "bg-green-100 text-green-800 border border-green-300";
+    case "Very High":
+      return "bg-red-600 text-white border border-red-600"; // merah
+    case "High":
+      return "bg-orange-500 text-white border border-orange-500"; // orange
+    case "Medium":
+      return "bg-yellow-400 text-black border border-yellow-400"; // kuning
+    case "Low":
+      return "bg-blue-500 text-white border border-blue-500"; // biru
+    case "Very Low":
+      return "bg-green-500 text-white border border-green-500"; // hijau
     default:
       return "bg-gray-100 text-gray-700";
   }
@@ -46,7 +50,7 @@ export default function FormAnalisis({
   const [errorMessage, setErrorMessage] = useState("");
   const [showError, setShowError] = useState(false);
 
-  // 🔸 Atur riskId dari parameter URL jika tidak ada dari props
+  // Set riskId from URL if not provided via props
   useEffect(() => {
     if (!riskId && riskIdFromQuery) {
       setRiskId(riskIdFromQuery);
@@ -61,7 +65,7 @@ export default function FormAnalisis({
     }
   };
 
-  // 🔸 Deteksi mode edit atau tambah
+  // Detect edit or add mode
   useEffect(() => {
     const isEditMode = !!(propId || (!propRiskId && idFromQuery));
     if (isEditMode) {
@@ -73,7 +77,7 @@ export default function FormAnalisis({
     }
   }, [propId, propRiskId, idFromQuery]);
 
-  // 🔸 Ambil data jika mode edit
+  // Fetch data in edit mode
   useEffect(() => {
     if (!riskAnalysisId) {
       setForm({
@@ -114,7 +118,7 @@ export default function FormAnalisis({
     };
   }, [riskAnalysisId, defaultSeverity, defaultProbability]);
 
-  // 🔸 Validasi input (1–5)
+  // Validate numeric inputs (1–5)
   const handleChange = (field, value) => {
     const intVal = parseInt(value);
     if (value === "" || (intVal >= 1 && intVal <= 5)) {
@@ -125,18 +129,20 @@ export default function FormAnalisis({
   const isValid =
     form.severity !== "" && form.probability !== "" && riskId.trim() !== "";
 
-  // 🔸 Hitung grading berdasarkan score
+  // Compute English grading based on score
   const getBandsRisiko = (skor) => {
-    if (skor >= 15) return "Tinggi";
-    if (skor >= 8) return "Sedang";
-    return "Rendah";
+    if (skor >= 20) return "Very High"; // red
+    if (skor >= 15) return "High"; // orange
+    if (skor >= 8) return "Medium"; // yellow
+    if (skor >= 4) return "Low"; // blue
+    return "Very Low"; // green
   };
 
-  // 🔸 Fungsi simpan (tambah atau edit)
+  // Save (create or update)
   const handleSave = useCallback(async () => {
-    console.log("handleSave dipanggil, form:", form, "riskId:", riskId);
+    console.log("handleSave called, form:", form, "riskId:", riskId);
     if (!isValid) {
-      alert("Isi semua data dengan benar dan pastikan Risk ID tersedia.");
+      alert("Fill in all fields correctly and ensure Risk ID is available.");
       return;
     }
 
@@ -165,11 +171,11 @@ export default function FormAnalisis({
       setTimeout(() => {
         setShowSuccess(false);
         if (onClose) onClose();
-        // Redirect ke halaman dashboard setelah toast hilang
+        // Redirect to dashboard after toast hides
         router.push("/dashboard?page=analisis-risiko");
       }, 2000);
     } catch (error) {
-      let message = "Data analisis risiko ini sudah ada";
+      let message = "This risk analysis data already exists";
       setErrorMessage(message);
       setShowError(true);
       setTimeout(() => {
@@ -180,7 +186,7 @@ export default function FormAnalisis({
     }
   }, [form, isValid, riskId, riskAnalysisId, onSave, onClose, router]);
 
-  // 🔸 Tombol batal
+  // Cancel button
   const handleCancel = useCallback(() => {
     if (onClose) {
       onClose();
@@ -201,7 +207,7 @@ export default function FormAnalisis({
       <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 w-full max-w-md relative max-h-[80vh] overflow-y-auto">
           <h4 className="text-lg font-bold mb-4 text-black">
-            {riskAnalysisId ? "Edit" : "Tambah"} Analisis Risiko
+            {riskAnalysisId ? "Edit" : "Add"} Risk Analysis
           </h4>
 
           <div className="mb-4 text-gray-800">
@@ -216,7 +222,7 @@ export default function FormAnalisis({
               value={form.severity}
               onChange={(e) => handleChange("severity", e.target.value)}
               className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Masukkan angka 1 sampai 5"
+              placeholder="Enter a number from 1 to 5"
             />
           </div>
 
@@ -232,7 +238,7 @@ export default function FormAnalisis({
               value={form.probability}
               onChange={(e) => handleChange("probability", e.target.value)}
               className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Masukkan angka 1 sampai 5"
+              placeholder="Enter a number from 1 to 5"
             />
           </div>
 
@@ -274,7 +280,7 @@ export default function FormAnalisis({
         </div>
       </div>
       {showSuccess && (
-        <SuccessToast message="Data analisis risiko berhasil disimpan!" />
+        <SuccessToast message="Risk analysis saved successfully!" />
       )}
       {showError && (
         <ErrorToast

@@ -48,7 +48,7 @@ export default function RiskControlScoringSummary() {
         });
       })
       .catch((err) => {
-        console.error("Gagal ambil data risk appetite:", err);
+        console.error("Failed to fetch risk appetite:", err);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -57,13 +57,13 @@ export default function RiskControlScoringSummary() {
     <div className={`w-full ${loading ? "animate-pulse" : ""}`}>
       <h2 className="text-[16px] font-semibold text-gray-700 mb-2 flex items-center gap-2">
         <BookmarkSlashIcon className="w-5 h-5 text-green-800" />
-        Ringkasan Kontrol & Skor
+        Control & Score Summary
       </h2>
 
       <div className="bg-white rounded-2xl  p-4 w-full font-semibold min-h-[220px]">
         <div className="mb-4 font-semibold">
           <MiniCard
-            title="Total Risiko"
+            title="Total Risks"
             value={summary.total}
             color="bg-blue-100"
             text="text-black"
@@ -74,7 +74,7 @@ export default function RiskControlScoringSummary() {
 
         <div className="grid grid-cols-2 gap-2 py-2">
           <MiniCard
-            title={`C Tertinggi (C=${summary.highestControl})`}
+            title={`Highest Controllability (C=${summary.highestControl})`}
             value={summary.highestControlCount}
             color="bg-green-100"
             text="text-green-600"
@@ -82,7 +82,7 @@ export default function RiskControlScoringSummary() {
             loading={loading}
           />
           <MiniCard
-            title={`C Terendah (C=${summary.lowestControl})`}
+            title={`Lowest Controllability (C=${summary.lowestControl})`}
             value={summary.lowestControlCount}
             color="bg-red-100"
             text="text-red-600"
@@ -106,7 +106,7 @@ export default function RiskControlScoringSummary() {
             loading={loading}
           />
           <MiniCard
-            title="Skoring Tertinggi"
+            title="Highest Scoring"
             value={summary.highestScoring}
             color="bg-orange-100"
             text="text-orange-600"

@@ -23,7 +23,7 @@ export default function VerticalBarChartByCluster() {
     getAllRiskAnalysisWithoutLimit()
       .then((res) => {
         const clusterCount = res.reduce((acc, curr) => {
-          const cluster = curr.risk?.cluster || "Tidak Diketahui";
+          const cluster = curr.risk?.cluster || "Unknown";
           acc[cluster] = (acc[cluster] || 0) + 1;
           return acc;
         }, {});
@@ -42,7 +42,7 @@ export default function VerticalBarChartByCluster() {
         setData(formatted);
       })
       .catch((err) => {
-        console.error("Gagal ambil data:", err.message);
+        console.error("Failed to fetch data:", err.message);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -55,15 +55,15 @@ export default function VerticalBarChartByCluster() {
       <div className="flex items-center gap-2 mb-2">
         <ChartBarIcon className="w-5 h-5 text-blue-600" />
         <h2 className="text-[16px] font-semibold text-gray-700">
-          Risiko per Klaster
+          Risks by Cluster
         </h2>
       </div>
 
       <div className="bg-white rounded-xl p-4 w-full h-[320px] transition-all">
         {/* Chart Container */}
-        {loading ? (
+          {loading ? (
           <div className="w-full h-full flex items-center justify-center">
-            <p className="text-sm text-gray-500">Memuat grafik cluster...</p>
+            <p className="text-sm text-gray-500">Loading cluster chart...</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
@@ -100,7 +100,7 @@ export default function VerticalBarChartByCluster() {
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Bar
                 dataKey="total"
-                name="Total Risiko"
+                name="Total Risks"
                 radius={[10, 10, 10, 10]}
                 barSize={14}
               >

@@ -1,6 +1,6 @@
 import api from "./api";
 
-// Simpan data analisis risiko (POST untuk create, PUT untuk update)
+// Save risk analysis data (POST for create, PUT for update)
 export async function saveRiskAnalysis(data) {
   try {
     if (data.id) {
@@ -16,41 +16,41 @@ export async function saveRiskAnalysis(data) {
       error.response?.data?.message ||
       error.response?.data?.error ||
       error.message ||
-      "Gagal menyimpan data analisis risiko";
+      "Failed to save risk analysis data";
 
     throw new Error(message);
   }
 }
 
-// Ambil semua data analisis risiko (GET)
+// Get all risk analysis data (GET)
 export async function getAllRiskAnalysis() {
   try {
     const response = await api.get("/risk-analysis");
     return response.data;
   } catch (error) {
-    throw new Error("Gagal mengambil data analisis risiko");
+    throw new Error("Failed to retrieve risk analysis data");
   }
 }
 
-// Ambil semua data analisis risiko tanpa batasan role
+// Get all risk analysis data without role restrictions
 export async function getAllRiskAnalysisWithoutLimit() {
   try {
     const response = await api.get("/risk-analysis/all");
     return response.data;
   } catch (error) {
-    throw new Error("Gagal mengambil semua data analisis risiko (tanpa batasan)");
+    throw new Error("Failed to retrieve all risk analysis data (without restrictions)");
   }
 }
 
 
-// Ambil data analisis risiko berdasarkan ID analisis
+// Get risk analysis data by analysis ID
 export async function fetchRiskAnalysisById(id) {
   try {
     const response = await api.get(`/risk-analysis/${id}`); 
     console.log(response.data);
     return response.data;
   } catch (error) {
-    throw new Error("Gagal mengambil data analisis risiko berdasarkan ID analisis");
+    throw new Error("Failed to retrieve risk analysis data by analysis ID");
   }
 }
 
@@ -65,7 +65,7 @@ export async function deleteRiskAnalysis(id) {
   }
 }
 
-// Kirim analisis risiko ke Koordinator Manajemen Risiko
+// Send risk analysis to Risk Management Coordinator
 export async function sendToMenris(id) {
   try {
     const response = await api.post(`/risk-analysis/${id}/send`);
@@ -75,7 +75,7 @@ export async function sendToMenris(id) {
     const message =
       error.response?.data?.message ||
       error.message ||
-      "Gagal mengirim data ke Koordinator Manajemen Risiko";
+      "Failed to send data to Risk Management Coordinator";
     throw new Error(message);
   }
 }
@@ -86,7 +86,10 @@ export async function getPendingAndApprovedRiskAnalysis() {
     const response = await api.get("/risk-analysis/pending-and-approved");
     return response.data;
   } catch (error) {
-    throw new Error("Gagal mengambil data analisis risiko pending dan approved");
+    const message =
+      error.response?.data?.message || error.response?.data?.error || error.message ||
+      "Failed to fetch pending and approved risk analysis";
+    throw new Error(message);
   }
 }
 

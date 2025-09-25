@@ -8,10 +8,10 @@ export async function fetchRiskHandlings() {
     return response.data;
   } catch (error) {
     const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Gagal mengambil data penanganan risiko";
+  error.response?.data?.message ||
+  error.response?.data?.error ||
+  error.message ||
+  "Failed to fetch risk handling data";
 
     throw new Error(message);
   }
@@ -24,10 +24,10 @@ export async function fetchRiskAppetites() {
     return response.data;
   } catch (error) {
     const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Gagal mengambil data risk appetite";
+  error.response?.data?.message ||
+  error.response?.data?.error ||
+  error.message ||
+  "Failed to fetch risk appetite data";
 
     throw new Error(message);
   }
@@ -40,10 +40,10 @@ export async function fetchRiskHandlingspublic() {
     return response.data;
   } catch (error) {
     const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Gagal mengambil data penanganan risiko";
+  error.response?.data?.message ||
+  error.response?.data?.error ||
+  error.message ||
+  "Failed to fetch risk handling data";
 
     throw new Error(message);
   }
@@ -55,10 +55,10 @@ export async function createRiskHandling(data) {
     return response.data;
   } catch (error) {
     const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Gagal menambahkan data penanganan risiko";
+  error.response?.data?.message ||
+  error.response?.data?.error ||
+  error.message ||
+  "Failed to add risk handling data";
 
     throw new Error(message);
   }
@@ -70,10 +70,10 @@ export async function sendToKepala(id) {
     return response.data;
   } catch (error) {
     const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Gagal mengirim notifikasi ke kepala puskesmas";
+  error.response?.data?.message ||
+  error.response?.data?.error ||
+  error.message ||
+  "Failed to send notification to Health Center Head";
 
     throw new Error(message);
   }
@@ -85,10 +85,10 @@ export async function updateRiskHandling(id, data) {
     return response.data;
   } catch (error) {
     const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Gagal mengupdate data penanganan risiko";
+  error.response?.data?.message ||
+  error.response?.data?.error ||
+  error.message ||
+  "Failed to update risk handling data";
 
     throw new Error(message);
   }
@@ -100,10 +100,10 @@ export async function deleteRiskHandling(id) {
     return response.data;
   } catch (error) {
     const message =
-      error.response?.data?.message ||
-      error.response?.data?.error ||
-      error.message ||
-      "Gagal menghapus data penanganan risiko";
+  error.response?.data?.message ||
+  error.response?.data?.error ||
+  error.message ||
+  "Failed to delete risk handling data";
 
     throw new Error(message);
   }

@@ -1,6 +1,6 @@
 import api from "./api";
 
-// Simpan mitigasi risiko (create new mitigation)
+// Save risk mitigation (create new mitigation)
 export async function saveRiskMitigation(data) {
   try {
     const response = await api.post("/risk-mitigations", data);
@@ -10,7 +10,7 @@ export async function saveRiskMitigation(data) {
       error.response?.data?.message ||
       error.response?.data?.error ||
       error.message ||
-      "Gagal menyimpan mitigasi risiko";
+      "Failed to save risk mitigation";
 
     throw new Error(message);
   }
@@ -24,7 +24,7 @@ export async function getAllRiskMitigations() {
     const message =
       error.response?.data?.message ||
       error.message ||
-      "Gagal mengambil data mitigasi risiko";
+      "Failed to retrieve risk mitigation data";
 
     throw new Error(message);
   }
@@ -39,13 +39,13 @@ export async function getMitigationsByRiskId(riskId) {
     const message =
       error.response?.data?.message ||
       error.message ||
-      "Gagal mengambil mitigasi risiko";
+      "Failed to retrieve risk mitigation";
     throw new Error(message);
   }
 }
 
 
-// Update mitigasi risiko by id
+// Update risk mitigation by id
 export async function updateRiskMitigation(id, data) {
   try {
     const response = await api.put(`/risk-mitigations/${id}`, data);
@@ -54,13 +54,13 @@ export async function updateRiskMitigation(id, data) {
     const message =
       error.response?.data?.message ||
       error.message ||
-      "Gagal memperbarui mitigasi risiko";
+      "Failed to update risk mitigation";
     throw new Error(message);
   }
 }
 
 
-// Ambil data lengkap risk beserta analisisnya by analysis ID
+// Get complete risk data along with its analysis by analysis ID
 export async function getCompleteRiskAnalysisById(riskId) {
   try {
     const response = await api.get(`/risk-analysis/by-risk/${riskId}/complete`);
@@ -69,12 +69,12 @@ export async function getCompleteRiskAnalysisById(riskId) {
     const message =
       error.response?.data?.message ||
       error.message ||
-      "Gagal mengambil data analisis risiko lengkap";
+      "Failed to retrieve complete risk analysis data";
     throw new Error(message);
   }
 }
 
-// Hapus mitigasi risiko by id
+// Delete risk mitigation by id
 export async function deleteRiskMitigation(id) {
   try {
     const response = await api.delete(`/risk-mitigations/${id}`);

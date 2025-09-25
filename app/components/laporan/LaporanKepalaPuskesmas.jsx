@@ -86,9 +86,7 @@ export default function LaporanKepalaPuskesmas() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-4">
-          Laporan Risiko
-        </h1>
+        <h1 className="text-2xl font-semibold text-gray-800 mb-4">Risk Report</h1>
 
         <div className="flex flex-wrap gap-2 items-center">
           {/* Search Input */}
@@ -110,32 +108,9 @@ export default function LaporanKepalaPuskesmas() {
             />
           </div>
 
-          {/* Filter Efektivitas */}
-          {/* <div className="relative inline-flex items-center gap-1 text-sm text-black">
-            <span>Efektivitas:</span>
-            <select
-              value={filterEfektivitas}
-              onChange={(e) => {
-                setFilterEfektivitas(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black appearance-none pr-6"
-            >
-              <option value="All">Semua</option>
-              <option value="E">Efektif</option>
-              <option value="KE">Kurang Efektif</option>
-              <option value="TE">Tidak Efektif</option>
-            </select>
-            <img
-              src="/icons/chevron-down.svg"
-              alt="Filter Icon"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 pointer-events-none"
-            />
-          </div> */}
-
-          {/* Sort by Tanggal */}
+          {/* Sort by Date */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Sort Tanggal:</span>
+            <span className="text-sm text-gray-600">Sort Date:</span>
             <select
               value={sortByDateDesc ? "Desc" : "Asc"}
               onChange={(e) => {
@@ -144,8 +119,8 @@ export default function LaporanKepalaPuskesmas() {
               }}
               className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black"
             >
-              <option value="Desc">Terbaru</option>
-              <option value="Asc">Terlama</option>
+              <option value="Desc">Newest</option>
+              <option value="Asc">Oldest</option>
             </select>
           </div>
 
@@ -159,7 +134,7 @@ export default function LaporanKepalaPuskesmas() {
             }}
             className="text-sm px-3 py-2 border border-red-500 rounded-md text-red-500 hover:bg-red-100"
           >
-            Reset
+            Reset Filter
           </button>
 
           <DownloadPDFDropdown onDownload={handleDownload} />
@@ -167,66 +142,64 @@ export default function LaporanKepalaPuskesmas() {
       </div>
 
       {error ? (
-        <p className="text-red-500">Gagal memuat data: {error}</p>
+        <p className="text-red-500">Failed to load data: {error}</p>
       ) : sortedData.length === 0 && !loading ? (
-        <p className="text-gray-500">Tidak ada laporan yang disetujui.</p>
+        <p className="text-gray-500">No approved reports found.</p>
       ) : (
         <div className="overflow-x-auto max-h-[75vh] shadow-md rounded mt-4">
           <table className="w-full text-sm text-left bg-white rounded">
             <thead className="bg-gray-100 text-[#5932EA] border-b">
               <tr>
                 <th className="p-2 text-center">No</th>
-                <th className="py-2">Klaster</th>
+                <th className="py-2">Cluster</th>
                 <th className="py-2">Unit</th>
-                <th className="py-2">Nama Risiko</th>
-                <th className="py-2">Kategori</th>
+                <th className="py-2">Risk Name</th>
+                <th className="py-2">Category</th>
                 <th className="p-2 whitespace-nowrap text-center">Signature</th>
                 <th className="p-2">Handled By</th>
-                <th className="py-2 text-center">Tanggal</th>
+                <th className="py-2 text-center">Date</th>
               </tr>
             </thead>
             <tbody>
-              {loading
-                ? [...Array(5)].map((_, i) => (
-                    <tr key={i} className="animate-pulse bg-gray-50">
-                      {[...Array(8)].map((_, j) => (
-                        <td key={j} className="p-2 text-center">
-                          <div className="h-4 bg-gray-200 rounded w-4/5 mx-auto" />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                : paginatedData.map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className={`text-[12px] text-[#292D32] border-b border-gray-200 ${
-                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                      }`}
-                    >
-                      <td className="py-2 text-center">
-                        {startIndex + index + 1}
+              {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse bg-gray-50">
+                    {Array.from({ length: 8 }).map((_, j) => (
+                      <td key={j} className="p-2 text-center">
+                        <div className="h-4 bg-gray-200 rounded w-4/5 mx-auto" />
                       </td>
-                      <td className="py-2">{item.risk?.cluster || "-"}</td>
-                      <td className="py-2">{item.risk?.unit || "-"}</td>
-                      <td className="py-2">{item.risk?.name || "-"}</td>
-                      <td className="py-2">{item.risk?.category || "-"}</td>
-                      <td className="p-2 text-center">
-                        {item.approval_signature ? (
-                          <img
-                            src={item.approval_signature}
-                            alt="Signature"
-                            className="h-4 object-contain mx-auto"
-                          />
-                        ) : (
-                          "-"
-                        )}
-                      </td>
-                      <td className="p-2">{item.handler?.name || "-"}</td>
-                      <td className="py-2 text-center">
-                        {item.created_at?.split("T")[0] || "-"}
-                      </td>
-                    </tr>
-                  ))}
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                paginatedData.map((item, index) => (
+                  <tr
+                    key={item.id}
+                    className={`text-[12px] text-[#292D32] border-b border-gray-200 ${
+                      index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                    }`}
+                  >
+                    <td className="py-2 text-center">{startIndex + index + 1}</td>
+                    <td className="py-2">{item.risk?.cluster || "-"}</td>
+                    <td className="py-2">{item.risk?.unit || "-"}</td>
+                    <td className="py-2">{item.risk?.name || "-"}</td>
+                    <td className="py-2">{item.risk?.category || "-"}</td>
+                    <td className="p-2 text-center">
+                      {item.approval_signature ? (
+                        <img
+                          src={item.approval_signature}
+                          alt="Signature"
+                          className="h-4 object-contain mx-auto"
+                        />
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td className="p-2">{item.handler?.name || "-"}</td>
+                    <td className="py-2 text-center">{item.created_at?.split("T")[0] || "-"}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
 

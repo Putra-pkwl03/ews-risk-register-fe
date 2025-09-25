@@ -166,8 +166,8 @@ export default function Sidebar({
               />
               {isOpen && <span className="text-sm">Dashboard</span>}
             </motion.li>
-            {/* Identifikasi Risiko */}
-            {role === "koordinator_unit" && (
+            {/* Risk Identification */}
+            {role === "unit_coordinator" && (
               <motion.li
                 variants={itemVariants}
                 onClick={() => {
@@ -190,11 +190,11 @@ export default function Sidebar({
                       : "text-[#9197B3]"
                   }`}
                 />
-                {isOpen && <span className="text-sm">Identifikasi Risiko</span>}
+                {isOpen && <span className="text-sm">Risk Identification</span>}
               </motion.li>
             )}
-            {/* Analisis Risiko untuk Koordinator Unit */}
-            {role === "koordinator_unit" && (
+            {/* Risk Analysis for Unit Coordinator */}
+            {role === "unit_coordinator" && (
               <motion.li
                 variants={itemVariants}
                 onClick={() => {
@@ -218,7 +218,7 @@ export default function Sidebar({
                     page === "analisis-risiko" ? "text-white" : "text-[#9197B3]"
                   }`}
                 />
-                {isOpen && <span className="text-sm">Analisis Risiko</span>}
+                {isOpen && <span className="text-sm">Risk Analysis</span>}
 
                 {notifCountValidation > 0 && (
                   <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
@@ -228,8 +228,8 @@ export default function Sidebar({
               </motion.li>
             )}
 
-            {/* Menu Analisis Risiko untuk Koordinator Menris (tidak berubah) */}
-            {role === "koordinator_menris" && (
+            {/* Risk Analysis Menu for Risk Management Coordinator (unchanged) */}
+            {role === "risk_management_coordinator" && (
               <motion.li
                 variants={itemVariants}
                 onClick={() => {
@@ -255,7 +255,7 @@ export default function Sidebar({
                       : "text-[#9197B3]"
                   }`}
                 />
-                {isOpen && <span className="text-sm">Analisis Risiko</span>}
+                {isOpen && <span className="text-sm">Risk Analysis</span>}
 
                 {notifCountMenris > 0 && (
                   <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
@@ -265,8 +265,8 @@ export default function Sidebar({
               </motion.li>
             )}
 
-            {/* Penanganan Risiko - Khusus Koordinator Mutu */}
-            {role === "koordinator_mutu" && (
+            {/* Risk Management - Specifically for Quality Coordinator */}
+            {role === "quality_coordinator" && (
               <>
                 <motion.li
                   variants={itemVariants}
@@ -293,7 +293,7 @@ export default function Sidebar({
                         : "text-[#9197B3]"
                     }`}
                   />
-                  {isOpen && <span className="text-sm">Analisis Risiko</span>}
+                  {isOpen && <span className="text-sm">Risk Analysis</span>}
                   {notifCountValidation > 0 && (
                     <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
                       {notifCountValidation}
@@ -301,7 +301,7 @@ export default function Sidebar({
                   )}
                 </motion.li>
 
-                {/* Menu baru Evaluasi Risiko tanpa notif */}
+                {/* New Risk Evaluation menu without notifications */}
                 <motion.li
                   variants={itemVariants}
                   onClick={() => handleNavigate("evaluasi-risiko")}
@@ -322,12 +322,12 @@ export default function Sidebar({
                         : "text-[#9197B3]"
                     }`}
                   />
-                  {isOpen && <span className="text-sm">Evaluasi Risiko</span>}
+                  {isOpen && <span className="text-sm">Risk Evaluation</span>}
                 </motion.li>
               </>
             )}
-            {/* Menu Penanganan Risiko - Koordinator Mutu & Koordinator Unit */}
-            {["koordinator_mutu", "koordinator_unit"].includes(role) && (
+            {/* Risk Management Menu - Quality Coordinator & Unit Coordinator */}
+            {["quality_coordinator", "unit_coordinator"].includes(role) && (
               <motion.li
                 variants={itemVariants}
                 onClick={() => {
@@ -353,7 +353,7 @@ export default function Sidebar({
                       : "text-[#9197B3]"
                   }`}
                 />
-                {isOpen && <span className="text-sm">Penanganan Risiko</span>}
+                {isOpen && <span className="text-sm">Risk Management</span>}
 
                 {notifCountReview > 0 && (
                   <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
@@ -362,8 +362,8 @@ export default function Sidebar({
                 )}
               </motion.li>
             )}
-            {/* Kepala Puskesmas */}
-            {role === "kepala_puskesmas" && (
+            {/* Health Center Head */}
+            {role === "health_center_head" && (
               <>
                 {console.log(
                   "[DEBUG Sidebar] notifCountHandling:",
@@ -372,7 +372,7 @@ export default function Sidebar({
                 {console.log("[DEBUG Sidebar] role:", role)}
                 {console.log("[DEBUG Sidebar] page:", page)}
 
-                {/* Menu Manajemen Risiko */}
+                {/* Risk Management Menu */}
                 <motion.li
                   variants={itemVariants}
                   onClick={() => {
@@ -398,7 +398,7 @@ export default function Sidebar({
                         : "text-[#9197B3]"
                     }`}
                   />
-                  {isOpen && <span className="text-sm">Manajemen Risiko</span>}
+                  {isOpen && <span className="text-sm">Risk Management</span>}
 
                   {notifCountHandling > 0 && (
                     <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
@@ -429,14 +429,17 @@ export default function Sidebar({
                       : "text-[#9197B3]"
                   }`}
                 />
-                {isOpen && <span className="text-sm">Download Laporan</span>}
+                {isOpen && <span className="text-sm">Download Report</span>}
               </motion.li>
             )} */}
             
 
+            {/*
+              The following block was a role-specific menu for "kepala_puskesmas" (Health Center Head).
+              Kept commented out but translated labels for future reference.
+            */}
             {/* {role === "kepala_puskesmas" && (
   <>
-   
     {console.log(
       "[DEBUG Sidebar] notifCountHandling:",
       notifCountHandling
@@ -467,7 +470,7 @@ export default function Sidebar({
           page === "manajemen-risiko" ? "text-white" : "text-[#9197B3]"
         }`}
       />
-      {isOpen && <span className="text-sm">Manajemen Risiko</span>}
+      {isOpen && <span className="text-sm">Risk Management</span>}
       {notifCountHandling > 0 && (
         <span className="ml-auto inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full w-5 h-5">
           {notifCountHandling}
@@ -494,7 +497,7 @@ export default function Sidebar({
           page === "laporan" ? "text-white" : "text-[#9197B3]"
         }`}
       />
-      {isOpen && <span className="text-sm">Laporan</span>}
+      {isOpen && <span className="text-sm">Report</span>}
     </motion.li>
   </>
 )} */}
@@ -522,7 +525,7 @@ export default function Sidebar({
             )}
 
               <>
-              {/* Menu Laporan bisa diakses semua role */}
+              {/* Report menu accessible to all roles */}
               <motion.li
                 variants={itemVariants}
                 onClick={() => handleNavigate("laporan")}
@@ -541,7 +544,7 @@ export default function Sidebar({
                     page === "laporan" ? "text-white" : "text-[#9197B3]"
                   }`}
                 />
-                {isOpen && <span className="text-sm">Laporan</span>}
+                {isOpen && <span className="text-sm">Report</span>}
               </motion.li>
             </>
           </ul>

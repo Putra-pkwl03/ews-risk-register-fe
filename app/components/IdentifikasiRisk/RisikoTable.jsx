@@ -44,15 +44,15 @@ export default function RisikoTable({
       <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
         <tr>
           <th className="p-2">No</th>
-          <th className="p-2">Klaster</th>
+          <th className="p-2">Cluster</th>
           <th className="p-2">Unit</th>
-          <th className="p-2">Nama Risiko</th>
-          <th className="p-2">Kategori</th>
-          <th className="p-2">Deskripsi</th>
-          <th className="p-2">Penyebab</th>
-          <th className="p-2">Dampak</th>
+          <th className="p-2">Risk Name</th>
+          <th className="p-2">Category</th>
+          <th className="p-2">Description</th>
+          <th className="p-2">Causes</th>
+          <th className="p-2">Impact</th>
           <th className="p-2 text-center">UC/C</th>
-          <th className="p-2 text-center">Aksi</th>
+          <th className="p-2 text-center">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -65,7 +65,7 @@ export default function RisikoTable({
         ) : displayedData.length === 0 ? (
           <tr>
             <td colSpan={10} className="text-center py-4 text-gray-400">
-              Tidak ada data ditemukan.
+              No data found.
             </td>
           </tr>
         ) : (

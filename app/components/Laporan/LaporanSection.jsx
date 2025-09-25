@@ -5,7 +5,7 @@ import { ArrowDownTrayIcon, CalendarDaysIcon } from "@heroicons/react/24/solid";
 import { downloadExcel } from "../../utils/laporanUtils";
 
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString("id-ID", {
+  return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -59,7 +59,7 @@ const LaporanSection = ({ title, data, filename }) => (
         ))}
       </div>
     ) : (
-      <div className="text-gray-500 italic">Tidak ada data</div>
+      <div className="text-gray-500 italic">No data</div>
     )}
   </section>
 );

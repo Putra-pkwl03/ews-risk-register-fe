@@ -4,7 +4,7 @@ const api = axios.create({
   baseURL: 'http://localhost:8000/api',
 });
 
-// Interceptor untuk menyisipkan token ke setiap request
+// Interceptor to inject token into every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -13,13 +13,13 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor untuk menangani token expired
+// Interceptor to handle token expiration
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Cek jika token expired dan belum dicoba refresh
+    // Check if token expired and not yet tried to refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 

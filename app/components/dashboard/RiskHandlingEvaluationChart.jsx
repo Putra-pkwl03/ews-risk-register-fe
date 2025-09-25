@@ -16,9 +16,9 @@ import { fetchRiskHandlingspublic } from "../../lib/pnrisiko";
 import { ChartBarSquareIcon } from "@heroicons/react/24/outline";
 
 const barColors = {
-  Efektif: "#16A34A",
-  "Kurang Efektif": "#FACC15",
-  "Tidak Efektif": "#DC2626",
+  Effective: "#16A34A",
+  "Less Effective": "#FACC15",
+  Ineffective: "#DC2626",
 };
 
 export default function RiskHandlingEvaluationChart() {
@@ -43,16 +43,16 @@ export default function RiskHandlingEvaluationChart() {
         });
 
         const hasilBarChart = [
-          { name: "Efektif", value: efektif },
-          { name: "Kurang Efektif", value: kurangEfektif },
-          { name: "Tidak Efektif", value: tidakEfektif },
+          { name: "Effective", value: efektif },
+          { name: "Less Effective", value: kurangEfektif },
+          { name: "Ineffective", value: tidakEfektif },
         ];
 
         setTotalRisks(data.length);
         setBarChartData(hasilBarChart);
       })
       .catch((err) => {
-        console.error("Gagal ambil data evaluasi:", err.message);
+        console.error("Failed to fetch evaluation data:", err.message);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -63,7 +63,7 @@ export default function RiskHandlingEvaluationChart() {
       <div className="flex items-center gap-2 mb-2">
         <ChartBarSquareIcon className="w-5 h-5 text-indigo-500" />
         <h2 className="text-[16px] font-semibold text-gray-700">
-          Evaluasi Penanganan Risiko
+          Risk Handling Evaluation
         </h2>
       </div>
 
@@ -79,7 +79,7 @@ export default function RiskHandlingEvaluationChart() {
         <div className="mt-2 h-[180px]">
           {loading ? (
             <div className="w-full h-full flex items-center justify-center">
-              <p className="text-sm text-gray-500">Memuat grafik evaluasi...</p>
+              <p className="text-sm text-gray-500">Loading evaluation chart...</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">

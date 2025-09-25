@@ -41,7 +41,7 @@ export default function AddMitigation() {
     );
   };
 
-  const allTypes = ["regulasi", "sdm", "sarana_prasarana"];
+  const allTypes = ["regulasi", "sdm", "sarana_prasarana"]; // keep backend keys
 
   const addMitigation = () => {
     if (mitigations.length >= 3) return;
@@ -103,7 +103,7 @@ export default function AddMitigation() {
         m.descriptions.length === 0 ||
         m.descriptions.some((desc) => !desc.trim())
       ) {
-        setError("Semua field wajib diisi dan deskripsi tidak boleh kosong.");
+        setError("All fields are required and descriptions cannot be empty.");
         return;
       }
     }
@@ -120,13 +120,13 @@ export default function AddMitigation() {
         });
       }
 
-      setToastMessage("Mitigasi risiko berhasil disimpan.");
+      setToastMessage("Risk mitigations saved successfully.");
       setShowSuccess(true);
       setTimeout(() => {
         router.push("/dashboard?page=evaluasi-risiko");
       }, 1500);
     } catch (err) {
-      setToastMessage(err.message || "Terjadi kesalahan saat menyimpan data.");
+      setToastMessage(err.message || "An error occurred while saving data.");
       setShowError(true);
     } finally {
       setLoading(false);
@@ -158,18 +158,15 @@ export default function AddMitigation() {
         onClose={() => setShowError(false)}
       />
       <div className="relative mb-5">
-        {/* Tombol back di kiri atas */}
         <button
           onClick={() => router.push("/dashboard?page=evaluasi-risiko")}
           className="absolute top-0 left-0 flex items-center space-x-2 text-gray-700 hover:text-gray-900 hover:cursor-pointer p-4"
-          aria-label="Kembali"
+          aria-label="Back"
         >
           <ArrowLeftIcon className="h-5 w-5 hover:text-blue-500" />
         </button>
-
-        {/* Judul di tengah, agak ke bawah */}
         <div className="flex justify-center pt-8">
-          <h3 className="text-xl font-semibold text-black">Mitigasi Risiko</h3>
+          <h3 className="text-xl font-semibold text-black">Risk Mitigation</h3>
         </div>
       </div>
 
@@ -187,13 +184,13 @@ export default function AddMitigation() {
                   type="button"
                   onClick={() => removeMitigation(mIdx)}
                   className="absolute top-0 right-0 text-red-600 hover:text-red-800 text-xl cursor-pointer"
-                  title="Hapus Mitigasi"
+                  title="Remove Mitigation"
                 >
                   <X size={18} />
                 </button>
               )}
               <div className="mb-2">
-                <label className="block font-semibold">Tipe Mitigasi</label>
+                <label className="block font-semibold">Mitigation Type</label>
                 <select
                   value={m.mitigation_type}
                   onChange={(e) =>
@@ -201,7 +198,7 @@ export default function AddMitigation() {
                   }
                   className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:cursor-pointer"
                 >
-                  <option value="">-- Pilih Tipe --</option>
+                  <option value="">-- Select Type --</option>
                   {allTypes
                     .filter((type) => {
                       const used = mitigations.map(
@@ -212,16 +209,16 @@ export default function AddMitigation() {
                     .map((type) => (
                       <option key={type} value={type}>
                         {type === "regulasi"
-                          ? "Regulasi"
+                          ? "Regulation"
                           : type === "sdm"
-                          ? "SDM"
-                          : "Sarana Prasarana"}
+                          ? "Human Resources"
+                          : "Infrastructure"}
                       </option>
                     ))}
                 </select>
               </div>
               <div className="mb-2">
-                <label className="block font-semibold">Penanggung Jawab</label>
+                <label className="block font-semibold">Person in Charge (PIC)</label>
                 <select
                   value={m.pic_id}
                   onChange={(e) =>
@@ -229,13 +226,25 @@ export default function AddMitigation() {
                   }
                   className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:cursor-pointer"
                 >
-                  <option value="">-- Pilih PIC --</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.name} (
-                      {u.role.charAt(0).toUpperCase() + u.role.slice(1)})
-                    </option>
-                  ))}
+                  <option value="">-- Select PIC --</option>
+                  {users.map((u) => {
+                    let roleLabel =
+                      u.role.toLowerCase() === "risk_management_coordinator"
+                        ? "Risk Management Coordinator"
+                        : u.role
+                            .replace(/_/g, " ")
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ");
+                    return (
+                      <option key={u.id} value={u.id}>
+                        {u.name} ({roleLabel})
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
               <div className="mb-2">
@@ -250,7 +259,7 @@ export default function AddMitigation() {
                 />
               </div>
               <div>
-                <label className="block font-semibold">Deskripsi</label>
+                <label className="block font-semibold">Descriptions</label>
                 {m.descriptions.map((desc, dIdx) => (
                   <div key={dIdx} className="flex gap-2 items-start mb-2">
                     <textarea
@@ -258,7 +267,7 @@ export default function AddMitigation() {
                       onChange={(e) =>
                         updateDescription(mIdx, dIdx, e.target.value)
                       }
-                      placeholder={`Deskripsi ${dIdx + 1}`}
+                      placeholder={`Description ${dIdx + 1}`}
                       className="w-full rounded-md border border-gray-300 px-6 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                     />
                     {dIdx > 0 && (
@@ -314,7 +323,7 @@ export default function AddMitigation() {
             disabled={!isAllMitigationsFilled() || loading}
             className="w-full text-blue-600 border-blue-500 hover:bg-blue-100 hover:cursor-pointer py-2 text-md rounded-lg border transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Menyimpan..." : "Save Mitigations"}
+            {loading ? "Saving..." : "Save Mitigations"}
           </button>
         </div>
       </form>
