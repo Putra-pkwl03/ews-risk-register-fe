@@ -50,7 +50,7 @@ export default function RiskSummaryBox() {
         Risk Summary
       </h2>
 
-      <div className="bg-gradient-to-r from-[#5932EA] to-gray-300 rounded-2xl  p-4 w-full min-h-[220px]">
+      <div className="bg-[#5e7de4] to-slate-300  shadow rounded-xl transition-all duration-300 ease-in-out hover:shadow-md hover:scale-[1.02] hover:-translate-y-1 p-4 w-full min-h-[220px]">
         <div className="flex flex-col gap-3">
           <SummaryCard
             title="Total Risks"

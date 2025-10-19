@@ -60,8 +60,8 @@ export default function RiskControlScoringSummary() {
         Control & Score Summary
       </h2>
 
-      <div className="bg-white rounded-2xl  p-4 w-full font-semibold min-h-[220px]">
-        <div className="mb-4 font-semibold">
+      <div className="bg-white shadow rounded-xl transition-all duration-300 ease-in-out hover:shadow-md hover:scale-[1.02] hover:-translate-y-1  p-4 w-full font-semibold min-h-[220px]">
+        <div className="mb-2 font-semibold">
           <MiniCard
             title="Total Risks"
             value={summary.total}

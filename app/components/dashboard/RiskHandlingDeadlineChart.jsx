@@ -90,7 +90,7 @@ export default function RiskHandlingDeadlineChart() {
         </h2>
       </div>
 
-      <div className="bg-white rounded-xl  p-5 w-full max-w-2xl mx-auto transition-all">
+      <div className="bg-white shadow rounded-xl transition-all duration-300 ease-in-out hover:shadow-md hover:scale-[1.02] hover:-translate-y-1  p-5 w-full  mx-auto">
         <div className="text-sm text-right space-y-1">
           <div className="text-gray-500">
             Deadline within 3 days: {" "}
