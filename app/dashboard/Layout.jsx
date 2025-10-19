@@ -25,15 +25,15 @@ export default function Layout({ children, role }) {
   const [resetAtMenris, setResetAtMenris] = useState(null);
 
   return (
-    <div className="bg-white min-h-screen flex">
-      {role === "koordinator_menris" && (
+    <div className="bg-[#f8f8f8] min-h-screen flex">
+      {role === "risk_management_coordinator" && (
         <NotificationListener
           onCountUpdate={setNotifCountMenris}
           resetAt={resetAtMenris}
         />
       )}
 
-      {["koordinator_unit", "koordinator_mutu"].includes(role) && (
+      {["unit_coordinator", "quality_coordinator"].includes(role) && (
         <>
           <RiskValidationNotificationListener
             onCountUpdate={setNotifCountValidation}
@@ -46,7 +46,7 @@ export default function Layout({ children, role }) {
         </>
       )}
 
-      {role === "kepala_puskesmas" && (
+      {role === "health_center_head" && (
         <RiskHandlingNotificationListener
           onCountUpdate={setNotifCountHandling}
           resetAt={resetAtHandling}
@@ -57,7 +57,7 @@ export default function Layout({ children, role }) {
         isOpen={isSidebarOpen}
         toggle={toggleSidebar}
         role={role}
-        // Kirim masing-masing notifCount dan handler-nya
+  // Pass each notifCount and its handler
         notifCountMenris={notifCountMenris}
         onResetNotifMenris={() => {
           setResetAtMenris(Date.now());

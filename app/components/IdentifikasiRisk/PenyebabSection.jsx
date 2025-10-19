@@ -65,13 +65,13 @@ export default function PenyebabSection({
   return (
     <div className="mt-6">
       <div className="flex justify-between items-center mb-3">
-        <h4 className="text-xl font-semibold">Penyebab Risiko</h4>
+        <h4 className="text-xl font-semibold">Causes</h4>
         {!isEditMode && (
           <button
             type="button"
             onClick={onAdd}
             className="flex items-center gap-2 text-blue-600 hover:text-blue-800 font-semibold hover:cursor-pointer"
-            aria-label="Tambah penyebab risiko"
+            aria-label="Add cause"
           >
             <Plus size={20} />
             Add Causes
@@ -80,7 +80,7 @@ export default function PenyebabSection({
       </div>
 
       {penyebabList.length === 0 && (
-        <p className="text-gray-500 italic">Belum ada penyebab ditambahkan.</p>
+        <p className="text-gray-500 italic">No causes added yet.</p>
       )}
 
       {penyebabList.map((p, idx) => (
@@ -92,28 +92,28 @@ export default function PenyebabSection({
             <button
               onClick={() => handleEdit(idx)}
               className="w-[40px] h-[40px] bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center justify-center hover:cursor-pointer"
-              aria-label={`Edit penyebab ${p.kategori}`}
+              aria-label={`Edit cause ${p.kategori}`}
             >
               <Pencil size={18} />
             </button>
             <button
               onClick={() => onRemove(idx)}
               className="w-[40px] h-[40px] bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center justify-center hover:cursor-pointer"
-              aria-label={`Hapus penyebab ${p.kategori}`}
+              aria-label={`Remove cause ${p.kategori}`}
             >
               <X size={18} />
             </button>
           </div>
 
           <h5 className="font-semibold capitalize">{p.kategori || "-"}</h5>
-          <p className="mt-1 mb-1 font-semibold">Deskripsi Utama:</p>
+          <p className="mt-1 mb-1 font-semibold">Main Description:</p>
           <p className="text-gray-700 whitespace-pre-line">
             {p.deskripsiUtama || "-"}
           </p>
 
           {p.deskripsiSub && p.deskripsiSub.length > 0 && (
             <>
-              <p className="mt-2 font-semibold">Deskripsi Sub:</p>
+              <p className="mt-2 font-semibold">Sub Descriptions:</p>
               <div className="space-y-2">
                 {p.deskripsiSub.map((sub, i) => (
                   <div key={i} className="flex gap-2 items-start">

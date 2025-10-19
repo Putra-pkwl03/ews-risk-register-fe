@@ -17,11 +17,10 @@ export default function ConfirmDeleteModal({ isOpen, onClose, onConfirm }) {
 
         {/* Content */}
         <h2 className="text-md font-semibold mb-2 text-center text-gray-800">
-          Hapus Data?
+          Delete data?
         </h2>
         <p className="text-sm text-center text-gray-600 mb-6">
-          Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat
-          dipulihkan
+          Are you sure you want to delete this data? This action cannot be undone.
         </p>
 
         {/* Buttons */}
@@ -30,7 +29,7 @@ export default function ConfirmDeleteModal({ isOpen, onClose, onConfirm }) {
             onClick={onConfirm}
             className="px-4 py-2 text-sm rounded-lg bg-red-600 text-white hover:bg-red-700 transition hover:cursor-pointer"
           >
-            Hapus
+            Delete
           </button>
         </div>
       </div>

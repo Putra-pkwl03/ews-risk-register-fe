@@ -58,13 +58,13 @@ export default function Dashboard() {
       <div className="flex items-center justify-center h-screen w-screen bg-white">
         <div className="flex flex-col items-center gap-4 animate-pulse">
           <div className="w-10 h-10 border-4 border-blue-500 border-dashed rounded-full animate-spin" />
-          <p className="text-gray-700 text-sm">Memuat data pengguna...</p>
+          <p className="text-gray-700 text-sm">Loading user data...</p>
         </div>
       </div>
     );
   }
 
-  // Parsing page untuk evaluasi-risiko
+  // Parse page for evaluasi-risiko
   if (page.startsWith("evaluasi-risiko")) {
     const parts = page.split("/");
 
@@ -128,7 +128,7 @@ export default function Dashboard() {
     }
   }
 
-  // Mapping halaman utama lainnya
+  // Map other main pages
   return (
     <Layout
       notifCount={notifCount}

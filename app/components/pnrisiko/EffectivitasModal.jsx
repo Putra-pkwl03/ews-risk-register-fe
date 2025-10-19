@@ -29,27 +29,40 @@ export default function AddEffectivenessModal({
             );
 
         setRisks(filteredRisks || []);
-      } catch (err) {
-        console.error("Gagal memuat daftar risiko:", err);
+        } catch (err) {
+        console.error("Failed to load risk list:", err);
       }
     };
 
     fetchRisks();
   }, [isOpen, editingItem]);
 
+  // Fill form when editing, reset when adding new
   useEffect(() => {
     if (editingItem) {
       setRiskId(editingItem.risk_id);
       setEffectiveness(editingItem.effectiveness);
-      setBarrier(editingItem.barrier || ""); // Tambahan ini
+      setBarrier(editingItem.barrier || "");
     } else {
       setRiskId("");
       setEffectiveness("TE");
-      setBarrier(""); // Reset saat tambah baru
+      setBarrier("");
     }
   }, [editingItem]);
 
+  // Reset form when add-new modal opens
+  useEffect(() => {
+    if (isOpen && !editingItem) {
+      setRiskId("");
+      setEffectiveness("TE");
+      setBarrier("");
+    }
+  }, [isOpen, editingItem]);
+
   if (!isOpen) return null;
+
+  const isBarrierRequired =
+    (effectiveness === "TE" || effectiveness === "KE") && barrier.trim() === "";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,12 +78,12 @@ export default function AddEffectivenessModal({
     <div className="fixed inset-0 bg-black/40 flex items-center text-gray-900 justify-center z-50">
       <div className="bg-white rounded p-6 w-full max-w-md">
         <h2 className="text-lg font-semibold mb-4">
-          {editingItem ? "Edit Efektivitas" : "Tambah Efektivitas"}
+          {editingItem ? "Edit Effectiveness" : "Add Effectiveness"}
         </h2>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block mb-1 text-sm font-medium">Risiko</label>
+            <label className="block mb-1 text-sm font-medium">Risk</label>
             <select
               value={riskId}
               onChange={(e) => setRiskId(e.target.value)}
@@ -79,7 +92,7 @@ export default function AddEffectivenessModal({
               disabled={!!editingItem}
             >
               <option value="" disabled>
-                Pilih Risiko
+                Select Risk
               </option>
               {risks.map((risk) => (
                 <option key={risk.id} value={risk.id}>
@@ -91,7 +104,7 @@ export default function AddEffectivenessModal({
 
           <div className="mb-4">
             <label className="block mb-1 text-sm font-medium">
-              Efektivitas
+              Effectiveness
             </label>
             <select
               value={effectiveness}
@@ -99,21 +112,32 @@ export default function AddEffectivenessModal({
               className="w-full border rounded px-3 py-2 hover:cursor-pointer"
               required
             >
-              <option value="TE">Tidak Efektif</option>
-              <option value="KE">Kurang Efektif</option>
-              <option value="E">Efektif</option>
+              <option value="TE">Not Effective</option>
+              <option value="KE">Less Effective</option>
+              <option value="E">Effective</option>
             </select>
           </div>
-          <div className="mb-4">
-            <label className="block mb-1 text-sm font-medium">Hambatan</label>
-            <textarea
-              value={barrier}
-              onChange={(e) => setBarrier(e.target.value)}
-              className="w-full border rounded px-3 py-2 resize-none"
-              rows={3}
-              placeholder="Masukkan hambatan jika ada"
-            />
-          </div>
+
+          {effectiveness !== "E" && (
+            <div className="mb-4">
+              <label className="block mb-1 text-sm font-medium">Barrier</label>
+              <textarea
+                value={barrier}
+                onChange={(e) => setBarrier(e.target.value)}
+                className={`w-full border rounded px-3 py-2 resize-none ${
+                  isBarrierRequired ? "border-red-500" : ""
+                }`}
+                rows={3}
+                placeholder="Enter barrier if any"
+              />
+              {isBarrierRequired && (
+                <p className="text-red-500 text-xs mt-1">
+                  Barrier is required for Not Effective or Less Effective results.
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="flex justify-end space-x-2">
             <button
               type="button"
@@ -124,10 +148,10 @@ export default function AddEffectivenessModal({
             </button>
             <button
               type="submit"
-              disabled={loading}
-              className="w-[90px] h-[42px] text-sm border rounded-lg transition duration-300 ease-in-out flex items-center justify-center text-blue-600 border-blue-500 hover:bg-blue-100 hover:text-blue-700 hover:cursor-pointer"
+              disabled={loading || isBarrierRequired}
+              className="w-[90px] h-[42px] text-sm border rounded-lg transition duration-300 ease-in-out flex items-center justify-center text-blue-600 border-blue-500 hover:bg-blue-100 hover:text-blue-700 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Menyimpan..." : "Save"}
+              {loading ? "Saving..." : "Save"}
             </button>
           </div>
         </form>

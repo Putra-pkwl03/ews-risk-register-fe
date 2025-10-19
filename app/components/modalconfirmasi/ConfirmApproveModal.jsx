@@ -15,11 +15,10 @@ export default function ConfirmApproveModal({ isOpen, onClose, onConfirm }) {
         </button>
 
         <h2 className="text-md font-semibold mb-2 text-center text-gray-800">
-          Setujui Risiko Ini?
+          Approve this risk?
         </h2>
         <p className="text-sm text-center text-gray-600 mb-6">
-          Apakah Anda yakin ingin menyetujui dan mengirim risiko ini ke
-          Koordinator Manajemen Mutu?
+          Are you sure you want to approve and send this risk to the Quality Management Coordinator?
         </p>
 
         <div className="flex justify-center w-full gap-2">
@@ -27,7 +26,7 @@ export default function ConfirmApproveModal({ isOpen, onClose, onConfirm }) {
             onClick={onConfirm}
             className="px-4 py-2 text-sm rounded-lg bg-green-600 text-white hover:bg-green-700 transition hover:cursor-pointer"
           >
-            Setujui
+            Approve
           </button>
         </div>
       </div>

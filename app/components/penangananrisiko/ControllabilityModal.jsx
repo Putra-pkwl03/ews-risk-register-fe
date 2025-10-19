@@ -11,7 +11,7 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [decision, setDecision] = useState("");
-  // ✅ Tambahkan validasi sederhana
+  // ✅ simple validation
   const isFormValid = [1, 2, 3, 4].includes(controllability) && decision !== "";
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
@@ -33,7 +33,7 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
 
   const handleSubmit = async () => {
     if (!isFormValid) {
-      setError("Isi semua field dengan benar.");
+      setError("Please fill out all fields correctly.");
       return;
     }
 
@@ -55,7 +55,7 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
         await saveRiskAppetite(payload);
       }
 
-      setToastMessage("Kontrolabilitas berhasil disimpan.");
+  setToastMessage("Controllability saved successfully.");
       setShowSuccess(true);
 
       setTimeout(() => {
@@ -69,7 +69,7 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
         });
       }, 1000);
     } catch (err) {
-      const message = err.response?.data?.message || "Gagal menyimpan";
+      const message = err.response?.data?.message || "Failed to save";
       setToastMessage(message);
       setShowError(true);
       console.error(err);
@@ -85,13 +85,13 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
         className="bg-white text-[#292D32] rounded-lg shadow-lg max-w-md w-full p-6 relative"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-lg font-semibold mb-4">Kontrolabilitas Risiko</h2>
+  <h2 className="text-lg font-semibold mb-4">Risk Controllability</h2>
 
         <label
           htmlFor="controllability"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Nilai Kontrolabilitas (1-4)
+          Controllability Value (1-4)
         </label>
         <input
           id="controllability"
@@ -114,7 +114,7 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
           htmlFor="decision"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Keputusan
+    Decision
         </label>
         <select
           id="decision"
@@ -122,12 +122,12 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
           onChange={(e) => setDecision(e.target.value)}
           className="border border-gray-300 rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 hover:cursor-pointer"
         >
-          <option value="">-- Pilih Keputusan --</option>
+          <option value="">-- Select Decision --</option>
           <option value="accepted">Accepted</option>
           <option value="mitigated">Mitigated</option>
         </select>
 
-        {error && <p className="text-red-600 text-sm mb-3 ">{error}</p>}
+  {error && <p className="text-red-600 text-sm mb-3 ">{error}</p>}
 
         <div className="flex justify-end gap-2">
           <button
@@ -146,7 +146,7 @@ export default function ControlabilityModal({ isOpen, onClose, risk }) {
             }`}
             disabled={loading || !isFormValid}
           >
-            {loading ? "Menyimpan..." : "Simpan"}
+            {loading ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

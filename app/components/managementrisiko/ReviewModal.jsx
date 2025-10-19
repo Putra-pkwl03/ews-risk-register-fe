@@ -46,7 +46,7 @@ export default function ReviewModal({ isOpen, onClose, item }) {
 
       setSuccessToast({
         isOpen: true,
-        message: "Berhasil menindaklanjuti risiko.",
+        message: "Risk handling saved successfully.",
       });
 
       setTimeout(() => {
@@ -57,7 +57,7 @@ export default function ReviewModal({ isOpen, onClose, item }) {
     } catch (err) {
       setErrorToast({
         isOpen: true,
-        message: err.message || "Gagal menyimpan.",
+        message: err.message || "Failed to save.",
       });
     } finally {
       setLoading(false);
@@ -82,10 +82,10 @@ export default function ReviewModal({ isOpen, onClose, item }) {
       <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
         <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
           <h2 className="text-lg font-semibold mb-4 text-black">
-            Tindak Lanjut Risiko
+            Risk Review
           </h2>
           <p className="mb-2 text-sm text-gray-600">
-            Risiko: {item?.risk?.name}
+            Risk: {item?.risk?.name}
           </p>
 
           <select
@@ -93,15 +93,15 @@ export default function ReviewModal({ isOpen, onClose, item }) {
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
-            <option value="">-- Pilih --</option>
-            <option value="true">Setuju</option>
-            <option value="false">Tidak Setuju</option>
+            <option value="">-- Select --</option>
+            <option value="true">Approve</option>
+            <option value="false">Reject</option>
           </select>
 
           {status === "true" && (
             <div className="mb-4">
               <label className="block text-sm mb-2 text-black">
-                Tanda Tangan (gambar)
+                Signature (image)
               </label>
               <SignaturePad
                 ref={sigPadRef}
@@ -112,18 +112,18 @@ export default function ReviewModal({ isOpen, onClose, item }) {
                 className="mt-2 text-blue-600 text-sm hover:cursor-pointer"
                 onClick={() => sigPadRef.current.clear()}
               >
-                Hapus Tanda Tangan
+                Clear Signature
               </button>
             </div>
           )}
 
           {status === "false" && (
             <div className="mb-4">
-              <label className="block text-sm mb-2 text-black">Catatan</label>
+              <label className="block text-sm mb-2 text-black">Notes</label>
               <textarea
                 className="w-full border rounded px-3 py-2 text-gray-500"
                 rows={3}
-                placeholder="Masukkan alasan tidak menyetujui"
+                placeholder="Enter reason for rejection"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
               ></textarea>
@@ -146,7 +146,7 @@ export default function ReviewModal({ isOpen, onClose, item }) {
                   : "text-blue-600 border-blue-500 hover:bg-blue-100 hover:text-blue-700 hover:cursor-pointer"
               }`}
             >
-              {loading ? "Menyimpan..." : "Save"}
+              {loading ? "Saving..." : "Save"}
             </button>
           </div>
         </div>

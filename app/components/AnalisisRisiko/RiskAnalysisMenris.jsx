@@ -36,7 +36,7 @@ export default function RiskActionMenris() {
       const res = await getPendingAndApprovedRiskAnalysis();
       setDataRisiko(res);
     } catch (error) {
-      console.error("Gagal mengambil data:", error);
+  console.error("Failed to fetch data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -47,6 +47,21 @@ export default function RiskActionMenris() {
     pending: "/icons/pending.svg",
     validated_approved: "/icons/approved.svg",
     validated_rejected: "/icons/rejected.svg",
+  };
+
+  // Map normalized grading keys to English display labels
+  const gradingLabelMap = {
+    "very high": "Very High",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "very low": "Very Low",
+    // include Indonesian keys to ensure mapping works if gradingKey is Indonesian
+    "sangat tinggi": "Very High",
+    "tinggi": "High",
+    "sedang": "Medium",
+    "rendah": "Low",
+    "sangat rendah": "Very Low",
   };
 
   useEffect(() => {
@@ -60,25 +75,25 @@ export default function RiskActionMenris() {
         is_approved: true,
         notes: null,
       });
-      setSuccessMessage("Risiko berhasil divalidasi dan disetujui.");
+  setSuccessMessage("Risk successfully validated and approved.");
       setShowSuccessToast(true);
       setShowApproveModal(false);
       setSelectedRiskId(null);
       fetchData();
     } catch (error) {
-      console.error("Gagal memvalidasi risiko:", error);
+  console.error("Failed to validate risk:", error);
       setErrorMessage("Terjadi kesalahan saat menyetujui.");
       setShowErrorToast(true);
     }
   };
 
-  // Saat klik tolak, buka modal dan simpan id risiko yang ditolak
+  // When clicking reject, open modal and store the rejected risk id
   const handleRejectClick = (id) => {
     setRejectId(id);
     setRejectModalOpen(true);
   };
 
-  // Kirim alasan penolakan
+  // Submit rejection reason
   const handleRejectSubmit = async (reason) => {
     if (!rejectId) return;
     try {
@@ -87,14 +102,14 @@ export default function RiskActionMenris() {
         notes: reason,
       });
 
-      setSuccessMessage(`Risiko ditolak dengan alasan: ${reason}`);
+  setSuccessMessage(`Risk rejected with reason: ${reason}`);
       setShowSuccessToast(true);
 
       setRejectModalOpen(false);
       setRejectId(null);
       fetchData();
     } catch (error) {
-      console.error("Gagal menolak risiko:", error);
+  console.error("Failed to reject risk:", error);
       setErrorMessage("Terjadi kesalahan saat menolak.");
       setShowErrorToast(true);
     }
@@ -134,7 +149,7 @@ export default function RiskActionMenris() {
     <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
         <h5 className="text-[20px] text-black font-semibold">
-          Daftar Risiko Analisis
+          Risk Analysis List
         </h5>
         <div className="flex flex-col sm:flex-row sm:flex-wrap items-center gap-4">
           <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white min-w-[200px]">
@@ -153,13 +168,13 @@ export default function RiskActionMenris() {
           </div>
 
           <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-            <span>Status :</span>
+            <span>Status:</span>
             <select
               value={kategoriFilter}
               onChange={(e) => setKategoriFilter(e.target.value)}
               className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
             >
-              <option value="All">Semua</option>
+              <option value="All">All</option>
               <option value="draft">Draft</option>
               <option value="pending">Pending</option>
               <option value="validated_approved">Approved</option>
@@ -174,7 +189,7 @@ export default function RiskActionMenris() {
           </div>
 
           <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-            <span>Urutkan Skor :</span>
+            <span>Sort Score:</span>
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
@@ -183,9 +198,9 @@ export default function RiskActionMenris() {
                 !isSortingEnabled ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              <option value="">Semua</option>
-              <option value="Ascending">Rendah</option>
-              <option value="Descending">Tinggi</option>
+              <option value="">All</option>
+              <option value="Ascending">Low</option>
+              <option value="Descending">High</option>
             </select>
             <img
               src="/icons/chevron-down.svg"
@@ -210,16 +225,16 @@ export default function RiskActionMenris() {
         <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
           <tr>
             <th className="p-2 text-center">No</th>
-            <th className="p-2">Nama Risiko</th>
+            <th className="p-2">Risk Name</th>
             <th className="p-2">Unit</th>
             <th className="p-2">Cluster</th>
-            <th className="p-2">Kategori</th>
+            <th className="p-2">Category</th>
             <th className="p-2 text-center">Severity</th>
             <th className="p-2 text-center">Probability</th>
             <th className="p-2 text-center">Score</th>
             <th className="p-2 text-center">Grading</th>
             <th className="p-2 text-center">Status</th>
-            <th className="p-2 text-center">Aksi</th>
+            <th className="p-2 text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -236,7 +251,7 @@ export default function RiskActionMenris() {
           ) : paginatedRisiko.length === 0 ? (
             <tr>
               <td colSpan={9} className="py-6 text-center text-gray-400">
-                Tidak ada data risiko tersedia.
+                No risk data available.
               </td>
             </tr>
           ) : (
@@ -264,25 +279,42 @@ export default function RiskActionMenris() {
                   {item.analysis?.score || "-"}
                 </td>
                 <td className="p-2 text-center">
-                  <span
-                    className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border 
-                    ${
-                      item.analysis?.grading?.toLowerCase() === "sangat tinggi"
-                        ? "bg-red-800 text-white"
-                        : item.analysis?.grading?.toLowerCase() === "tinggi"
-                        ? "bg-red-500 text-white"
-                        : item.analysis?.grading?.toLowerCase() === "sedang"
-                        ? "bg-yellow-400 text-white"
-                        : item.analysis?.grading?.toLowerCase() === "rendah"
-                        ? "bg-green-700 text-white"
-                        : item.analysis?.grading?.toLowerCase() ===
-                          "sangat rendah"
-                        ? "bg-green-400 text-white"
-                        : "bg-gray-400 text-white"
-                    }`}
-                  >
-                    {item.analysis?.grading || "-"}
-                  </span>
+                  {(() => {
+                    const rawGrading = item.analysis?.grading || "";
+                    const gradingKey = String(rawGrading).toLowerCase().trim();
+
+                    // Determine color class for both English and Indonesian values
+                    let colorClass = "bg-gray-400 text-white";
+                    if (gradingKey === "very high" || gradingKey === "sangat tinggi") {
+                      colorClass = "bg-red-600 text-white";
+                    } else if (gradingKey === "high" || gradingKey === "tinggi") {
+                      colorClass = "bg-orange-500 text-white";
+                    } else if (gradingKey === "medium" || gradingKey === "sedang") {
+                      colorClass = "bg-yellow-400 text-black";
+                    } else if (gradingKey === "low" || gradingKey === "rendah") {
+                      colorClass = "bg-blue-500 text-white";
+                    } else if (gradingKey === "very low" || gradingKey === "sangat rendah") {
+                      colorClass = "bg-green-500 text-white";
+                    }
+
+                    // Compute display label: prefer mapped English label, otherwise title-case the raw value
+                    const mapped = gradingLabelMap[gradingKey];
+                    const toTitleCase = (s) =>
+                      String(s)
+                        .toLowerCase()
+                        .split(" ")
+                        .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : ""))
+                        .join(" ");
+                    const displayLabel = mapped || (rawGrading ? toTitleCase(rawGrading) : "-");
+
+                    return (
+                      <span
+                        className={`text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border ${colorClass}`}
+                      >
+                        {displayLabel}
+                      </span>
+                    );
+                  })()}
                 </td>
 
                 <td
@@ -312,34 +344,24 @@ export default function RiskActionMenris() {
                   </span>
                 </td>
                 <td className="p-2 text-center">
-                <div className="flex justify-center items-center gap-1.5">
-                  <button
-                    onClick={() => {
-                      setSelectedRiskId(item.id);
-                      setShowApproveModal(true);
-                    }}
-                    disabled={item.status === "validated_approved" || item.status === "validated_rejected"}
-                    className={`px-3 py-1 rounded-md text-xs font-medium 
-                      ${item.status === "validated_approved" || item.status === "validated_rejected"
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-green-600 hover:bg-green-700 text-white"
-                      }`}
-                  >
-                    Setuju
-                  </button>
-                  <button
-                    onClick={() => handleRejectClick(item.id)}
-                    disabled={item.status === "validated_approved" || item.status === "validated_rejected"}
-                    className={`px-3 py-1 rounded-md text-xs font-medium 
-                      ${item.status === "validated_approved" || item.status === "validated_rejected"
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-red-600 hover:bg-red-700 text-white"
-                      }`}
-                  >
-                    Tolak
-                  </button>
-                </div>
-              </td>
+                  <div className="flex justify-center items-center gap-1.5">
+                    <button
+                      onClick={() => {
+                        setSelectedRiskId(item.id);
+                        setShowApproveModal(true);
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-xs font-medium"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleRejectClick(item.id)}
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-xs font-medium"
+                    >
+                      Reject
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))
           )}

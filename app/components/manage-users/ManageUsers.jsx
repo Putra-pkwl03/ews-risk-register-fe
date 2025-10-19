@@ -61,7 +61,7 @@ export default function ManageUsers() {
     getUsers()
       .then((data) => setUsers(data))
       .catch((err) => {
-        setErrorMessage("Gagal mengambil data user.");
+        setErrorMessage("Failed to fetch users.");
         setErrorOpen(true);
         console.error("Gagal ambil users:", err);
       })
@@ -168,35 +168,20 @@ export default function ManageUsers() {
                 <option className="text-black text-center" value="admin">
                   Admin
                 </option>
-                <option
-                  className="text-black text-center"
-                  value="koordinator_unit"
-                >
-                  Kordinator Unit
+                <option className="text-black text-center" value="unit_coordinator">
+                  Unit Coordinator
                 </option>
-                <option
-                  className="text-black text-center"
-                  value="koordinator_mutu"
-                >
-                  Kordinator Mutu
+                <option className="text-black text-center" value="quality_coordinator">
+                  Quality Coordinator
                 </option>
-                <option
-                  className="text-black text-center"
-                  value="koordinator_menris"
-                >
-                  Koordinator Menris
+                <option className="text-black text-center" value="risk_management_coordinator">
+                  Risk Management Coordinator
                 </option>
-                <option
-                  className="text-black text-center"
-                  value="kepala_puskesmas"
-                >
-                  Kepala Puskesmas
+                <option className="text-black text-center" value="health_center_head">
+                  Health Center Head
                 </option>
-                <option
-                  className="text-black text-center"
-                  value="dinas_kesehatan"
-                >
-                  Dinkes
+                <option className="text-black text-center" value="health_office">
+                  Health Office
                 </option>
               </select>
               <img
@@ -207,7 +192,7 @@ export default function ManageUsers() {
             </div>
             {/* Sort by Tanggal */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Sort Tanggal:</span>
+              <span className="text-sm text-gray-600">Sort Date:</span>
               <select
                 value={sortByDateDesc ? "Desc" : "Asc"}
                 className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black"
@@ -216,8 +201,8 @@ export default function ManageUsers() {
                   setCurrentPage(1);
                 }}
               >
-                <option value="Desc">Terbaru</option>
-                <option value="Asc">Terlama</option>
+                <option value="Desc">Newest</option>
+                <option value="Asc">Oldest</option>
               </select>
             </div>
 
@@ -229,14 +214,14 @@ export default function ManageUsers() {
                 setSortByDateDesc(true); // kembali ke default: terbaru
                 setCurrentPage(1);
               }}
-              className="text-sm px-3 py-2 border border-red-500 rounded-md text-red-500 hover:bg-red-100"
+              className="text-sm px-3 py-2 border border-red-500 rounded-md text-red-500 hover:bg-red-100 cursor-pointer"
             >
-              Reset
+              Reset Filter
             </button>
 
             <button
               onClick={handleAdd}
-              className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 px-3 py-1.5 rounded-md"
+              className="flex items-center gap-1 text-sm border border-green-500 text-green-500 hover:bg-green-100 cursor-pointer px-3 py-1.5 rounded-md"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -259,11 +244,13 @@ export default function ManageUsers() {
         <table className="w-full text-sm sm:text-base shadow-gray-200 shadow-md ">
           <thead className="bg-gray-100 text-[#5932EA] text-left border-b-[1px] border-gray-200">
             <tr>
-              <th className="p-2 text-[14px] text-center sm:p-3 sm:text-base">No</th>
+              <th className="p-2 text-[14px] text-center sm:p-3 sm:text-base">
+                No
+              </th>
               <th className="p-2 text-[14px] sm:p-3 sm:text-base">Name</th>
               <th className="p-2 text-[14px] sm:p-3 sm:text-base">Email</th>
               <th className="p-2 text-[14px] sm:p-3 sm:text-base">Role</th>
-              <th className="p-2 text-[14px] sm:p-3 sm:text-base">
+              <th className="p-2 text-[14px] sm:p-3 text-center sm:text-base">
                 Created At
               </th>
               <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
@@ -271,7 +258,7 @@ export default function ManageUsers() {
               </th>
             </tr>
           </thead>
-          <tbody>
+            <tbody>
             {loading
               ? [...Array(6)].map((_, index) => (
                   <tr key={index}>
@@ -295,10 +282,12 @@ export default function ManageUsers() {
                     <td className="p-2 text-[12px] sm:p-3">{user.name}</td>
                     <td className="p-2 text-[12px] sm:p-3">{user.email}</td>
                     <td className="p-2 text-[12px] sm:p-3 capitalize">
-                      {user.role.replace("_", " ")}
+                      {user.role === "risk_management_coordinator"
+                        ? "Risk Management Coordinator"
+                        : user.role.replace(/_/g, " ")}
                     </td>
-                    <td className="p-2 text-[12px] sm:p-3">
-                      {new Date(user.created_at).toLocaleDateString("id-ID", {
+                    <td className="p-2 text-[12px] text-center sm:p-3">
+                      {new Date(user.created_at).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",

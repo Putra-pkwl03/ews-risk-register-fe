@@ -41,7 +41,7 @@ export default function DetailRiskHandling({ item, onClose }) {
       </button>
 
       <h2 className="text-xl font-bold text-center text-gray-800 mb-6">
-        Detail Penanganan Risiko
+        Risk Handling Details
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
@@ -59,7 +59,7 @@ export default function DetailRiskHandling({ item, onClose }) {
 
       {risk_appetite && (
         <div className="mt-6 mb-4">
-          <h3 className="font-semibold text-gray-800 mb-2">Selera Risiko</h3>
+          <h3 className="font-semibold text-gray-800 mb-2">Risk Appetite</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700">
             <DetailItem label="Scoring" value={risk_appetite.scoring} />
             <DetailItem label="Ranking" value={risk_appetite.ranking} />
@@ -71,16 +71,16 @@ export default function DetailRiskHandling({ item, onClose }) {
       {/* Penyebab */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-gray-800">Penyebab</h3>
+          <h3 className="font-semibold text-gray-800">Causes</h3>
           <button
             onClick={() => setShowFishbone(true)}
             className="text-md px-3 py-1 text-blue-500 hover:text-blue-700"
           >
-            Lihat Fishbone
+            View Fishbone
           </button>
         </div>
         {causes.length === 0 ? (
-          <p className="text-gray-500">Tidak ada penyebab yang tercatat.</p>
+          <p className="text-gray-500">No causes recorded.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {causes.map((cause) => (
@@ -89,14 +89,14 @@ export default function DetailRiskHandling({ item, onClose }) {
                 className="p-4 bg-gray-50 rounded-lg border border-gray-200 text-gray-800"
               >
                 <p>
-                  <strong>Kategori:</strong> {cause.category}
+                  <strong>Category:</strong> {cause.category}
                 </p>
                 <p>
-                  <strong>Penyebab Utama:</strong> {cause.main_cause}
+                  <strong>Main Cause:</strong> {cause.main_cause}
                 </p>
                 {cause.sub_causes && cause.sub_causes.length > 0 && (
                   <>
-                    <strong>Sub Penyebab:</strong>
+                    <strong>Sub Causes:</strong>
                     <ul className="list-disc list-inside mt-1 space-y-1 text-sm">
                       {cause.sub_causes.map((sub) => (
                         <li key={sub.id}>{sub.sub_cause}</li>
@@ -112,9 +112,9 @@ export default function DetailRiskHandling({ item, onClose }) {
 
       {/* Mitigasi */}
       <div className="mb-6">
-        <h3 className="font-semibold text-gray-800 mb-2">Mitigasi</h3>
+        <h3 className="font-semibold text-gray-800 mb-2">Mitigations</h3>
         {mitigations.length === 0 ? (
-          <p className="text-gray-500">Tidak ada mitigasi yang tercatat.</p>
+          <p className="text-gray-500">No mitigations recorded.</p>
         ) : (
           <div className="space-y-4">
             {mitigations.map((m) => (
@@ -126,7 +126,7 @@ export default function DetailRiskHandling({ item, onClose }) {
                   <strong>Type:</strong> {m.mitigation_type}
                 </p>
                 <p>
-                  <strong>Penanggung Jawab:</strong> {m.pic?.name || "-"}
+                  <strong>Responsible:</strong> {m.pic?.name || "-"}
                 </p>
                 <p>
                   <strong>Deadline:</strong> {m.deadline || "-"}
@@ -143,14 +143,14 @@ export default function DetailRiskHandling({ item, onClose }) {
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 mt-4">
         <div className="grid grid-cols-1 gap-4">
-          <DetailItem label="Efektivitas" value={effectiveness} />
+          <DetailItem label="Effectiveness" value={effectiveness} />
           <DetailItem label="Signature" value={approval_signature} />
           <DetailItem label="Handled By" value={handler?.name} />
         </div>
         <div className="grid grid-cols-1 gap-4">
           <DetailItem label="Reviewer" value={reviewer?.name} />
           <DetailItem
-            label="Tanggal Penanganan"
+            label="Handling Date"
             value={new Date(created_at).toLocaleString()}
           />
           <DetailItem label="Review Notes" value={review_notes || "-"} />
@@ -162,7 +162,7 @@ export default function DetailRiskHandling({ item, onClose }) {
         onClick={onClose}
         className="mt-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl w-full cursor-pointer"
       >
-        Tutup Detail
+        Close Details
       </button>
 
       <FishboneModal isOpen={showFishbone} onClose={() => setShowFishbone(false)}>

@@ -23,17 +23,17 @@ export default function ModalPenyebab({
     <div className="fixed inset-0 bg-black/40 flex items-center text-gray-900 justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-lg relative max-h-[80vh] overflow-y-auto">
         <h4 className="text-lg font-bold mb-4">
-          {penyebabBaru.id ? "Edit Penyebab" : "Tambah Penyebab"}
+          {penyebabBaru.id ? "Edit Cause" : "Add Cause"}
         </h4>
 
-        {/* Kategori */}
-        <label className="block mb-2 font-semibold">Kategori</label>
+        {/* Category */}
+        <label className="block mb-2 font-semibold">Category</label>
         <select
           value={penyebabBaru.kategori}
           onChange={(e) => onChange("kategori", e.target.value)}
           className="form-select mb-4 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">-- Pilih Kategori --</option>
+          <option value="">-- Select Category --</option>
           {kategoriPenyebab.map((kat) => (
             <option key={kat} value={kat}>
               {kat}
@@ -41,26 +41,26 @@ export default function ModalPenyebab({
           ))}
         </select>
 
-        {/* Deskripsi Utama */}
-        <label className="block mb-2 font-semibold">Deskripsi Utama</label>
+        {/* Main Description */}
+        <label className="block mb-2 font-semibold">Main Description</label>
         <textarea
           rows={3}
           value={penyebabBaru.deskripsiUtama}
           onChange={(e) => onChange("deskripsiUtama", e.target.value)}
           className="form-input mb-4 w-full border border-gray-300 rounded px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Masukkan deskripsi utama"
+          placeholder="Enter main description"
         />
 
-        {/* Sub Penyebab */}
+        {/* Sub Causes */}
         {penyebabBaru.deskripsiSub.length > 0 && (
           <>
-            <label className="block font-semibold">Sub Penyebab</label>
+            <label className="block font-semibold">Sub Causes</label>
             {penyebabBaru.deskripsiSub.map((desc, idx) => (
               <div key={idx} className="flex gap-2 items-start mb-2">
                 <textarea
                   value={desc}
                   onChange={(e) => onSubChange(idx, e.target.value)}
-                  placeholder={`Deskripsi ${idx + 1}`}
+                  placeholder={`Description ${idx + 1}`}
                   className="w-full rounded-md border border-gray-300 px-6 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 />
 
@@ -76,7 +76,7 @@ export default function ModalPenyebab({
           </>
         )}
 
-        {/* Tombol tambah sub */}
+        {/* Add sub button */}
         <button
           type="button"
           onClick={onAddSub}
@@ -86,7 +86,7 @@ export default function ModalPenyebab({
           Add Sub Causes
         </button>
 
-        {/* Tombol Aksi */}
+        {/* Action buttons */}
         <div className="flex justify-end mt-6 gap-2">
           <button
             type="button"

@@ -31,19 +31,19 @@ export default function RiskList({
   return (
     <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
-        <h5 className="text-[20px] text-black font-semibold">
-          Analisis Risiko
+          <h5 className="text-[20px] text-black font-semibold">
+          Risk Analysis
         </h5>
         <div className="flex flex-col sm:flex-row sm:flex-wrap items-center gap-4">
-          <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white min-w-[200px]">
+            <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white min-w-[200px]">
             <img
               src="/icons/search.svg"
               alt="Search Icon"
               className="h-4 w-4 mr-2 opacity-60"
             />
             <input
-              type="text"
-              placeholder="Search"
+                type="text"
+                placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="outline-none text-[12px] text-black w-full"
@@ -57,9 +57,9 @@ export default function RiskList({
               onChange={(e) => setKategoriFilter(e.target.value)}
               className="border border-gray-300 bg-white rounded-md p-2 text-[12px] text-center text-black hover:cursor-pointer focus:outline-none"
             >
-              <option value="All">Semua</option>
-              <option value="accepted">Diterima</option>
-              <option value="mitigated">Dicegah</option>
+              <option value="All">All</option>
+              <option value="accepted">Accepted</option>
+              <option value="mitigated">Mitigated</option>
             </select>
           </div>
 
@@ -70,9 +70,9 @@ export default function RiskList({
               onChange={(e) => setSortOrder(e.target.value)}
               className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer focus:outline-none"
             >
-              <option value="">Semua</option>
-              <option value="Ascending">Rendah</option>
-              <option value="Descending">Tinggi</option>
+              <option value="">All</option>
+              <option value="Ascending">Low</option>
+              <option value="Descending">High</option>
             </select>
           </div>
 
@@ -84,7 +84,7 @@ export default function RiskList({
             }}
             className="text-sm px-3 py-1 border border-red-500 rounded-md text-red-500 hover:bg-red-100 cursor-pointer"
           >
-            Reset
+            Reset Filter
           </button>
         </div>
       </div>
@@ -96,8 +96,8 @@ export default function RiskList({
                 "No",
                 "Cluster",
                 "Unit",
-                "Nama Risiko",
-                "Kategori",
+                "Risk Name",
+                "Category",
                 "Severity",
                 "Probability",
                 "Score",
@@ -105,12 +105,12 @@ export default function RiskList({
                 "Controllability",
                 "Scoring",
                 "Ranking",
-                "Aksi",
+                "Actions",
               ].map((title, i) => (
                 <th
                   key={i}
                   className={`p-2 text-[14px] sm:p-3 sm:text-bas ${
-                    title === "Aksi" ? "text-center" : ""
+                    title === "Actions" ? "text-center" : ""
                   }`}
                 >
                   {title}
@@ -120,7 +120,7 @@ export default function RiskList({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {isLoading ? (
-              Array.from({ length: 5 }).map((_, rowIndex) => (
+                Array.from({ length: 5 }).map((_, rowIndex) => (
                 <tr key={rowIndex} className="animate-pulse">
                   {Array.from({ length: 13 }).map((_, colIndex) => (
                     <td key={colIndex} className="p-2">
@@ -132,7 +132,7 @@ export default function RiskList({
             ) : currentRisks.length === 0 ? (
               <tr>
                 <td colSpan={13} className="text-center py-6 text-gray-500">
-                  Tidak ada data risiko yang sudah divalidasi.
+                  No validated risks available.
                 </td>
               </tr>
             ) : (
@@ -163,18 +163,16 @@ export default function RiskList({
                     <span
                       className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border 
                       ${
-                        risk.analysis?.grading?.toLowerCase() ===
-                        "sangat tinggi"
-                          ? "bg-red-800 text-white"
+                        risk.analysis?.grading?.toLowerCase() === "sangat tinggi"
+                          ? "bg-red-600 text-white"      // merah
                           : risk.analysis?.grading?.toLowerCase() === "tinggi"
-                          ? "bg-red-500 text-white"
+                          ? "bg-orange-500 text-white"    // orange
                           : risk.analysis?.grading?.toLowerCase() === "sedang"
-                          ? "bg-yellow-400 text-white"
+                          ? "bg-yellow-400 text-black"    // kuning
                           : risk.analysis?.grading?.toLowerCase() === "rendah"
-                          ? "bg-green-700 text-white"
-                          : risk.analysis?.grading?.toLowerCase() ===
-                            "sangat rendah"
-                          ? "bg-green-400 text-white"
+                          ? "bg-blue-500 text-white"      // biru
+                          : risk.analysis?.grading?.toLowerCase() === "sangat rendah"
+                          ? "bg-green-500 text-white"     // hijau
                           : "bg-gray-400 text-white"
                       }`}
                     >
@@ -217,16 +215,16 @@ export default function RiskList({
                           }`}
                           title={
                             risk.risk_appetite?.decision
-                              ? `Keputusan sudah dibuat: ${
+                              ? `Decision already made: ${
                                   risk.risk_appetite.decision === "accepted"
-                                    ? "Diterima"
-                                    : "Dicegah"
+                                    ? "Accepted"
+                                    : "Mitigated"
                                 }`
                               : risk.risk_appetite &&
                                 (risk.risk_appetite.scoring ||
                                   risk.risk_appetite.ranking)
-                              ? "Edit Selera Risiko"
-                              : "Atur Selera Risiko"
+                              ? "Edit Risk Appetite"
+                              : "Set Risk Appetite"
                           }
                         >
                           <HeartPlus
@@ -242,8 +240,8 @@ export default function RiskList({
                       {risk.risk_appetite?.decision && (
                         <span className="text-xs italic text-gray-500">
                           {risk.risk_appetite.decision === "accepted"
-                            ? "Diterima"
-                            : "Dicegah"}
+                            ? "Accepted"
+                            : "Mitigated"}
                         </span>
                       )}
                     </div>

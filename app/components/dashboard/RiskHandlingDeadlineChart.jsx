@@ -75,7 +75,7 @@ export default function RiskHandlingDeadlineChart() {
         setTotalExpired(expiredCount);
       })
       .catch((err) => {
-        console.error("Gagal ambil data deadline mitigasi:", err.message);
+        console.error("Failed to fetch mitigation deadlines:", err.message);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -86,20 +86,20 @@ export default function RiskHandlingDeadlineChart() {
       <div className="flex items-center gap-2 mb-2">
         <ClockIcon className="w-5 h-5 text-rose-500" />
         <h2 className="text-[16px] font-semibold text-gray-700">
-          Deadline Mitigasi Risiko
+          Risk Mitigation Deadlines
         </h2>
       </div>
 
       <div className="bg-white shadow rounded-xl transition-all duration-300 ease-in-out hover:shadow-md hover:scale-[1.02] hover:-translate-y-1  p-5 w-full  mx-auto">
         <div className="text-sm text-right space-y-1">
           <div className="text-gray-500">
-            Deadline -3 hari:{" "}
+            Deadline within 3 days: {" "}
             <strong className="text-rose-600">
               {loading ? "..." : totalWarning}
             </strong>
           </div>
           <div className="text-gray-500">
-            Sudah lewat:{" "}
+            Past due: {" "}
             <strong className="text-gray-400">
               {loading ? "..." : totalExpired}
             </strong>
@@ -109,7 +109,7 @@ export default function RiskHandlingDeadlineChart() {
         <div className="mt-2 h-[160px]">
           {loading ? (
             <div className="w-full h-full flex items-center justify-center">
-              <p className="text-sm text-gray-500">Memuat grafik deadline...</p>
+              <p className="text-sm text-gray-500">Loading deadlines chart...</p>
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
@@ -124,7 +124,7 @@ export default function RiskHandlingDeadlineChart() {
                   formatter={(_, __, item) => {
                     return [
                       `Deadline: ${item.payload.deadline}`,
-                      `Risiko: ${item.payload.risiko}`,
+                      `Risk: ${item.payload.risiko}`,
                     ];
                   }}
                 />

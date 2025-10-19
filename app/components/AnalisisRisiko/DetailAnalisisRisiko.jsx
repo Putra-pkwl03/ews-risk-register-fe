@@ -14,11 +14,11 @@ const statusColors = {
 };
 
 const gradingColors = {
-  "sangat tinggi": "bg-red-800 text-white",
-  tinggi: "bg-red-500 text-white",
-  sedang: "bg-yellow-400 text-white",
-  rendah: "bg-green-700 text-white",
-  "sangat rendah": "bg-green-400 text-white",
+  "sangat tinggi": "bg-red-600 text-white", // merah
+  tinggi: "bg-orange-500 text-white", // orange
+  sedang: "bg-yellow-400 text-black", // kuning
+  rendah: "bg-blue-500 text-white", // biru
+  "sangat rendah": "bg-green-500 text-white", // hijau
 };
 
 export default function DetailAnalisisRisiko({ data, onClose }) {
@@ -31,7 +31,7 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
           console.log("Fetched RiskAnalysis:", res);
           setRiskAnalysisData(res);
         })
-        .catch((err) => console.error("Gagal mengambil data:", err));
+  .catch((err) => console.error("Failed to fetch data:", err));
     }
   }, [data]);
 
@@ -53,10 +53,24 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
 
   const statusColorClass = statusColors[risk?.status] || "bg-gray-300";
 
+  // Translate Indonesian grading labels to English for display only
+  const translateGrading = (grading) => {
+    if (!grading) return "-";
+    const map = {
+      "sangat tinggi": "Very High",
+      "tinggi": "High",
+      "sedang": "Medium",
+      "rendah": "Low",
+      "sangat rendah": "Very Low",
+    };
+    const key = String(grading).toLowerCase();
+    return map[key] || grading;
+  };
+
   function formatDate(dateStr) {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
-    return date.toLocaleDateString("id-ID", {
+    return date.toLocaleDateString("en-US", {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -85,27 +99,27 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
       </button>
 
       <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
-        Detail Analisis Risiko
+        Risk Analysis Details
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 mb-8">
-        <DetailItem label="Klaster" value={risk.cluster} />
+        <DetailItem label="Cluster" value={risk.cluster} />
         <DetailItem label="Unit" value={risk.unit} />
-        <DetailItem label="Nama Risiko" value={risk.name} />
-        <DetailItem label="Kategori" value={risk.category} />
+        <DetailItem label="Risk Name" value={risk.name} />
+        <DetailItem label="Category" value={risk.category} />
         <DetailItem
-          label="Deskripsi"
+          label="Description"
           value={risk.description || "-"}
           spanFull
         />
         <div className="md:col-span-2">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-bold text-gray-800">Penyebab</h3>
+            <h3 className="text-lg font-bold text-gray-800">Causes</h3>
             <button
               onClick={() => setShowFishbone(true)}
               className="text-sm px-3 py-1 rounded-lg bg-blue-600 text-white hover:bg-blue-700 hover:cursor-pointer"
             >
-              Lihat Pohon Keputusan
+              View Tree Diagram
             </button>
           </div>
 
@@ -118,7 +132,7 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
                 >
                   <div className="mb-3">
                     <strong className="text-[16px] font-semibold">
-                      Kategori:
+                      Category:
                     </strong>{" "}
                     <span className="capitalize text-[15px]">
                       {cause.category}
@@ -126,7 +140,7 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
                   </div>
                   <div className="mb-3">
                     <strong className="text-[16px] font-semibold">
-                      Penyebab Utama:
+                      Main Cause:
                     </strong>{" "}
                     <span className="capitalize text-[15px]">
                       {cause.main_cause}
@@ -134,7 +148,7 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
                   </div>
                   {cause.sub_causes && cause.sub_causes.length > 0 && (
                     <div className="ml-4 mt-4 text-[15px] text-gray-700 font-medium">
-                      <strong className="block mb-1">Sub Penyebab:</strong>
+                      <strong className="block mb-1">Sub Causes:</strong>
                       <ul className="list-disc list-inside space-y-1">
                         {cause.sub_causes.map((sub) => (
                           <li key={sub.id}>{sub.sub_cause}</li>
@@ -146,11 +160,11 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500">Tidak ada penyebab yang tercatat.</p>
+            <p className="text-gray-500">No causes recorded.</p>
           )}
         </div>
 
-        <DetailItem label="Dampak" value={risk.impact || "-"} spanFull />
+        <DetailItem label="Impact" value={risk.impact || "-"} spanFull />
         <DetailItem label="UC/C" value={uc_c_display} />
         <DetailItem label="Severity" value={riskAnalysis.severity ?? "-"} />
         <DetailItem
@@ -158,13 +172,13 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
           value={riskAnalysis.probability ?? "-"}
         />
         <DetailItem label="Score" value={riskAnalysis.score ?? "-"} />
-        <DetailItem label="Dibuat oleh" value={creatorName} />
+        <DetailItem label="Created By" value={creatorName} />
         <DetailItem
-          label="Tanggal Dibuat"
+          label="Created At"
           value={formatDate(risk.created_at)}
         />
         <DetailItem
-          label="Tanggal Update"
+          label="Updated At"
           value={formatDate(risk.updated_at)}
         />
         <DetailItem
@@ -173,12 +187,12 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
             <span
               className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border ${gradingColorClass}`}
             >
-              {riskAnalysis.grading || "-"}
+              {translateGrading(riskAnalysis.grading)}
             </span>
           }
         />
         <DetailItem
-          label="Status Risiko"
+          label="Risk Status"
           custom={
             <div
               className={`px-3 py-2 inline-flex items-center gap-2 rounded-2xl text-white text-sm capitalize ${statusColorClass}`}
@@ -193,7 +207,7 @@ export default function DetailAnalisisRisiko({ data, onClose }) {
         onClick={onClose}
         className="mt-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl w-full hover:cursor-pointer"
       >
-        Tutup Detail
+        Close Details
       </button>
 
       <FishboneModal

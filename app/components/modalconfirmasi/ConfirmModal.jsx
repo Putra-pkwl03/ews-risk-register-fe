@@ -18,10 +18,10 @@ const ConfirmModal = ({ isOpen, message, onConfirm, onCancel }) => {
 
         {/* Konten */}
         <h2 className="text-md font-semibold mb-2 text-center text-gray-800">
-          Kirim ke Menris?
+          Send to Menris?
         </h2>
         <p className="text-sm text-center text-gray-600 mb-6">
-          {message || "Apakah Anda yakin ingin mengirim data ini ke Menris?"}
+          {message || "Are you sure you want to send this data to Menris?"}
         </p>
 
         {/* Tombol Aksi */}

@@ -33,7 +33,7 @@ export default function EditMitigationForm() {
         const data = await getUsers();
         setUsers(data);
       } catch (error) {
-        console.error("Gagal memuat data users", error);
+        console.error("Failed to load users", error);
       }
     };
     fetchUsers();
@@ -55,8 +55,8 @@ export default function EditMitigationForm() {
         setForms(initialForms);
         setError(null);
       } catch (err) {
-        console.error("Gagal memuat mitigasi:", err);
-        setError("Gagal memuat mitigasi.");
+        console.error("Failed to load mitigations:", err);
+        setError("Failed to load mitigations.");
       } finally {
         setLoading(false);
       }
@@ -75,7 +75,7 @@ export default function EditMitigationForm() {
       <div className="text-red-600 p-4 text-center font-semibold">{error}</div>
     );
   if (!mitigations.length)
-    return <div className="p-4 text-center">Data mitigasi tidak tersedia.</div>;
+    return <div className="p-4 text-center">No mitigation data available.</div>;
 
   const handleChange = (index, field, value) => {
     setForms((prev) => {
@@ -124,14 +124,14 @@ export default function EditMitigationForm() {
           })
         )
       );
-      setToastMessage("Semua mitigasi berhasil diperbarui.");
+      setToastMessage("All mitigations updated successfully.");
       setSuccessOpen(true);
       setTimeout(() => {
         router.push("/dashboard?page=evaluasi-risiko");
       }, 1500);
     } catch (err) {
-      console.error("Gagal update mitigasi:", err);
-      setToastMessage(err.message || "Gagal memperbarui mitigasi.");
+      console.error("Failed to update mitigations:", err);
+      setToastMessage(err.message || "Failed to update mitigations.");
       setErrorOpen(true);
     }
   };
@@ -152,11 +152,11 @@ export default function EditMitigationForm() {
         <button
           onClick={() => router.push("/dashboard?page=evaluasi-risiko")}
           className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 cursor-pointer"
-          aria-label="Kembali"
+          aria-label="Back"
         >
           <ArrowLeftIcon className="h-5 w-5 hover:text-blue-500" />
         </button>
-        <h2 className="text-xl font-semibold text-black">Edit Mitigasi</h2>
+        <h2 className="text-xl font-semibold text-black">Edit Mitigations</h2>
       </div>
       <div className="flex flex-col items-center py-5">
         <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-4xl">
@@ -169,7 +169,7 @@ export default function EditMitigationForm() {
                 <div className="space-y-2">
                   <div>
                     <label className="block text-sm font-medium">
-                      Jenis Mitigasi:
+                      Mitigation Type:
                     </label>
                     <select
                       value={form.mitigation_type}
@@ -182,24 +182,23 @@ export default function EditMitigationForm() {
                       }
                       className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 hover:cursor-pointer"
                     >
-                      {[
-                        form.mitigation_type,
-                        "regulasi",
-                        "sdm",
-                        "sarana_prasarana",
-                      ]
-                        .filter((v, i, arr) => arr.indexOf(v) === i)
-                        .map((type) => (
+                      {(() => {
+                        const baseTypes = ["regulasi", "sdm", "sarana_prasarana"];
+                        const types = form.mitigation_type && !baseTypes.includes(form.mitigation_type)
+                          ? [form.mitigation_type, ...baseTypes]
+                          : baseTypes;
+                        return types.map((type) => (
                           <option key={type} value={type}>
                             {type === "regulasi"
-                              ? "Regulasi"
+                              ? "Regulation"
                               : type === "sdm"
-                              ? "SDM"
+                              ? "Human Resources"
                               : type === "sarana_prasarana"
-                              ? "Sarana Prasarana"
+                              ? "Infrastructure"
                               : type}
                           </option>
-                        ))}
+                        ));
+                      })()}
                     </select>
                   </div>
 
@@ -245,14 +244,18 @@ export default function EditMitigationForm() {
 
                   <div>
                     <label className="block text-sm font-medium">
-                      Deskripsi:
+                      Descriptions:
                     </label>
                     {form.descriptions.map((desc, idx) => (
                       <textarea
                         key={idx}
                         value={desc.description}
                         onChange={(e) =>
-                          handleDescriptionChange(mitIndex, idx, e.target.value)
+                          handleDescriptionChange(
+                            mitIndex,
+                            idx,
+                            e.target.value
+                          )
                         }
                         className="w-full rounded-md border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2 resize-y min-h-[80px]"
                       />

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { addUser, editUser } from "../../lib/userApi";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+
 
 export default function UserFormModal({
   isOpen,
@@ -7,6 +9,8 @@ export default function UserFormModal({
   onUserSaved,
   editingUser = null,
 }) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -51,24 +55,24 @@ export default function UserFormModal({
     const newErrors = {};
 
     if (!form.name.trim()) {
-      newErrors.name = "Harus diisi";
+      newErrors.name = "Required";
     }
     if (!form.email.trim()) {
-      newErrors.email = "Harus diisi";
+      newErrors.email = "Required";
     }
     if (!editingUser) {
       if (!form.password) {
-        newErrors.password = "Harus diisi";
+        newErrors.password = "Required";
       }
       if (!form.confirmPassword) {
-        newErrors.confirmPassword = "Harus diisi";
+        newErrors.confirmPassword = "Required";
       }
       if (form.password !== form.confirmPassword) {
-        newErrors.confirmPassword = "Konfirmasi password tidak cocok";
+        newErrors.confirmPassword = "Password confirmation does not match";
       }
     }
     if (!form.role) {
-      newErrors.role = "Harus diisi";
+      newErrors.role = "Required";
     }
 
     setErrors(newErrors);
@@ -94,7 +98,7 @@ export default function UserFormModal({
       onUserSaved(!!editingUser);
       onClose();
     } catch (err) {
-      alert("Gagal menyimpan user.");
+      alert("Failed to save user.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -107,7 +111,7 @@ export default function UserFormModal({
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
       <div className="relative bg-white p-6 rounded-2xl shadow w-full max-w-lg mx-4">
         <h1 className="text-2xl font-bold mb-4 text-center text-gray-800">
-          {editingUser ? "Perbarui Pengguna" : "Tambah Pengguna Baru"}
+          {editingUser ? "Update User" : "Add New User"}
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -121,7 +125,7 @@ export default function UserFormModal({
               name="name"
               value={form.name}
               onChange={handleChange}
-              placeholder="eg: John Doe"
+              placeholder="e.g. John Doe"
               className={`w-full bg-[#f7faff] text-gray-700 placeholder:text-gray-200 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2
               ${
                 errors.name
@@ -144,7 +148,7 @@ export default function UserFormModal({
               name="email"
               value={form.email}
               onChange={handleChange}
-              placeholder="eg: john@gmail.com"
+              placeholder="e.g. john@gmail.com"
               className={`w-full bg-[#f7faff] text-gray-700 placeholder:text-gray-200 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2
               ${
                 errors.email
@@ -162,20 +166,33 @@ export default function UserFormModal({
             <label className="block text-sm font-bold mb-1 text-gray-800">
               Password
             </label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Enter Your Password"
-              autoComplete="new-password"
-              className={`w-full bg-[#f7faff] text-gray-700 placeholder:text-gray-200 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2
-              ${
-                errors.password
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300 focus:ring-blue-400"
-              }`}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                autoComplete="new-password"
+                className={`w-full bg-[#f7faff] text-gray-700 placeholder:text-gray-200 border px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2
+                ${
+                  errors.password
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-blue-400"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="w-5 h-5" />
+                ) : (
+                  <EyeIcon className="w-5 h-5" />
+                )}
+              </button>
+            </div>
             {errors.password && (
               <p className="text-red-600 text-xs mt-1">{errors.password}</p>
             )}
@@ -183,22 +200,35 @@ export default function UserFormModal({
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-bold mb-1 text-gray-800">
+              <label className="block text-sm font-bold mb-1 text-gray-800">
               Confirm Password
             </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm Your Password"
-              className={`w-full bg-[#f7faff] text-gray-700 placeholder:text-gray-200 border px-4 py-2 rounded-lg focus:outline-none focus:ring-2
-              ${
-                errors.confirmPassword
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300 focus:ring-blue-400"
-              }`}
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm your password"
+                className={`w-full bg-[#f7faff] text-gray-700 placeholder:text-gray-200 border px-4 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2
+        ${
+          errors.confirmPassword
+            ? "border-red-500 focus:ring-red-500"
+            : "border-gray-300 focus:ring-blue-400"
+        }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showConfirmPassword ? (
+                  <EyeSlashIcon className="w-5 h-5" />
+                ) : (
+                  <EyeIcon className="w-5 h-5" />
+                )}
+              </button>
+            </div>
             {errors.confirmPassword && (
               <p className="text-red-600 text-xs mt-1">
                 {errors.confirmPassword}
@@ -224,22 +254,21 @@ export default function UserFormModal({
             >
               <option value="">-- Select Role --</option>
               {[
-              "koordinator_unit",
-              "koordinator_menris",
-              "koordinator_mutu",
-              "kepala_puskesmas",
-              "dinas_kesehatan",
-              "admin",
-            ].map((role) => (
-              <option key={role} value={role}>
-                {role === "koordinator_menris"
-                  ? "Koordinator Manrisk"
-                  : role
-                      .replace(/_/g, " ")
-                      .replace(/\b\w/g, (c) => c.toUpperCase())}
-              </option>
-            ))}
-
+                "unit_coordinator",
+                "risk_management_coordinator",
+                "quality_coordinator",
+                "health_center_head",
+                "health_office",
+                "admin",
+              ].map((role) => (
+                <option key={role} value={role}>
+                  {role === "risk_management_coordinator"
+                    ? "Risk Management Coordinator"
+                    : role
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (c) => c.toUpperCase())}
+                </option>
+              ))}
             </select>
             {errors.role && (
               <p className="text-red-600 text-xs mt-1">{errors.role}</p>

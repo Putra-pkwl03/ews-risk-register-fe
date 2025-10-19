@@ -160,9 +160,7 @@ export default function EvaluasiRisiko() {
   return (
     <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4 flex-wrap">
-        <h5 className="text-[20px] text-black font-semibold">
-          Evaluasi Risiko
-        </h5>
+        <h5 className="text-[20px] text-black font-semibold">Risk Evaluation</h5>
         <div className="flex flex-wrap gap-4 mb-4">
           <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white min-w-[200px]">
             <img
@@ -172,7 +170,7 @@ export default function EvaluasiRisiko() {
             />
             <input
               type="text"
-              placeholder="Search nama risiko..."
+              placeholder="Search risk name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="outline-none text-[12px] text-black w-full"
@@ -180,15 +178,15 @@ export default function EvaluasiRisiko() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Keputusan:</span>
+            <span className="text-sm text-gray-600">Decision:</span>
             <select
               value={kategoriFilter}
               onChange={(e) => setKategoriFilter(e.target.value)}
               className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black"
             >
-              <option value="All">Semua</option>
-              <option value="accepted">Diterima</option>
-              <option value="mitigated">Dicegah</option>
+              <option value="All">All</option>
+              <option value="accepted">Accepted</option>
+              <option value="mitigated">Mitigated</option>
             </select>
           </div>
 
@@ -200,8 +198,8 @@ export default function EvaluasiRisiko() {
               className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-black"
             >
               <option value="">Default</option>
-              <option value="Ascending">Rendah</option>
-              <option value="Descending">Tinggi</option>
+              <option value="Ascending">Low</option>
+              <option value="Descending">High</option>
             </select>
           </div>
 
@@ -235,7 +233,7 @@ export default function EvaluasiRisiko() {
               </svg>
             </span>
           </span>
-          {dataDeadline.length} mitigasi perlu tindak lanjut segera
+          {dataDeadline.length} mitigations require immediate follow-up
         </button>
 
         {showInfoDeadline && (
@@ -267,7 +265,7 @@ export default function EvaluasiRisiko() {
                       </div>
                     </div>
                     <span className="text-xs font-semibold px-3 py-1 rounded-full bg-red-100 text-red-700">
-                      Tindak Lanjut Segera
+                      Immediate Action Needed
                     </span>
                   </div>
                 ))}
@@ -300,7 +298,7 @@ export default function EvaluasiRisiko() {
                       </div>
                     </div>
                     <span className="text-xs font-semibold px-3 py-1 rounded-full bg-blue-100 text-blue-700">
-                      Perlu Diperhatikan
+                      Needs Attention
                     </span>
                   </div>
                 ))}
@@ -323,10 +321,10 @@ export default function EvaluasiRisiko() {
                 Unit
               </th>
               <th className="p-2  text-left text-[14px] sm:p-3 sm:text-bas">
-                Nama Risiko
+                Risk Name
               </th>
               <th className="p-2 text-left text-[14px] sm:p-3 sm:text-bas">
-                Mitigasi
+                Mitigation
               </th>
               <th className="p-2  text-center text-[14px] sm:p-3 sm:text-bas">
                 Controllability
@@ -338,7 +336,7 @@ export default function EvaluasiRisiko() {
                 Decision
               </th>
               <th className="p-2 text-center text-[14px] sm:p-3 sm:text-bas">
-                Aksi
+                Actions
               </th>
             </tr>
           </thead>
@@ -360,7 +358,7 @@ export default function EvaluasiRisiko() {
                   colSpan={8}
                   className="text-center text-[12px] sm:text-base py-6 text-gray-500"
                 >
-                  Tidak ada data risiko yang sudah divalidasi.
+                  No validated risk data.
                 </td>
               </tr>
             ) : (
@@ -406,7 +404,7 @@ export default function EvaluasiRisiko() {
                         <button
                           onClick={() => onDetailClick(risk)}
                           className="p-1 rounded transition"
-                          title="Detail"
+                          title="Details"
                         >
                           <img
                             src="/icons/detail.svg"
@@ -461,7 +459,7 @@ export default function EvaluasiRisiko() {
                               setSelectedMitigationId(mitigationsForRisk[0].id);
                               setShowDeleteModal(true);
                             }}
-                            title="Hapus Mitigasi"
+                            title="Delete Mitigation"
                             className="p-1 rounded hover:bg-gray-100 cursor-pointer"
                           >
                             <img
@@ -494,13 +492,13 @@ export default function EvaluasiRisiko() {
       <SuccessToast
         isOpen={showSuccess}
         onClose={() => setShowSuccess(false)}
-        message="Mitigasi berhasil dihapus."
+        message="Mitigation deleted successfully."
       />
 
       <ErrorToast
         isOpen={showError}
         onClose={() => setShowError(false)}
-        message="Gagal menghapus mitigasi. Coba lagi."
+        message="Failed to delete mitigation. Try again."
       />
 
       <Pagination

@@ -9,11 +9,11 @@ const statusColors = {
 };
 
 const gradingColors = {
-  "sangat tinggi": "bg-red-800 text-white",
-  tinggi: "bg-red-500 text-white",
-  sedang: "bg-yellow-400 text-white",
-  rendah: "bg-green-700 text-white",
-  "sangat rendah": "bg-green-400 text-white",
+  "sangat tinggi": "bg-red-600 text-white", // very high
+  tinggi: "bg-orange-500 text-white", // high
+  sedang: "bg-yellow-400 text-black", // medium
+  rendah: "bg-blue-500 text-white", // low
+  "sangat rendah": "bg-green-500 text-white", // very low
 };
 
 export default function RiskDetail({ risk, onBack }) {
@@ -29,7 +29,7 @@ export default function RiskDetail({ risk, onBack }) {
   function formatDate(dateStr) {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
-    return date.toLocaleDateString("id-ID", {
+    return date.toLocaleDateString("en-US", {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -48,20 +48,20 @@ export default function RiskDetail({ risk, onBack }) {
       </button>
 
       <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
-        Detail Analisis Risiko
+        Risk Analysis Details
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700 mb-8">
-        <DetailItem label="Nama Risiko" value={risk.name} />
-        <DetailItem label="Klaster" value={risk.cluster} />
+        <DetailItem label="Risk Name" value={risk.name} />
+        <DetailItem label="Cluster" value={risk.cluster} />
         <DetailItem label="Unit" value={risk.unit} />
-        <DetailItem label="Kategori" value={risk.category} />
+        <DetailItem label="Category" value={risk.category} />
         <DetailItem
-          label="Deskripsi"
+          label="Description"
           value={risk.description || "-"}
           spanFull
         />
-        <DetailItem label="Dampak" value={risk.impact || "-"} spanFull />
+        <DetailItem label="Impact" value={risk.impact || "-"} spanFull />
         <DetailItem label="UC/C" value={uc_c_display} />
         <DetailItem label="Severity" value={risk.analysis?.severity ?? "-"} />
         <DetailItem
@@ -80,7 +80,7 @@ export default function RiskDetail({ risk, onBack }) {
           }
         />
         <DetailItem
-          label="Status Risiko"
+          label="Risk Status"
           custom={
             <div
               className={`px-3 py-2 inline-flex items-center gap-2 rounded-2xl text-white text-sm capitalize ${statusColorClass}`}
@@ -102,11 +102,11 @@ export default function RiskDetail({ risk, onBack }) {
           value={risk.risk_appetite?.ranking ?? "-"}
         />
         <DetailItem
-          label="Tanggal Dibuat"
+          label="Created At"
           value={formatDate(risk.created_at)}
         />
         <DetailItem
-          label="Tanggal Diperbarui"
+          label="Updated At"
           value={formatDate(risk.updated_at)}
         />
       </div>
@@ -115,7 +115,7 @@ export default function RiskDetail({ risk, onBack }) {
         onClick={onBack}
         className="mt-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl w-full hover:cursor-pointer"
       >
-        Tutup Detail
+        Close Details
       </button>
     </div>
   );

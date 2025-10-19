@@ -58,11 +58,11 @@ export default function AnalisisRisiko() {
     setLoading(true);
     getAllRiskAnalysis()
       .then((res) => {
-        console.log("Data analisis risiko berhasil diambil:", res);
+        console.log("Risk analysis data fetched successfully:", res);
         setAnalisisRisiko(res);
       })
       .catch((err) => {
-        console.error("Gagal mengambil data analisis risiko:", err);
+        console.error("Failed to fetch risk analysis data:", err);
       })
       .finally(() => {
         setLoading(false);
@@ -74,7 +74,7 @@ export default function AnalisisRisiko() {
     setShowFormAnalisis(true);
   };
 
-  // Handler update data setelah save berhasil di form
+  // Update handler after successful save from form
   const handleUpdate = (updatedRisk) => {
     setAnalisisRisiko((prevRisks) => {
       const index = prevRisks.findIndex((r) => r.id === updatedRisk.id);
@@ -90,11 +90,11 @@ export default function AnalisisRisiko() {
     setShowFormAnalisis(false);
     setEditingRisk(null);
 
-    // Tampilkan toast sukses
-    setToastMessage("Data berhasil diperbarui");
+    // Show success toast
+    setToastMessage("Data updated successfully");
     setToastOpen(true);
 
-    // Opsional: refresh data dari API jika mau sync dengan server
+    // Optional: refresh data from API to sync with server
     setLoading(true);
     getAllRiskAnalysis()
       .then((res) => setAnalisisRisiko(res))
@@ -139,20 +139,20 @@ export default function AnalisisRisiko() {
     try {
       await deleteRiskAnalysis(riskToDelete);
 
-      // Update state data setelah berhasil hapus
+      // Update state after successful delete
       setAnalisisRisiko((prev) =>
         prev.filter((item) => item.id !== riskToDelete)
       );
 
-      // Tutup modal hapus
+      // Close delete modal
       closeDeleteModal();
 
-      // Tampilkan toast sukses, alert dihapus supaya UX lebih halus
-      setToastMessage("Data berhasil dihapus");
+      // Show success toast
+      setToastMessage("Data deleted successfully");
       setToastOpen(true);
     } catch (error) {
-      console.error("Error saat hapus:", error);
-      alert(`Gagal menghapus data: ${error.message}`);
+      console.error("Error deleting:", error);
+      alert(`Failed to delete data: ${error.message}`);
     }
   };
 
@@ -164,9 +164,9 @@ export default function AnalisisRisiko() {
   };
 
   const getBandsRisiko = (skor) => {
-    if (skor >= 15) return "Tinggi";
-    if (skor >= 8) return "Sedang";
-    return "Rendah";
+    if (skor >= 15) return "High";
+    if (skor >= 8) return "Medium";
+    return "Low";
   };
 
   const filteredData = analisisRisiko.filter((item) => {
@@ -253,7 +253,7 @@ export default function AnalisisRisiko() {
       const response = await sendToMenris(id);
 
       setToastMessage(
-        "Risiko berhasil dikirim ke Koordinator Manajemen Risiko"
+        "Risk successfully sent to the Risk Management Coordinator"
       );
       setToastOpen(true);
 
@@ -263,7 +263,7 @@ export default function AnalisisRisiko() {
       setShowModal(false);
     } catch (error) {
       setErrorToastMessage(
-        error.message || "Terjadi kesalahan saat mengirim risiko"
+        error.message || "An error occurred while sending the risk"
       );
       setErrorToastOpen(true);
     } finally {
@@ -288,9 +288,7 @@ export default function AnalisisRisiko() {
       {!showDetail && (
         <div className="bg-white rounded-sm shadow-gray-200 shadow-xl p-4 mb-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4 flex-wrap">
-            <h5 className="text-[20px] text-black font-semibold">
-              Analisis Risiko
-            </h5>
+            <h5 className="text-[20px] text-black font-semibold">Risk Analysis</h5>
 
             <div className="flex flex-col sm:flex-row sm:flex-wrap items-center gap-4">
               <div className="flex items-center border border-gray-300 rounded-md px-3 py-1.5 bg-white min-w-[200px]">
@@ -309,13 +307,13 @@ export default function AnalisisRisiko() {
               </div>
 
               <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-                <span>Status :</span>
+                <span>Status:</span>
                 <select
                   value={kategoriFilter}
                   onChange={handleKategoriChange}
                   className="border border-gray-300 bg-white rounded-md px-2 py-1 text-[12px] text-center text-black hover:cursor-pointer appearance-none focus:outline-none pr-6 pl-0"
                 >
-                  <option value="All">Semua</option>
+                  <option value="All">All</option>
                   <option value="draft">Draft</option>
                   <option value="pending">Pending</option>
                   <option value="validated_approved">Approved</option>
@@ -330,7 +328,7 @@ export default function AnalisisRisiko() {
               </div>
 
               <div className="relative inline-flex items-center gap-1 text-sm text-gray-400">
-                <span>Urutkan Skor :</span>
+                <span>Sort by Score:</span>
                 <select
                   value={sortOrder}
                   onChange={handleSortChange}
@@ -339,9 +337,9 @@ export default function AnalisisRisiko() {
                     !isSortingEnabled ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
-                  <option value="">Semua</option>
-                  <option value="Ascending">Rendah</option>
-                  <option value="Descending">Tinggi</option>
+                  <option value="">All</option>
+                  <option value="Ascending">Low</option>
+                  <option value="Descending">High</option>
                 </select>
                 <img
                   src="/icons/chevron-down.svg"
@@ -357,7 +355,7 @@ export default function AnalisisRisiko() {
                 }}
                 className="text-sm px-3 py-1 border border-red-500 rounded-md text-red-500 hover:bg-red-100 cursor-pointer"
               >
-                Reset Filter
+                Reset Filters
               </button>
             </div>
           </div>
@@ -366,10 +364,10 @@ export default function AnalisisRisiko() {
             <thead className="bg-gray-100 text-[#5932EA] text-left border-b">
               <tr>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base">No</th>
-                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Klaster</th>
+                <th className="p-2 text-[14px] sm:p-3 sm:text-base">Cluster</th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base">Unit</th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base">
-                  Nama Risiko
+                  Risk Name
                 </th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
                   Severity
@@ -378,16 +376,16 @@ export default function AnalisisRisiko() {
                   Probability
                 </th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
-                  Skor
+                  Score
                 </th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
-                  Bands Risiko
+                  Grading
                 </th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
                   Status
                 </th>
                 <th className="p-2 text-[14px] sm:p-3 sm:text-base text-center">
-                  Aksi
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -401,7 +399,7 @@ export default function AnalisisRisiko() {
               ) : paginatedData.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="text-center py-4 text-gray-400">
-                    Tidak ada data ditemukan.
+                    No data found.
                   </td>
                 </tr>
               ) : (
@@ -429,24 +427,38 @@ export default function AnalisisRisiko() {
                       <td className="p-2 text-center">{item.probability}</td>
                       <td className="p-2 text-center">{item.score}</td>
                       <td className="p-2 text-center">
-                        <span
-                          className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border 
-                        ${
-                          item.grading?.toLowerCase() === "sangat tinggi"
-                            ? "bg-red-800 text-white"
-                            : item.grading?.toLowerCase() === "tinggi"
-                            ? "bg-red-500 text-white"
-                            : item.grading?.toLowerCase() === "sedang"
-                            ? "bg-yellow-400 text-white"
-                            : item.grading?.toLowerCase() === "rendah"
-                            ? "bg-green-700 text-white"
-                            : item.grading?.toLowerCase() === "sangat rendah"
-                            ? "bg-green-400 text-white"
-                            : "bg-gray-400 text-white"
-                        }`}
-                        >
-                          {item.grading || "-"}
-                        </span>
+                        {(() => {
+                          const g = (item.grading || "").toLowerCase();
+                          const isVeryHigh = ["sangat tinggi", "very high"].includes(g);
+                          const isHigh = ["tinggi", "high"].includes(g);
+                          const isMedium = ["sedang", "medium"].includes(g);
+                          const isLow = ["rendah", "low"].includes(g);
+                          const isVeryLow = ["sangat rendah", "very low"].includes(g);
+                          const cls = isVeryHigh
+                            ? "bg-red-600 text-white"
+                            : isHigh
+                            ? "bg-orange-500 text-white"
+                            : isMedium
+                            ? "bg-yellow-400 text-black"
+                            : isLow
+                            ? "bg-blue-500 text-white"
+                            : isVeryLow
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-400 text-white";
+                          const display = (() => {
+                            if (g === "sangat tinggi") return "Very High";
+                            if (g === "tinggi") return "High";
+                            if (g === "sedang") return "Medium";
+                            if (g === "rendah") return "Low";
+                            if (g === "sangat rendah") return "Very Low";
+                            return item.grading || "-";
+                          })();
+                          return (
+                            <span className={`capitalize text-[12px] font-medium px-2 py-2 flex justify-center items-center rounded-md border ${cls}`}>
+                              {display}
+                            </span>
+                          );
+                        })()}
                       </td>
 
                       <td
@@ -472,7 +484,7 @@ export default function AnalisisRisiko() {
                         )}
                         {item.risk?.status || "-"}
                       </td>
-                      <td className="p-2 text-sm">
+                      <td className="p-2 text-sm w-30">
                         <div className="flex flex-wrap justify-center sm:justify-start items-center gap-1.5">
                           <button onClick={() => handleDetailClick(item)}>
                             <img
@@ -485,7 +497,7 @@ export default function AnalisisRisiko() {
                             onClick={() => handleEdit(item)}
                             title={
                               isDisabled
-                                ? "Risiko ini tidak dapat diedit karena sudah dikirim atau disetujui"
+                                ? "This risk cannot be edited because it has already been sent or approved"
                                 : "Edit"
                             }
                             disabled={isDisabled}
@@ -503,8 +515,8 @@ export default function AnalisisRisiko() {
                             onClick={() => openDeleteModal(item.id)}
                             title={
                               isDisabled
-                                ? "Risiko ini tidak dapat dihapus karena sudah dikirim atau disetujui"
-                                : "Hapus"
+                                ? "This risk cannot be deleted because it has already been sent or approved"
+                                : "Delete"
                             }
                             disabled={isDisabled}
                             className={`${
@@ -526,8 +538,8 @@ export default function AnalisisRisiko() {
                             }}
                             title={
                               isDisabled
-                                ? "Risiko ini sudah dikirim atau disetujui"
-                                : "Kirim ke Menris"
+                                ? "This risk has already been sent or approved"
+                                : "Send to Risk Management"
                             }
                             disabled={isDisabled || loadingId === item.id}
                             className={`${
@@ -571,7 +583,7 @@ export default function AnalisisRisiko() {
           )}
           <ConfirmModal
             isOpen={showModal}
-            message="Apakah Anda yakin ingin mengirim ke Menris?"
+            message="Are you sure you want to send to Risk Management?"
             onConfirm={() => {
               setShowModal(false);
               handleSend(selectedId);

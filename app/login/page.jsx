@@ -51,7 +51,7 @@ export default function Login() {
       localStorage.setItem("userId", res.data.user.id); 
       router.replace("/dashboard");
     } catch (err) {
-      setError("Login gagal. Periksa kembali kredensial Anda.");
+      setError("Login failed. Please check your credentials.");
       setIsLoading(false);
     }
   };
@@ -91,12 +91,12 @@ export default function Login() {
                   className={`w-full bg-[#d0d6db66] rounded-[20px] h-[50px] px-4 text-white placeholder-[#cdcdcd] text-base outline-none ${
                     !emailValid ? "border-2 border-red-500" : ""
                   }`}
-                  placeholder="Masukkan Email"
+                  placeholder="Enter Email"
                   required
                 />
                 {!emailValid && (
                   <p className="text-sm text-red-400 mt-1">
-                    Format email tidak valid
+                    Invalid email format
                   </p>
                 )}
               </div>
@@ -117,7 +117,7 @@ export default function Login() {
                     className={`w-full bg-[#d0d6db66] rounded-[20px] h-[50px] px-4 pr-12 text-white placeholder-[#cdcdcd] text-base outline-none ${
                       !passwordValid ? "border-2 border-red-500" : ""
                     }`}
-                    placeholder="Masukkan Password"
+                    placeholder="Enter Password"
                     required
                   />
                   <button
@@ -134,7 +134,7 @@ export default function Login() {
                 </div>
                 {!passwordValid && (
                   <p className="text-sm text-red-400 mt-1">
-                    Password tidak boleh kosong
+                    Password cannot be empty
                   </p>
                 )}
               </div>
@@ -142,7 +142,7 @@ export default function Login() {
               {/* Error */}
               {error && <div className="text-red-400 text-sm">{error}</div>}
 
-              {/* Tombol Login */}
+              {/* Login Button */}
               <button
                 type="submit"
                 disabled={isLoading}

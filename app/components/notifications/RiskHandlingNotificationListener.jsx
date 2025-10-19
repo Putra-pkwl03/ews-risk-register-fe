@@ -85,7 +85,7 @@ export default function RiskHandlingNotificationListener({
     }
   }, [notifications, onCountUpdate, localStorageKey]);
 
-  // Reset saat diklik menu
+  // Reset when menu is clicked
   useEffect(() => {
     if (!localStorageKey || !resetAt) return;
 

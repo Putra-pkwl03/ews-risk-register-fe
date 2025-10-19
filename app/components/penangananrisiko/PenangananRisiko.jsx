@@ -53,9 +53,9 @@ export default function PenangananRisiko() {
     currentPage * itemsPerPage
   );
 
-  // Fungsi fetch ulang data risiko
+  // Function to re-fetch validated risks
   const fetchValidatedRisks = async () => {
-    setIsLoading(true); // ← mulai loading
+    setIsLoading(true); // start loading
     try {
       const data = await getValidatedRisks();
       console.log(data);
@@ -63,7 +63,7 @@ export default function PenangananRisiko() {
     } catch (error) {
       console.error(error.message);
     } finally {
-      setIsLoading(false); // ← selesai loading
+      setIsLoading(false); // finished loading
     }
   };
 
@@ -99,14 +99,14 @@ export default function PenangananRisiko() {
     try {
       await editRiskAppetiteDecision(riskAppetiteId, decision);
       if (decision === "mitigated") {
-        router.push("/dashboard?page=evaluasi-risiko");
+        router.push("/dashboard?page=evaluasi-risk");
         return;
       }
 
       const updatedRisks = await getValidatedRisks();
       setRisks(updatedRisks);
     } catch (error) {
-      console.error("Gagal mengubah keputusan:", error.message);
+      console.error("Failed to change decision:", error.message);
     }
   };
 
@@ -120,7 +120,7 @@ export default function PenangananRisiko() {
 
   return (
     <RiskList
-      risks={paginatedRisks}
+      risks={sortedData}
       onDetailClick={handleDetailClick}
       onOpenControlibility={handleOpenControlibility}
       selectedRisk={selectedRisk}

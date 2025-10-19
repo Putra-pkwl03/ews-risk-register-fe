@@ -85,7 +85,7 @@ export default function DownloadExportButton({ onExport }) {
                 d="M8 7V3M16 7V3M3 11h18M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
               />
             </svg>
-            <span className="font-medium">Semua Data</span>
+            <span className="font-medium">All Data</span>
           </button>
           <button
             onClick={() => handleRangeSelect("last6")}
@@ -105,7 +105,7 @@ export default function DownloadExportButton({ onExport }) {
                 d="M8 7V3M16 7V3M3 11h18M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
               />
             </svg>
-            <span className="font-medium">6 Bulan Terakhir</span>
+            <span className="font-medium">Last 6 Months</span>
           </button>
         </div>
       )}

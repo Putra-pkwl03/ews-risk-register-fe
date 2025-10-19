@@ -38,7 +38,7 @@ export default function RiskSummaryBox() {
         setTotalCluster(filteredByCluster.size);
       })
       .catch((err) => {
-        console.error("Gagal ambil data ringkasan risiko:", err.message);
+        console.error("Failed to fetch risk summary:", err.message);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -47,19 +47,19 @@ export default function RiskSummaryBox() {
     <div className={`w-full ${loading ? "animate-pulse" : ""}`}>
       <h2 className="text-[16px] font-semibold text-gray-700 mb-2 flex items-center gap-2">
         <BookmarkIcon className="w-5 h-5 text-pink-500" />
-        Ringkasan Risiko
+        Risk Summary
       </h2>
 
       <div className="bg-[#5e7de4] to-slate-300  shadow rounded-xl transition-all duration-300 ease-in-out hover:shadow-md hover:scale-[1.02] hover:-translate-y-1 p-4 w-full min-h-[220px]">
         <div className="flex flex-col gap-3">
           <SummaryCard
-            title="Total Risiko"
+            title="Total Risks"
             value={totalRisiko}
             icon={<CalculatorIcon className="h-5 w-5 text-blue-500" />}
             loading={loading}
           />
           <SummaryCard
-            title="Total Unit"
+            title="Total Units"
             value={totalUnit}
             icon={
               <MagnifyingGlassPlusIcon className="h-5 w-5 text-green-500" />
@@ -67,7 +67,7 @@ export default function RiskSummaryBox() {
             loading={loading}
           />
           <SummaryCard
-            title="Total Klaster"
+            title="Total Clusters"
             value={totalCluster}
             icon={
               <ChevronDoubleRightIcon className="h-5 w-5 text-purple-500" />
@@ -77,7 +77,7 @@ export default function RiskSummaryBox() {
         </div>
 
         <p className="text-xs text-white mt-4">
-          * Unit & klaster hanya dihitung jika memiliki risiko terkait.
+          * Units and clusters are counted only if they have associated risks.
         </p>
       </div>
     </div>
